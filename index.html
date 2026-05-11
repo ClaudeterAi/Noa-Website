@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOA — Dubai's First Floating Beach Club</title>
+<meta name="description" content="NOA is Dubai's first floating beach club. Anchored in the Arabian Gulf, opening 2026. Infinity pool, four bars, world-class DJs, private cabanas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&family=Cormorant:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="logo">NOA</a>
+  <div class="nav-links">
+    <a href="morning-package.html">Packages</a>
+    <a href="events.html">Events</a>
+    <a href="about.html">About</a>
+    <a href="location.html">Location</a>
+    <a href="faq.html">FAQ</a>
+    <a href="morning-package.html" class="nav-book">Book Now</a>
+  </div>
+  <div class="nav-ham" id="ham" onclick="openMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="nav-mob" id="mobmenu">
+  <button class="nav-mob-close" onclick="closeMenu()">×</button>
+  <a href="morning-package.html">Morning Package</a>
+  <a href="afternoon-package.html">Afternoon Package</a>
+  <a href="cabana.html">Private Cabana</a>
+  <a href="events.html">Events</a>
+  <a href="about.html">About</a>
+  <a href="location.html">Location</a>
+  <a href="faq.html">FAQ</a>
+  <a href="contact.html">Contact</a>
+  <a href="morning-package.html"><button>Book Now</button></a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-fade"></div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ti"><span class="ti-dot"></span>Infinity Pool</span>
+    <span class="ti"><span class="ti-dot"></span>4 Premium Bars</span>
+    <span class="ti"><span class="ti-dot"></span>Private Cabanas</span>
+    <span class="ti"><span class="ti-dot"></span>World-Class DJs</span>
+    <span class="ti"><span class="ti-dot"></span>Gulf-View Restaurant</span>
+    <span class="ti"><span class="ti-dot"></span>Sunset Rooftop</span>
+    <span class="ti"><span class="ti-dot"></span>Dubai Marina Departure</span>
+    <span class="ti"><span class="ti-dot"></span>360° Arabian Gulf Views</span>
+    <span class="ti"><span class="ti-dot"></span>Opening 2026</span>
+    <span class="ti"><span class="ti-dot"></span>Infinity Pool</span>
+    <span class="ti"><span class="ti-dot"></span>4 Premium Bars</span>
+    <span class="ti"><span class="ti-dot"></span>Private Cabanas</span>
+    <span class="ti"><span class="ti-dot"></span>World-Class DJs</span>
+    <span class="ti"><span class="ti-dot"></span>Gulf-View Restaurant</span>
+    <span class="ti"><span class="ti-dot"></span>Sunset Rooftop</span>
+    <span class="ti"><span class="ti-dot"></span>Dubai Marina Departure</span>
+    <span class="ti"><span class="ti-dot"></span>360° Arabian Gulf Views</span>
+    <span class="ti"><span class="ti-dot"></span>Opening 2026</span>
+  </div>
+</div>
+
+<!-- SPLIT: DJ | BEACH CLUB -->
+<section class="split">
+  <div class="split-cell">
+    <div class="split-bg" style="background:url('https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=900&auto=format&fit=crop&q=85') center/cover;"></div>
+    <div class="split-overlay"></div>
+    <div class="split-text">
+      <div class="split-h">DJ Stage</div>
+      <div class="split-s">Where the Sound Lives</div>
+    </div>
+  </div>
+  <div class="split-cell">
+    <div class="split-bg" style="background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&auto=format&fit=crop&q=85') center/cover;"></div>
+    <div class="split-overlay"></div>
+    <div class="split-text">
+      <div class="split-h">Beach Club</div>
+      <div class="split-s">Where the Party Starts</div>
+    </div>
+  </div>
+</section>
+
+<!-- MORNING PACKAGE -->
+<section class="pkg" id="packages">
+  <div class="pkg-copy rv">
+    <div class="pkg-num">Package — 01</div>
+    <div class="pkg-h">Morning<br>Package</div>
+    <div class="pkg-vibe">Chill Vibe</div>
+    <div class="pkg-time">9:30 AM — 2:00 PM</div>
+    <p class="pkg-desc">Start your day with our exclusive morning experience, designed for those seeking a relaxed, laid-back atmosphere before the vibrant party begins. Unwind on our lounge areas, bask in the warm Gulf sun on spacious daybeds, and bathe in our 22-metre infinity pool with the Burj Al Arab on the horizon.</p>
+    <div class="pkg-actions">
+      <a href="morning-package.html" class="pkg-more">See More</a>
+      <a href="morning-package.html"><button class="pkg-btn">Book Now</button></a>
+    </div>
+  </div>
+  <div class="pkg-img">
+    <div class="pkg-img-inner" style="background:url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1100&auto=format&fit=crop&q=85') center/cover;"></div>
+  </div>
+</section>
+
+<!-- AFTERNOON PACKAGE -->
+<section class="pkg flip">
+  <div class="pkg-img">
+    <div class="pkg-img-inner" style="background:url('https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1100&auto=format&fit=crop&q=85') center/cover;"></div>
+  </div>
+  <div class="pkg-copy rv">
+    <div class="pkg-num">Package — 02</div>
+    <div class="pkg-h">Afternoon<br>Package</div>
+    <div class="pkg-vibe">Party Vibe</div>
+    <div class="pkg-time">12:00 PM — 9:30 PM</div>
+    <p class="pkg-desc">Dive into the vibrant afternoon session — full pool access, Dubai's hottest DJs spinning on the open-air deck, and a curated dining experience. Whether you want to dance, float, or simply watch the city skyline turn gold at dusk, this is NOA at its most electric.</p>
+    <div class="pkg-actions">
+      <a href="afternoon-package.html" class="pkg-more">See More</a>
+      <a href="afternoon-package.html"><button class="pkg-btn">Book Now</button></a>
+    </div>
+  </div>
+</section>
+
+<!-- CABANA PACKAGE -->
+<section class="pkg">
+  <div class="pkg-copy rv">
+    <div class="pkg-num">Package — 03</div>
+    <div class="pkg-h">Private<br>Cabana</div>
+    <div class="pkg-vibe">Exclusive · All Day</div>
+    <div class="pkg-time">9:30 AM — 9:30 PM</div>
+    <p class="pkg-desc">Your own poolside sanctuary — a dedicated cabana with personal butler, unlimited F&amp;B credit, and front-row views of the Arabian Gulf. Ideal for groups seeking total privacy, effortless comfort, and the highest tier of service on the water. From AED 8,500 per cabana.</p>
+    <div class="pkg-actions">
+      <a href="cabana.html" class="pkg-more">Enquire</a>
+      <a href="cabana.html"><button class="pkg-btn">Reserve Cabana</button></a>
+    </div>
+  </div>
+  <div class="pkg-img">
+    <div class="pkg-img-inner" style="background:url('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=1100&auto=format&fit=crop&q=85') center/cover;"></div>
+  </div>
+</section>
+
+<!-- RESTAURANT -->
+<section class="rest">
+  <div class="rv">
+    <div class="rest-h">Panoramic<br>Restaurant</div>
+    <div class="rest-sub">Gulf &amp; Asian Cuisine</div>
+  </div>
+  <div class="rest-grid rv d1">
+    <div class="rest-img">
+      <div class="rest-img-inner" style="background:url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=900&auto=format&fit=crop&q=85') center/cover;"></div>
+    </div>
+    <div class="rest-img">
+      <div class="rest-img-inner" style="background:url('https://images.unsplash.com/photo-1553621042-f6e147245754?w=900&auto=format&fit=crop&q=85') center/cover;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="events" id="events">
+  <div class="events-top rv">
+    <div class="events-h">Upcoming<br>Events</div>
+    <a href="events.html"><button class="events-all">View All Events</button></a>
+  </div>
+  <div class="events-grid">
+
+    <a href="events.html" class="evt rv">
+      <div class="evt-img">
+        <div class="evt-bg" style="background:url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=700&auto=format&fit=crop&q=85') center/cover;"></div>
+        <div class="evt-dim"></div>
+      </div>
+      <div class="evt-body">
+        <div class="evt-date">Fri 14 March 2026 · Afternoon</div>
+        <div class="evt-name">Golden Hour<br>Opening Night</div>
+        <div class="evt-who">DJ Claptone · Berlin</div>
+        <div class="evt-link">Reserve Your Spot</div>
+      </div>
+    </a>
+
+    <a href="events.html" class="evt rv d1">
+      <div class="evt-img">
+        <div class="evt-bg" style="background:url('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=700&auto=format&fit=crop&q=85') center/cover;"></div>
+        <div class="evt-dim"></div>
+      </div>
+      <div class="evt-body">
+        <div class="evt-date">Fri 21 March 2026 · Full Moon</div>
+        <div class="evt-name">Desert Moon<br>Night</div>
+        <div class="evt-who">Peggy Gou · Seoul / Berlin</div>
+        <div class="evt-link">Reserve Your Spot</div>
+      </div>
+    </a>
+
+    <a href="events.html" class="evt rv d2">
+      <div class="evt-img">
+        <div class="evt-bg" style="background:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&auto=format&fit=crop&q=85') center/cover;"></div>
+        <div class="evt-dim"></div>
+      </div>
+      <div class="evt-body">
+        <div class="evt-date">Fri 28 March 2026 · All White</div>
+        <div class="evt-name">NOA<br>White Edition</div>
+        <div class="evt-who">Black Coffee · Johannesburg</div>
+        <div class="evt-link">Reserve Your Spot</div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- AMENITIES -->
+<section class="amen">
+  <div class="amen-h rv">On Board NOA</div>
+  <div class="amen-grid rv d1">
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><rect x="2" y="17" width="26" height="9" rx="4.5" stroke="#1a1a1a" stroke-width="1"/><path d="M7,17 C7,11 10.7,7 15,7 C19.3,7 23,11 23,17" stroke="#1a1a1a" stroke-width="1" fill="none"/><circle cx="15" cy="20" r="2" fill="#1a1a1a" opacity=".35"/></svg>
+      <div class="amen-n">22m Infinity Pool</div>
+      <div class="amen-d">Suspended over the Arabian Gulf</div>
+    </div>
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><path d="M3,26 L3,13 L15,5 L27,13 L27,26" stroke="#1a1a1a" stroke-width="1"/><rect x="9" y="17" width="12" height="9" stroke="#1a1a1a" stroke-width="1"/><circle cx="15" cy="13" r="2" stroke="#1a1a1a" stroke-width="1"/></svg>
+      <div class="amen-n">4 Premium Bars</div>
+      <div class="amen-d">Craft cocktails &amp; Champagne cellar</div>
+    </div>
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><ellipse cx="15" cy="9" rx="7" ry="4.5" stroke="#1a1a1a" stroke-width="1"/><path d="M8,9 L5,24 L25,24 L22,9" stroke="#1a1a1a" stroke-width="1" fill="none"/><line x1="5" y1="24" x2="25" y2="24" stroke="#1a1a1a" stroke-width="1"/></svg>
+      <div class="amen-n">Fine Dining</div>
+      <div class="amen-d">Gulf &amp; Asian fusion, panoramic views</div>
+    </div>
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><rect x="3" y="11" width="24" height="15" rx="2" stroke="#1a1a1a" stroke-width="1"/><path d="M9,11 L9,8 Q9,4 13,4 L17,4 Q21,4 21,8 L21,11" stroke="#1a1a1a" stroke-width="1" fill="none"/><circle cx="15" cy="19" r="2.5" stroke="#1a1a1a" stroke-width="1"/></svg>
+      <div class="amen-n">Private Cabanas</div>
+      <div class="amen-d">10 exclusive poolside suites</div>
+    </div>
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><path d="M3,15 C3,9 8.4,4 15,4 C21.6,4 27,9 27,15" stroke="#1a1a1a" stroke-width="1" fill="none"/><path d="M8,15 C8,12 11.1,9.5 15,9.5" stroke="#1a1a1a" stroke-width=".7" fill="none"/><rect x="3" y="15" width="24" height="10" rx="2" stroke="#1a1a1a" stroke-width="1"/></svg>
+      <div class="amen-n">World DJ Stage</div>
+      <div class="amen-d">International headliners every weekend</div>
+    </div>
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><polygon points="15,2 18,10 27,10 20,15 23,23 15,18 7,23 10,15 3,10 12,10" stroke="#1a1a1a" stroke-width="1" fill="none"/></svg>
+      <div class="amen-n">Rooftop Terrace</div>
+      <div class="amen-d">360° Burj Al Arab panorama</div>
+    </div>
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><path d="M3,24 Q3,17 9,13.5 Q15,10 21,13.5 Q27,17 27,24" stroke="#1a1a1a" stroke-width="1" fill="none"/><line x1="3" y1="24" x2="27" y2="24" stroke="#1a1a1a" stroke-width="1"/></svg>
+      <div class="amen-n">Luxury Daybeds</div>
+      <div class="amen-d">Floating over the open Gulf waters</div>
+    </div>
+    <div class="amen-item">
+      <svg class="amen-ico" viewBox="0 0 30 30" fill="none"><ellipse cx="15" cy="22" rx="13" ry="4" stroke="#1a1a1a" stroke-width=".7" opacity=".4"/><path d="M5,22 Q5,13 10,10 Q15,8 20,10 Q25,13 25,22" stroke="#1a1a1a" stroke-width="1" fill="none"/><circle cx="15" cy="12" r="2.5" stroke="#1a1a1a" stroke-width="1"/></svg>
+      <div class="amen-n">Shuttle Boats</div>
+      <div class="amen-d">Complimentary from Dubai Marina</div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section class="location" id="location">
+  <div class="loc-map">
+    <div class="loc-map-bg"></div>
+    <div class="loc-dim"></div>
+    <div class="loc-pin-wrap">
+      <div class="loc-dot"></div>
+      <div class="loc-ring"></div>
+    </div>
+    <div class="loc-label-tag"><span>NOA · Dubai Marina</span></div>
+  </div>
+  <div class="loc-info rv">
+    <div class="loc-h">Find<br>NOA</div>
+    <div class="loc-items">
+      <div class="loc-row">
+        <div class="loc-bar"></div>
+        <div>
+          <div class="loc-lbl">Departure</div>
+          <div class="loc-val">Dubai Marina Pier, Berth 7<br>Shuttle every 30 min from 9:00 AM</div>
+        </div>
+      </div>
+      <div class="loc-row">
+        <div class="loc-bar"></div>
+        <div>
+          <div class="loc-lbl">Hours</div>
+          <div class="loc-val">Daily — 9:30 AM to 9:30 PM<br>Closed during private events</div>
+        </div>
+      </div>
+      <div class="loc-row">
+        <div class="loc-bar"></div>
+        <div>
+          <div class="loc-lbl">Reservations</div>
+          <div class="loc-val">+971 4 840 0000<br><a href="mailto:hello@noa-dubai.com">hello@noa-dubai.com</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="faq-wrap">
+    <div class="faq-h rv">FAQ</div>
+    <div class="rv d1">
+      <div class="faq-item open">
+        <div class="faq-q" onclick="faqToggle(this)">Do I need to book in advance? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Walk-ins are welcome, but advance booking is strongly recommended. NOA has limited daily capacity and reserved daybeds sell out quickly, especially on weekends and event nights.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What is the dress code? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Smart beach casual is required. We welcome linen shirts, tailored shorts, resort wear and chic cover-ups. Tank tops, ripped clothing, sports jerseys, and flip-flops are not permitted. NOA reserves the right to deny entry.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What's included in my package? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>All packages include shuttle boat transfer, welcome drink, pool access, towel, and guest insurance. F&amp;B credit is loaded to a wristband at check-in. Unused credit is non-refundable and cannot be carried over.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What is the minimum age? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Morning Package: minimum age 4 years. Afternoon Package: minimum age 18 years. Alcohol is not served to guests under 21 in compliance with UAE law.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What is the cancellation policy? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Cancellations more than 72 hours in advance receive a full refund minus 10% service fee. Within 72 hours: non-refundable. Cabana and special event bookings are strictly non-refundable.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Can I arrive by private boat? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Yes. Direct anchoring alongside NOA is not permitted — our crew will guide your final approach by tender. Contact us in advance to arrange private arrival logistics from Dubai Marina.</p></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px;"><a href="faq.html" class="pkg-more">See All Questions</a></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-pre rv">Dubai, UAE · Opening 2026</div>
+  <div class="cta-h rv d1">Reserve Your<br>Place at Sea</div>
+  <p class="cta-body rv d2">A day on the water unlike anything Dubai has ever seen. Arrive as a guest, leave as part of the legend.</p>
+  <div class="cta-row rv d3">
+    <a href="morning-package.html"><button class="pkg-btn">Book Now</button></a>
+    <a href="events.html" class="pkg-more">View Events</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-grid">
+    <div>
+      <a href="index.html" class="ft-logo">NOA</a>
+      <p class="ft-about">Dubai's first floating beach club. Anchored in the Arabian Gulf. Opening 2026.</p>
+      <div class="ft-socials">
+        <a href="#" class="ft-soc">IG</a>
+        <a href="#" class="ft-soc">TK</a>
+        <a href="#" class="ft-soc">FB</a>
+        <a href="#" class="ft-soc">YT</a>
+      </div>
+    </div>
+    <div class="ft-col">
+      <h4>Experience</h4>
+      <ul>
+        <li><a href="index.html">Beach Club</a></li>
+        <li><a href="morning-package.html">Morning Package</a></li>
+        <li><a href="afternoon-package.html">Afternoon Package</a></li>
+        <li><a href="cabana.html">Private Cabanas</a></li>
+        <li><a href="events.html">Events</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Information</h4>
+      <ul>
+        <li><a href="about.html">About NOA</a></li>
+        <li><a href="location.html">How to Arrive</a></li>
+        <li><a href="faq.html">Dress Code</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="contact.html">Press</a></li>
+      </ul>
+    </div>
+    <div class="ft-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="contact.html">Reservations</a></li>
+        <li><a href="contact.html">Private Events</a></li>
+        <li><a href="contact.html">Group Bookings</a></li>
+        <li><a href="contact.html">Partnerships</a></li>
+        <li><a href="contact.html">Careers</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2026 NOA Beach Club Dubai. All rights reserved.</span>
+    <div class="ft-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms &amp; Conditions</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
