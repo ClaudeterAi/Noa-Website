@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — NOA</title>
+<meta name="description" content="Get in touch with NOA — reservations, private events, partnerships, press, careers.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&family=Cormorant:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="cur"></div><div id="cur2"></div>
+
+<nav id="nav">
+  <a href="index.html" class="logo">NOA</a>
+  <div class="nav-links">
+    <a href="morning-package.html">Packages</a>
+    <a href="events.html">Events</a>
+    <a href="about.html">About</a>
+    <a href="location.html">Location</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html" class="nav-book">Book Now</a>
+  </div>
+  <div class="nav-ham" id="ham" onclick="openMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="nav-mob" id="mobmenu">
+  <button class="nav-mob-close" onclick="closeMenu()">×</button>
+  <a href="morning-package.html">Morning Package</a>
+  <a href="afternoon-package.html">Afternoon Package</a>
+  <a href="cabana.html">Private Cabana</a>
+  <a href="events.html">Events</a>
+  <a href="about.html">About</a>
+  <a href="location.html">Location</a>
+  <a href="faq.html">FAQ</a>
+  <a href="contact.html">Contact</a>
+  <a href="contact.html"><button>Book Now</button></a>
+</div>
+
+<section class="subhero">
+  <div class="subhero-bg" style="background-image:url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1800&auto=format&fit=crop&q=85');"></div>
+  <div class="subhero-dim"></div>
+  <div class="subhero-text rv">
+    <div class="subhero-kicker">— Get in Touch</div>
+    <h1 class="subhero-h">Write to <em>Us</em></h1>
+    <div class="subhero-sub">Reservations, private events, partnerships, careers. The right person on our team will reply within one business day.</div>
+  </div>
+</section>
+
+<section class="contact-strip">
+  <div class="contact-grid">
+    <div class="contact-cell">
+      <h6>Address</h6>
+      <p>Dubai Marina Pier<br>Berth 7, Dubai, UAE</p>
+    </div>
+    <div class="contact-cell">
+      <h6>Phone</h6>
+      <a href="tel:+97148400000">+971 4 840 0000</a>
+    </div>
+    <div class="contact-cell">
+      <h6>Email</h6>
+      <a href="mailto:hello@noa-dubai.com">hello@noa-dubai.com</a>
+    </div>
+    <div class="contact-cell">
+      <h6>Hours</h6>
+      <p>Daily<br>9:30 AM — 9:30 PM</p>
+    </div>
+  </div>
+</section>
+
+<section class="form-block">
+  <div class="form-wrap">
+    <div class="form-h rv">Send a Message</div>
+    <div class="form-sub rv d1">Fill in the form below and we will route your message to the right person on our team.</div>
+    <form class="rv d2" onsubmit="event.preventDefault();alert('Message received — we will reply within one business day.');">
+      <div class="form-grid">
+        <div class="form-field"><label>First Name</label><input type="text" name="first" required></div>
+        <div class="form-field"><label>Last Name</label><input type="text" name="last" required></div>
+        <div class="form-field"><label>Email</label><input type="email" name="email" required></div>
+        <div class="form-field"><label>Phone</label><input type="tel" name="phone"></div>
+        <div class="form-field full"><label>Reason for Writing</label>
+          <select name="dept">
+            <option>Reservation enquiry</option>
+            <option>Private event</option>
+            <option>Group booking (12+)</option>
+            <option>Partnership</option>
+            <option>Press</option>
+            <option>Careers</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-field full"><label>Country of Residence</label>
+          <select name="country">
+            <option>United Arab Emirates</option>
+            <option>United Kingdom</option>
+            <option>United States</option>
+            <option>Saudi Arabia</option>
+            <option>India</option>
+            <option>Germany</option>
+            <option>France</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-field full"><label>Message</label><textarea name="message" placeholder="Tell us what you have in mind — date, group size, any preferences." required></textarea></div>
+        <div class="form-field full" style="flex-direction:row;align-items:center;gap:10px;"><input type="checkbox" id="c1" style="width:auto;flex:none;"><label for="c1" style="margin:0;">I agree to be contacted about my enquiry.</label></div>
+        <div class="form-field full" style="flex-direction:row;align-items:center;gap:10px;"><input type="checkbox" id="c2" style="width:auto;flex:none;"><label for="c2" style="margin:0;">Send me NOA's monthly newsletter.</label></div>
+      </div>
+      <div class="form-actions"><button type="submit" class="pkg-btn">Send Message</button></div>
+      <p class="form-meta" style="margin-top:24px;">For urgent reservation queries please call <a href="tel:+97148400000" style="border-bottom:1px solid;color:#1a1a1a;">+971 4 840 0000</a> directly.</p>
+    </form>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-pre rv">Or Reserve Directly</div>
+  <div class="cta-h rv d1">Skip the Form,<br>Pick a Seat</div>
+  <p class="cta-body rv d2">If you're ready to book a session today, the fastest way is the packages page. The form above is for everything else.</p>
+  <div class="cta-row rv d3">
+    <a href="morning-package.html"><button class="pkg-btn">See Packages</button></a>
+    <a href="events.html" class="pkg-more">See Events</a>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-grid">
+    <div>
+      <a href="index.html" class="ft-logo">NOA</a>
+      <p class="ft-about">Dubai's first floating beach club. Anchored in the Arabian Gulf. Opening 2026.</p>
+      <div class="ft-socials"><a href="#" class="ft-soc">IG</a><a href="#" class="ft-soc">TK</a><a href="#" class="ft-soc">FB</a><a href="#" class="ft-soc">YT</a></div>
+    </div>
+    <div class="ft-col"><h4>Experience</h4><ul><li><a href="index.html">Beach Club</a></li><li><a href="morning-package.html">Morning Package</a></li><li><a href="afternoon-package.html">Afternoon Package</a></li><li><a href="cabana.html">Private Cabanas</a></li><li><a href="events.html">Events</a></li></ul></div>
+    <div class="ft-col"><h4>Information</h4><ul><li><a href="about.html">About NOA</a></li><li><a href="location.html">How to Arrive</a></li><li><a href="faq.html">Dress Code</a></li><li><a href="faq.html">FAQ</a></li><li><a href="contact.html">Press</a></li></ul></div>
+    <div class="ft-col"><h4>Contact</h4><ul><li><a href="contact.html">Reservations</a></li><li><a href="contact.html">Private Events</a></li><li><a href="contact.html">Group Bookings</a></li><li><a href="contact.html">Partnerships</a></li><li><a href="contact.html">Careers</a></li></ul></div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2026 NOA Beach Club Dubai. All rights reserved.</span>
+    <div class="ft-legal"><a href="#">Privacy Policy</a><a href="#">Terms and Conditions</a><a href="#">Cookie Policy</a></div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

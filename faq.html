@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ — NOA</title>
+<meta name="description" content="Frequently asked questions about NOA — booking, arrival, dress code, private events, and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&family=Cormorant:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="cur"></div><div id="cur2"></div>
+
+<nav id="nav">
+  <a href="index.html" class="logo">NOA</a>
+  <div class="nav-links">
+    <a href="morning-package.html">Packages</a>
+    <a href="events.html">Events</a>
+    <a href="about.html">About</a>
+    <a href="location.html">Location</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html" class="nav-book">Book Now</a>
+  </div>
+  <div class="nav-ham" id="ham" onclick="openMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="nav-mob" id="mobmenu">
+  <button class="nav-mob-close" onclick="closeMenu()">×</button>
+  <a href="morning-package.html">Morning Package</a>
+  <a href="afternoon-package.html">Afternoon Package</a>
+  <a href="cabana.html">Private Cabana</a>
+  <a href="events.html">Events</a>
+  <a href="about.html">About</a>
+  <a href="location.html">Location</a>
+  <a href="faq.html">FAQ</a>
+  <a href="contact.html">Contact</a>
+  <a href="contact.html"><button>Book Now</button></a>
+</div>
+
+<section class="subhero">
+  <div class="subhero-bg" style="background-image:url('https://images.unsplash.com/photo-1553621042-f6e147245754?w=1800&auto=format&fit=crop&q=85');"></div>
+  <div class="subhero-dim"></div>
+  <div class="subhero-text rv">
+    <div class="subhero-kicker">— Good to Know</div>
+    <h1 class="subhero-h">Frequently <em>Asked</em></h1>
+    <div class="subhero-sub">Everything we get asked the most. If something is missing, write to us and we'll add it.</div>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="faq-wrap">
+    <div class="faq-h rv">Booking and Entry</div>
+    <div class="rv d1">
+      <div class="faq-item open">
+        <div class="faq-q" onclick="faqToggle(this)">Do I need to book in advance? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Walk-ins are welcome, but advance booking is strongly recommended. NOA has limited daily capacity and reserved daybeds sell out quickly, especially on weekends and event nights.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What is the cancellation policy? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Cancellations more than 72 hours in advance receive a full refund minus 10% service fee. Within 72 hours: non-refundable. Cabana and special event bookings are strictly non-refundable.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What is the minimum age? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Morning Package: minimum age 4 years. Afternoon Package: minimum age 18 years. Alcohol is not served to guests under 21 in compliance with UAE law.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Is photography allowed on board? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Personal photography is welcome on the open deck. Professional cameras, lenses over 200mm, drones, and any commercial filming require prior written permission. Photography of other guests requires their consent.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Do you sell gift vouchers? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Yes. Gift vouchers are available in any AED value at the package or cabana level. Vouchers are valid for 12 months from issue and can be redeemed for any session subject to availability.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" style="border-top:none;padding-top:0;">
+  <div class="faq-wrap">
+    <div class="faq-h rv">Arrival and Access</div>
+    <div class="rv d1">
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">How do I get to NOA? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>NOA is reached by our complimentary shuttle boat from Dubai Marina Pier, Berth 7. The crossing takes 11 minutes. Shuttles run every 30 minutes from 9:00 AM to 10:00 PM.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Is parking available at the pier? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Yes — valet parking is available adjacent to Berth 7 from 9:00 AM. Self-park is available at the Dubai Marina public garage, a four-minute walk away. Both are paid; valet is charged to your wristband if you wish.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Can I arrive by private boat? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Yes. Direct anchoring alongside NOA is not permitted — our crew will guide your final approach by tender. Contact us in advance to arrange private arrival logistics from Dubai Marina.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Is the deck accessible for guests with reduced mobility? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>The main deck, pool deck, restaurant and one accessible cabana are step-free and reachable by ramped boarding from the shuttle. The upper deck involves a short flight of stairs. Please let us know at booking so we can assign accessible seating.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" style="border-top:none;padding-top:0;">
+  <div class="faq-wrap">
+    <div class="faq-h rv">On Board</div>
+    <div class="rv d1">
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What is the dress code? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Smart beach casual is required. We welcome linen shirts, tailored shorts, resort wear and chic cover-ups. Tank tops, ripped clothing, sports jerseys, and flip-flops are not permitted in the restaurant. NOA reserves the right to deny entry.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What's included in my package? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>All packages include shuttle boat transfer, welcome drink, pool access, towel, and guest insurance. F and B credit is loaded to a wristband at check-in. Unused credit is non-refundable and cannot be carried over.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What happens in bad weather? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>NOA operates in normal Gulf weather year-round. In the rare event of a sustained sandstorm or high sea state, the day will be cancelled and bookings refunded or transferred at the guest's choice. Light rain does not affect operations.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Can I bring my own food or drink? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>No. All food and drink is supplied on board. We have a full restaurant, four bars, a cellar list, and a non-alcoholic menu including specialty coffee. Outside food and drink are not permitted, including for dietary or religious reasons — please let us know at booking and we will accommodate.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" style="border-top:none;padding-top:0;">
+  <div class="faq-wrap">
+    <div class="faq-h rv">Private Events</div>
+    <div class="rv d1">
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">Can NOA be hired for a private event? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Yes — full venue hire is available on selected days, and partial hire (the upper deck, the restaurant, a cabana cluster) is available throughout the week. Capacity for full hire is 280. Contact our private events team for a proposal.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="faqToggle(this)">What's the minimum spend for a group booking? <div class="faq-plus">+</div></div>
+        <div class="faq-ans"><p>Groups of 12 or more receive a custom proposal with a minimum spend tied to the day, the session and the deck configuration. Cabana clusters and private decks are available for groups of 12 to 48.</p></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:36px;"><a href="contact.html" class="pkg-more">Still Have a Question? Write to Us</a></div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-pre rv">Anything Else?</div>
+  <div class="cta-h rv d1">Just<br>Ask Us</div>
+  <p class="cta-body rv d2">If something here didn't answer your question, write to the team directly. We reply within one business day.</p>
+  <div class="cta-row rv d3">
+    <a href="contact.html"><button class="pkg-btn">Write to Us</button></a>
+    <a href="morning-package.html" class="pkg-more">Reserve a Seat</a>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-grid">
+    <div>
+      <a href="index.html" class="ft-logo">NOA</a>
+      <p class="ft-about">Dubai's first floating beach club. Anchored in the Arabian Gulf. Opening 2026.</p>
+      <div class="ft-socials"><a href="#" class="ft-soc">IG</a><a href="#" class="ft-soc">TK</a><a href="#" class="ft-soc">FB</a><a href="#" class="ft-soc">YT</a></div>
+    </div>
+    <div class="ft-col"><h4>Experience</h4><ul><li><a href="index.html">Beach Club</a></li><li><a href="morning-package.html">Morning Package</a></li><li><a href="afternoon-package.html">Afternoon Package</a></li><li><a href="cabana.html">Private Cabanas</a></li><li><a href="events.html">Events</a></li></ul></div>
+    <div class="ft-col"><h4>Information</h4><ul><li><a href="about.html">About NOA</a></li><li><a href="location.html">How to Arrive</a></li><li><a href="faq.html">Dress Code</a></li><li><a href="faq.html">FAQ</a></li><li><a href="contact.html">Press</a></li></ul></div>
+    <div class="ft-col"><h4>Contact</h4><ul><li><a href="contact.html">Reservations</a></li><li><a href="contact.html">Private Events</a></li><li><a href="contact.html">Group Bookings</a></li><li><a href="contact.html">Partnerships</a></li><li><a href="contact.html">Careers</a></li></ul></div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2026 NOA Beach Club Dubai. All rights reserved.</span>
+    <div class="ft-legal"><a href="#">Privacy Policy</a><a href="#">Terms and Conditions</a><a href="#">Cookie Policy</a></div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>

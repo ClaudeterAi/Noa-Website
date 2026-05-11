@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Events — NOA</title>
+<meta name="description" content="The NOA event programme — DJ residency nights, opening series, monthly headliners.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&family=Cormorant:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="cur"></div><div id="cur2"></div>
+
+<nav id="nav">
+  <a href="index.html" class="logo">NOA</a>
+  <div class="nav-links">
+    <a href="morning-package.html">Packages</a>
+    <a href="events.html">Events</a>
+    <a href="about.html">About</a>
+    <a href="location.html">Location</a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html" class="nav-book">Book Now</a>
+  </div>
+  <div class="nav-ham" id="ham" onclick="openMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="nav-mob" id="mobmenu">
+  <button class="nav-mob-close" onclick="closeMenu()">×</button>
+  <a href="morning-package.html">Morning Package</a>
+  <a href="afternoon-package.html">Afternoon Package</a>
+  <a href="cabana.html">Private Cabana</a>
+  <a href="events.html">Events</a>
+  <a href="about.html">About</a>
+  <a href="location.html">Location</a>
+  <a href="faq.html">FAQ</a>
+  <a href="contact.html">Contact</a>
+  <a href="contact.html"><button>Book Now</button></a>
+</div>
+
+<section class="subhero">
+  <div class="subhero-bg" style="background-image:url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1800&auto=format&fit=crop&q=85');"></div>
+  <div class="subhero-dim"></div>
+  <div class="subhero-text rv">
+    <div class="subhero-kicker">— On the Water</div>
+    <h1 class="subhero-h">The <em>Events</em></h1>
+    <div class="subhero-sub">A monthly programme of nights with the world's most considered DJs. The full calendar is below.</div>
+  </div>
+</section>
+
+<section class="events">
+  <div class="events-top rv">
+    <div class="events-h">March 2026<br>Opening Series</div>
+  </div>
+  <div class="events-grid">
+    <a href="contact.html" class="evt rv">
+      <div class="evt-img">
+        <div class="evt-bg" style="background:url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=700&auto=format&fit=crop&q=85') center/cover;"></div>
+        <div class="evt-dim"></div>
+      </div>
+      <div class="evt-body">
+        <div class="evt-date">Fri 14 March 2026 · Afternoon</div>
+        <div class="evt-name">Golden Hour<br>Opening Night</div>
+        <div class="evt-who">DJ Claptone · Berlin</div>
+        <div class="evt-link">Reserve Your Spot</div>
+      </div>
+    </a>
+    <a href="contact.html" class="evt rv d1">
+      <div class="evt-img">
+        <div class="evt-bg" style="background:url('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=700&auto=format&fit=crop&q=85') center/cover;"></div>
+        <div class="evt-dim"></div>
+      </div>
+      <div class="evt-body">
+        <div class="evt-date">Fri 21 March 2026 · Full Moon</div>
+        <div class="evt-name">Desert Moon<br>Night</div>
+        <div class="evt-who">Peggy Gou · Seoul / Berlin</div>
+        <div class="evt-link">Reserve Your Spot</div>
+      </div>
+    </a>
+    <a href="contact.html" class="evt rv d2">
+      <div class="evt-img">
+        <div class="evt-bg" style="background:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&auto=format&fit=crop&q=85') center/cover;"></div>
+        <div class="evt-dim"></div>
+      </div>
+      <div class="evt-body">
+        <div class="evt-date">Fri 28 March 2026 · All White</div>
+        <div class="evt-name">NOA<br>White Edition</div>
+        <div class="evt-who">Black Coffee · Johannesburg</div>
+        <div class="evt-link">Reserve Your Spot</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section class="event-strip">
+  <div class="event-strip-h rv">April 2026</div>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 04 Apr</div>
+    <div class="event-row-name">Rooftop Session</div>
+    <div class="event-row-who">Solomun · Hamburg</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 11 Apr</div>
+    <div class="event-row-name">Sunset Sessions</div>
+    <div class="event-row-who">Dixon · Berlin</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 18 Apr</div>
+    <div class="event-row-name">Latin Night</div>
+    <div class="event-row-who">Nicola Cruz · Quito</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Sat 19 Apr</div>
+    <div class="event-row-name">Afterhours</div>
+    <div class="event-row-who">Tale Of Us · Berlin</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 25 Apr</div>
+    <div class="event-row-name">NOA Residents Night</div>
+    <div class="event-row-who">House Residents</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+</section>
+
+<section class="event-strip" style="border-top:none;padding-top:0;">
+  <div class="event-strip-h rv">May 2026</div>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 02 May</div>
+    <div class="event-row-name">Spring Equinox</div>
+    <div class="event-row-who">Mind Against · Berlin</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 09 May</div>
+    <div class="event-row-name">Mediterranean Nights</div>
+    <div class="event-row-who">Bedouin · Brooklyn</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Sat 17 May</div>
+    <div class="event-row-name">House Series</div>
+    <div class="event-row-who">DJ Tennis b2b Carlita</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 23 May</div>
+    <div class="event-row-name">Black Coffee Returns</div>
+    <div class="event-row-who">Black Coffee · Johannesburg</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+  <a href="contact.html" class="event-row rv">
+    <div class="event-row-date">Fri 30 May</div>
+    <div class="event-row-name">Closing of the Month</div>
+    <div class="event-row-who">Honey Dijon · Chicago</div>
+    <div class="event-row-cta">Reserve →</div>
+  </a>
+</section>
+
+<section class="cta">
+  <div class="cta-pre rv">Event Reservations</div>
+  <div class="cta-h rv d1">Reserve a<br>Place for a Night</div>
+  <p class="cta-body rv d2">Event seats are limited and sell out quickly. Reserve your spot in advance to guarantee entry.</p>
+  <div class="cta-row rv d3">
+    <a href="contact.html"><button class="pkg-btn">Enquire About a Night</button></a>
+    <a href="morning-package.html" class="pkg-more">See Daily Packages</a>
+  </div>
+</section>
+
+<footer>
+  <div class="ft-grid">
+    <div>
+      <a href="index.html" class="ft-logo">NOA</a>
+      <p class="ft-about">Dubai's first floating beach club. Anchored in the Arabian Gulf. Opening 2026.</p>
+      <div class="ft-socials"><a href="#" class="ft-soc">IG</a><a href="#" class="ft-soc">TK</a><a href="#" class="ft-soc">FB</a><a href="#" class="ft-soc">YT</a></div>
+    </div>
+    <div class="ft-col"><h4>Experience</h4><ul><li><a href="index.html">Beach Club</a></li><li><a href="morning-package.html">Morning Package</a></li><li><a href="afternoon-package.html">Afternoon Package</a></li><li><a href="cabana.html">Private Cabanas</a></li><li><a href="events.html">Events</a></li></ul></div>
+    <div class="ft-col"><h4>Information</h4><ul><li><a href="about.html">About NOA</a></li><li><a href="location.html">How to Arrive</a></li><li><a href="faq.html">Dress Code</a></li><li><a href="faq.html">FAQ</a></li><li><a href="contact.html">Press</a></li></ul></div>
+    <div class="ft-col"><h4>Contact</h4><ul><li><a href="contact.html">Reservations</a></li><li><a href="contact.html">Private Events</a></li><li><a href="contact.html">Group Bookings</a></li><li><a href="contact.html">Partnerships</a></li><li><a href="contact.html">Careers</a></li></ul></div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2026 NOA Beach Club Dubai. All rights reserved.</span>
+    <div class="ft-legal"><a href="#">Privacy Policy</a><a href="#">Terms and Conditions</a><a href="#">Cookie Policy</a></div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
