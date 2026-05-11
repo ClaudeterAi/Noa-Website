@@ -907,8 +907,34 @@ input,select,textarea{font-size:16px;}
   .bk-day-ev-label{font-size:.5rem;}
 
   /* Floor plan: scroll horizontally if needed */
-  .bk-map-wrap{margin:0 -20px;padding:0 20px;}
-  #yachtMap{min-width:760px;}
+  /* Floor plan: rotate the yacht 90° left so it reads as a long portrait
+     boat on phones (bow points down). No horizontal scroll needed. */
+  .bk-map-wrap{
+    --bkw: min(86vw, 360px);
+    margin: 24px auto 12px;
+    padding: 0;
+    overflow: visible;
+    position: relative;
+    width: var(--bkw);
+    height: calc(var(--bkw) * 2);
+  }
+  #yachtMap{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--bkw) * 2);
+    height: var(--bkw);
+    min-width: 0;
+    max-width: none;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    transform-origin: center center;
+  }
+  /* Counter-rotate the lone DJ text label so it reads upright */
+  #yachtMap text{
+    transform: rotate(90deg);
+    transform-origin: center;
+    transform-box: fill-box;
+  }
   .bk-floor-head{flex-direction:column;align-items:flex-start;gap:12px;}
   .bk-floor-h{text-align:left;font-size:.78rem;}
   .bk-floor-back,.bk-floor-next{width:100%;padding:14px;min-height:48px;}
