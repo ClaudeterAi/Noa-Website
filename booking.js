@@ -343,9 +343,12 @@ function renderCart(){
   const subtotal = cart.reduce((s, c) => s + c.price, 0);
   const vat = Math.round(subtotal * 0.05);
   const total = subtotal + vat;
+  const guests = cart.reduce((s, c) => s + c.guests, 0);
   $('#bkPaySubtotal').textContent = 'AED ' + subtotal.toLocaleString();
   $('#bkPayVat').textContent = 'AED ' + vat.toLocaleString();
   $('#bkPayTotal').textContent = 'AED ' + total.toLocaleString();
+  const gEl = $('#bkPayGuests'); if (gEl) gEl.textContent = guests;
+  const qEl = $('#bkQrAmount'); if (qEl) qEl.textContent = total.toLocaleString();
 }
 
 // ---- Step navigation -------------------------------------------------
@@ -358,6 +361,50 @@ function showStep(n){
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// ---- QR generator (fake-but-realistic Aani QR) ----------------------
+// Hand-crafts a 25x25 grid SVG with 3 finder patterns + pseudo-random
+// data modules + a center "aani" badge. No external dependency.
+function renderQR(target, seedStr){
+  if (!target) return;
+  const N = 25, M = 8;
+  const finders = [[0,0],[18,0],[0,18]];
+  function isFinder(x,y){ return finders.some(([fx,fy]) => x>=fx&&y>=fy&&x<fx+7&&y<fy+7); }
+  function isFinderBlack(x,y){
+    for (const [fx,fy] of finders) {
+      if (x<fx||y<fy||x>=fx+7||y>=fy+7) continue;
+      const lx=x-fx, ly=y-fy;
+      const onRing = lx===0||ly===0||lx===6||ly===6;
+      const innerBlock = lx>=2&&lx<=4&&ly>=2&&ly<=4;
+      return onRing || innerBlock;
+    }
+    return false;
+  }
+  let seed = 1; for (const c of (seedStr||'aani')) seed = (seed*31 + c.charCodeAt(0)) >>> 0;
+  function rand(){ seed = (seed*1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; }
+  const inLogo = (x,y) => x>=10&&x<=14&&y>=10&&y<=14;
+  let parts = [`<svg viewBox="0 0 ${N*M} ${N*M}" xmlns="http://www.w3.org/2000/svg" width="200" height="200" style="display:block;">`];
+  parts.push(`<rect width="${N*M}" height="${N*M}" fill="#fff"/>`);
+  for (let y = 0; y < N; y++){
+    for (let x = 0; x < N; x++){
+      let black = false;
+      if (isFinder(x,y)) black = isFinderBlack(x,y);
+      else if (inLogo(x,y)) black = false;
+      else if ((x===6 && y>=8 && y<=16) || (y===6 && x>=8 && x<=16)) black = ((x+y)%2)===0; // timing pattern
+      else black = rand() > 0.52;
+      if (black) parts.push(`<rect x="${x*M}" y="${y*M}" width="${M}" height="${M}" fill="#1a1a1a"/>`);
+    }
+  }
+  // Center aani badge
+  parts.push(`<rect x="${10*M-2}" y="${10*M-2}" width="${5*M+4}" height="${5*M+4}" fill="#fff"/>`);
+  parts.push(`<rect x="${10*M}" y="${10*M}" width="${5*M}" height="${5*M}" fill="#1a1a1a" rx="3"/>`);
+  parts.push(`<text x="${12.5*M}" y="${12.5*M+4}" fill="#fff" font-family="Josefin Sans, sans-serif" font-size="11" letter-spacing="2" text-anchor="middle">aani</text>`);
+  parts.push(`</svg>`);
+  target.innerHTML = parts.join('');
+}
+
+// ---- Payment method selection ---------------------------------------
+let selectedPayMethod = null;
 
 // ---- Init ------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
@@ -417,16 +464,53 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#bkGoToStep3').addEventListener('click', () => { if (cart.length) showStep(3); else alert('Pick a seat first.'); });
   $('#bkBackToStep2').addEventListener('click', () => showStep(2));
 
-  // Pay form (mock)
+  // Payment method selection (Card vs QR)
+  $$('.bk-pay-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.bk-pay-opt').forEach(x => x.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedPayMethod = btn.dataset.method;
+      const cardPanel = $('#bkPayCard');
+      const qrPanel = $('#bkPayQr');
+      cardPanel.classList.toggle('show', selectedPayMethod === 'card');
+      qrPanel.classList.toggle('show', selectedPayMethod === 'qr');
+      // Toggle required on card fields
+      cardPanel.querySelectorAll('input').forEach(i => i.required = (selectedPayMethod === 'card'));
+      if (selectedPayMethod === 'qr') {
+        const ref = 'NOA-' + Date.now().toString(36).toUpperCase();
+        renderQR($('#bkQrSvg'), ref);
+        $('#bkConfirmBtn').textContent = "I've Completed Payment";
+      } else {
+        $('#bkConfirmBtn').textContent = 'Confirm Reservation';
+      }
+    });
+  });
+
+  // Credit / Debit card tab toggle
+  $$('.bk-card-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      $$('.bk-card-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  // Pay form submit (mock)
   $('#bkPayForm').addEventListener('submit', e => {
     e.preventDefault();
+    if (!selectedPayMethod) {
+      alert('Please choose a payment method — Card or Scan Code.');
+      return;
+    }
     const ref = 'NOA-' + Date.now().toString(36).toUpperCase();
+    const methodLabel = selectedPayMethod === 'qr'
+      ? 'Aani QR payment'
+      : ($('.bk-card-tab.active')?.dataset.card === 'debit' ? 'Debit card' : 'Credit card');
     cart = [];
     sessionStorage.removeItem('noa-cart');
     document.querySelector('.bk-review-wrap').innerHTML = `
       <div class="bk-confirm" style="grid-column:1/-1">
         <h2>Reservation confirmed.</h2>
-        <p>A confirmation email has been sent. Your reference is <strong>${ref}</strong>. Pier check-in opens 30 minutes before your arrival time at Dubai Marina, Pier 7.</p>
+        <p>Paid via ${methodLabel}. A confirmation email has been sent. Your reference is <strong>${ref}</strong>. Pier check-in opens 30 minutes before your arrival time at Dubai Marina, Pier 7.</p>
         <a href="index.html" class="pkg-btn" style="background:#1a1a1a;color:#fff;display:inline-block;text-decoration:none;">Back to home</a>
       </div>`;
   });

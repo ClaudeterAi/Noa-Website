@@ -209,18 +209,87 @@
       <h3 class="bk-pay-h">Order Summary</h3>
       <div class="bk-pay-line"><span>Subtotal</span><span id="bkPaySubtotal">AED 0</span></div>
       <div class="bk-pay-line"><span>VAT (5%)</span><span id="bkPayVat">AED 0</span></div>
+      <div class="bk-pay-line"><span>Guests</span><span id="bkPayGuests">0</span></div>
       <div class="bk-pay-line bk-pay-total"><span>Total</span><span id="bkPayTotal">AED 0</span></div>
 
       <form id="bkPayForm" class="bk-pay-form">
+
+        <h4 class="bk-section-h">Your Details</h4>
         <input type="text" name="name" placeholder="Full Name" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="tel" name="phone" placeholder="Phone (+971...)" required>
-        <input type="text" name="card" placeholder="Card Number" required>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-          <input type="text" name="exp" placeholder="MM/YY" required>
-          <input type="text" name="cvv" placeholder="CVV" required>
+
+        <h4 class="bk-section-h">Payment Method</h4>
+        <div class="bk-pay-methods">
+          <button type="button" class="bk-pay-opt" data-method="card">
+            <div class="bk-pay-opt-icon">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.2">
+                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                <line x1="2" y1="10" x2="22" y2="10"/>
+                <line x1="6" y1="15" x2="9" y2="15"/>
+              </svg>
+            </div>
+            <div class="bk-pay-opt-text">
+              <div class="bk-pay-opt-lbl">Click to use Card</div>
+              <div class="bk-pay-opt-sub">Credit or Debit · Visa · Mastercard · Amex</div>
+            </div>
+          </button>
+          <button type="button" class="bk-pay-opt" data-method="qr">
+            <div class="bk-pay-opt-icon">
+              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+                <rect x="14" y="14" width="3" height="3"/>
+                <rect x="18" y="14" width="3" height="3"/>
+                <rect x="14" y="18" width="3" height="3"/>
+                <rect x="18" y="18" width="3" height="3"/>
+              </svg>
+            </div>
+            <div class="bk-pay-opt-text">
+              <div class="bk-pay-opt-lbl">Click to Scan Code</div>
+              <div class="bk-pay-opt-sub">Aani · UAE Instant Payment</div>
+            </div>
+          </button>
         </div>
-        <button type="submit">Confirm Reservation</button>
+
+        <!-- Card detail panel -->
+        <div class="bk-pay-detail" id="bkPayCard">
+          <div class="bk-card-toggle">
+            <button type="button" class="bk-card-tab active" data-card="credit">Credit Card</button>
+            <button type="button" class="bk-card-tab" data-card="debit">Debit Card</button>
+          </div>
+          <input type="text" name="cardName" placeholder="Name on Card">
+          <input type="text" name="cardNumber" placeholder="Card Number">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <input type="text" name="exp" placeholder="MM/YY">
+            <input type="text" name="cvv" placeholder="CVV">
+          </div>
+          <div class="bk-pay-brands">
+            <span class="bk-brand">VISA</span>
+            <span class="bk-brand">Mastercard</span>
+            <span class="bk-brand">Amex</span>
+            <span class="bk-brand">Diners</span>
+          </div>
+        </div>
+
+        <!-- QR detail panel -->
+        <div class="bk-pay-detail" id="bkPayQr">
+          <div class="bk-qr-headline">Scan with your banking app</div>
+          <div class="bk-qr-frame" id="bkQrSvg"></div>
+          <div class="bk-qr-amount">AED <span id="bkQrAmount">0</span></div>
+          <div class="bk-qr-supported">
+            <div class="bk-qr-supported-lbl">Supported</div>
+            <div class="bk-qr-banks">
+              <span>Emirates NBD</span><span>Mashreq</span><span>FAB</span>
+              <span>ADCB</span><span>HBZ</span><span>NBF</span>
+              <span class="more">+ 50 banks via Aani</span>
+            </div>
+          </div>
+          <div class="bk-qr-status">⌛ Waiting for payment…</div>
+        </div>
+
+        <button type="submit" class="bk-confirm-btn" id="bkConfirmBtn">Confirm Reservation</button>
       </form>
     </aside>
   </div>

@@ -702,3 +702,123 @@ body.booking-page { padding-top: 96px; }
   .bk-review-wrap { grid-template-columns: 1fr; }
   .bk-pay-panel { position: static; }
 }
+
+/* ========================================================
+   PAYMENT FLOW (Step 3 — Card + Aani QR)
+   ======================================================== */
+.bk-section-h {
+  font-family: 'Cormorant', serif; font-style: italic; font-weight: 300;
+  font-size: 1.15rem; margin: 28px 0 14px; letter-spacing: .02em;
+}
+.bk-pay-form .bk-section-h:first-child { margin-top: 8px; }
+
+.bk-pay-methods {
+  display: grid; grid-template-columns: 1fr; gap: 10px;
+  margin-bottom: 18px;
+}
+.bk-pay-opt {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 18px; border: 1px solid #d8d0bf; background: #fff;
+  text-align: left; cursor: pointer; transition: all .2s;
+  font-family: inherit; color: inherit;
+}
+.bk-pay-opt:hover { border-color: #1a1a1a; }
+.bk-pay-opt.selected { border-color: #1a1a1a; background: #1a1a1a; color: #fff; }
+.bk-pay-opt-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border: 1px solid currentColor; flex-shrink: 0;
+}
+.bk-pay-opt.selected .bk-pay-opt-icon { border-color: #fff; }
+.bk-pay-opt-text { flex: 1; min-width: 0; }
+.bk-pay-opt-lbl {
+  font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+  font-weight: 400; margin-bottom: 4px;
+}
+.bk-pay-opt-sub {
+  font-size: .68rem; opacity: .65; line-height: 1.4;
+}
+
+/* Detail panel — hidden until method picked */
+.bk-pay-detail {
+  display: none; padding: 20px; background: #fff;
+  border: 1px solid #e5e0d6; margin-bottom: 18px;
+  animation: bkSlideIn .25s ease;
+}
+.bk-pay-detail.show { display: block; }
+@keyframes bkSlideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* Card panel */
+.bk-card-toggle {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  margin-bottom: 16px;
+}
+.bk-card-tab {
+  padding: 10px 12px; border: 1px solid #d8d0bf;
+  font-size: .62rem; letter-spacing: .22em; text-transform: uppercase;
+  background: #fff; cursor: pointer; transition: all .2s;
+  font-family: inherit;
+}
+.bk-card-tab:first-child { border-right: none; }
+.bk-card-tab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+.bk-pay-detail .bk-pay-form input,
+.bk-pay-detail input {
+  width: 100%; border: 1px solid #d8d0bf; padding: 12px 14px;
+  font: inherit; background: #fff; margin-bottom: 10px;
+}
+.bk-pay-detail input:focus { outline: none; border-color: #1a1a1a; }
+.bk-pay-brands {
+  display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid #f0eadc;
+}
+.bk-brand {
+  font-size: .58rem; letter-spacing: .22em; text-transform: uppercase;
+  color: #888;
+}
+
+/* QR panel */
+.bk-qr-headline {
+  font-size: .68rem; letter-spacing: .26em; text-transform: uppercase;
+  color: #555; text-align: center; margin-bottom: 14px;
+}
+.bk-qr-frame {
+  display: flex; align-items: center; justify-content: center;
+  background: #fff; padding: 16px; border: 1px solid #f0eadc;
+  margin: 0 auto 14px; max-width: 232px;
+}
+.bk-qr-frame svg { display: block; }
+.bk-qr-amount {
+  font-family: 'Cormorant', serif; font-size: 1.7rem; font-weight: 300;
+  text-align: center; margin-bottom: 16px;
+}
+.bk-qr-supported {
+  padding-top: 14px; border-top: 1px solid #f0eadc;
+}
+.bk-qr-supported-lbl {
+  font-size: .58rem; letter-spacing: .26em; text-transform: uppercase;
+  color: #888; margin-bottom: 10px; text-align: center;
+}
+.bk-qr-banks {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+}
+.bk-qr-banks span {
+  font-size: .6rem; padding: 5px 10px; background: #f5f1ea;
+  letter-spacing: .08em; color: #555;
+}
+.bk-qr-banks span.more {
+  font-style: italic; background: transparent; color: #888;
+}
+.bk-qr-status {
+  text-align: center; margin-top: 16px; font-size: .68rem;
+  letter-spacing: .22em; text-transform: uppercase; color: #c9a875;
+  animation: bkPulse 1.5s ease-in-out infinite;
+}
+@keyframes bkPulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+
+.bk-confirm-btn {
+  margin-top: 18px; background: #1a1a1a; color: #fff; padding: 18px;
+  font-size: .72rem; letter-spacing: .28em; text-transform: uppercase;
+  border: 1px solid #1a1a1a; transition: all .25s; cursor: pointer;
+  width: 100%;
+}
+.bk-confirm-btn:hover { background: transparent; color: #1a1a1a; }
+.bk-confirm-btn:disabled { opacity: .4; cursor: not-allowed; }
