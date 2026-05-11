@@ -585,19 +585,45 @@ body.booking-page { padding-top: 96px; }
 .bk-map-wrap { max-width: 1300px; margin: 0 auto; overflow-x: auto; }
 #yachtMap { width: 100%; min-width: 900px; height: auto; display: block; }
 
-/* Yacht seats */
+/* Yacht seats — fills set inline in SVG (so gradients render); CSS only handles stroke + interaction */
 .seat { cursor: pointer; transition: opacity .2s, filter .2s; }
-.seat:hover { filter: brightness(.85); }
-.seat.daybed { fill: #ede4d3; stroke: #1a1a1a; stroke-width: 1; }
-.seat.front-daybed { fill: #d9b78b; stroke: #1a1a1a; stroke-width: 1; }
-.seat.balcony-sofa { fill: #7aa6a8; stroke: #1a1a1a; stroke-width: 1; }
-.seat.cabana { fill: #d9b78b; stroke: #1a1a1a; stroke-width: 1; }
-.seat.front-cabana { fill: #5d4d44; stroke: #1a1a1a; stroke-width: 1; }
-.seat.dj-lounge { fill: #c9a875; stroke: #1a1a1a; stroke-width: 1; }
+.seat:hover { filter: brightness(.92); }
+.seat.daybed,
+.seat.front-daybed,
+.seat.cabana,
+.seat.front-cabana,
+.seat.balcony-sofa,
+.seat.dj-lounge { stroke: #1a1a1a; stroke-width: 1; }
 .seat.entry { fill: #fff; stroke: #1a1a1a; stroke-width: .8; stroke-dasharray: 3 2; }
-.seat.taken { fill: #d8d8d8 !important; stroke: #999; cursor: not-allowed; opacity: .55; }
+
+/* SOLD state — strong overrides so grey is unmistakable, including over gradient fills */
+.seat.taken,
+.seat.taken[fill] {
+  fill: #c8c8c8 !important;
+  stroke: #999 !important;
+  cursor: not-allowed !important;
+  opacity: .6;
+}
+/* Hide labels on sold seats so a fresh "SOLD" badge can render via JS if needed */
+.seat.taken + text.seat-lbl,
+.seat.taken ~ text.seat-lbl { opacity: .45; }
+
+/* Seat number labels (text on each seat) */
+.seat-lbl {
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: .08em;
+  fill: #1a1a1a;
+  text-anchor: middle;
+  user-select: none;
+}
+.seat-lbl.light { fill: #fff; }
+.seat-lbl.sm    { font-size: 14px; letter-spacing: .06em; }
+.seat-lbl.xs    { font-size: 11px; letter-spacing: .04em; }
+
 .hull { fill: none; stroke: #1a1a1a; stroke-width: 1.2; }
-.pool { fill: #cfeaf0; stroke: #1a1a1a; stroke-width: 1; }
+.pool { stroke: #1a1a1a; stroke-width: 1; }
 .deck-line { stroke: #1a1a1a; stroke-width: .8; fill: none; }
 .fixture { fill: #fff; stroke: #1a1a1a; stroke-width: .8; }
 
