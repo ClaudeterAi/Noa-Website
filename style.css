@@ -11,20 +11,37 @@ body.hl #cur{width:18px;height:18px;background:transparent;border:1.5px solid #1
 body.hl #cur2{width:40px;height:40px;}
 @media(hover:none){#cur,#cur2{display:none;}body{cursor:auto;}}
 
-/* NAV */
-/* NAV — always white, never transparent */
-#nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;background:#fff;border-bottom:1px solid rgba(0,0,0,.08);transition:padding .3s,box-shadow .3s;}
-#nav.stuck{padding:14px 48px;box-shadow:0 6px 24px -16px rgba(0,0,0,.18);}
-.logo{font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:1.55rem;letter-spacing:.45em;text-transform:uppercase;line-height:1;color:#1a1a1a;}
-.nav-links{display:flex;align-items:center;gap:34px;}
-.nav-links a{font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;color:#1a1a1a;font-weight:400;transition:opacity .2s;}
-.nav-links a:hover{opacity:.55;}
-.nav-book,a.nav-book{font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;padding:13px 26px;border:1px solid #1a1a1a;background:#fff;color:#1a1a1a;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-weight:400;transition:background .25s,color .25s;white-space:nowrap;display:inline-block;}
-.nav-book:hover,a.nav-book:hover,.nav-book:focus,a.nav-book:focus{background:#1a1a1a;color:#fff;}
-.nav-book:hover *,a.nav-book:hover *{color:#fff;}
+/* NAV — transparent over hero by default, white on scroll.
+   Smaller padding + tighter type than my previous version. */
+#nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:22px 48px;background:transparent;border-bottom:1px solid transparent;transition:background .35s,padding .3s,border-color .3s,box-shadow .35s;}
+#nav.stuck{padding:12px 48px;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:rgba(0,0,0,.08);box-shadow:0 6px 24px -16px rgba(0,0,0,.18);}
+.logo{font-family:'Josefin Sans',sans-serif;font-weight:300;font-size:1.45rem;letter-spacing:.45em;text-transform:uppercase;line-height:1;color:#fff;transition:color .3s;}
+#nav.stuck .logo{color:#1a1a1a;}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-links a{font-size:.66rem;letter-spacing:.28em;text-transform:uppercase;color:#fff;font-weight:400;transition:color .3s,opacity .2s;}
+#nav.stuck .nav-links a{color:#1a1a1a;}
+.nav-links a:hover{opacity:.7;}
+.nav-book,a.nav-book{font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;padding:11px 22px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-weight:400;transition:background .25s,color .25s,border-color .3s;white-space:nowrap;display:inline-block;}
+.nav-book:hover,a.nav-book:hover{background:#fff;color:#1a1a1a;}
+.nav-book:hover *,a.nav-book:hover *{color:#1a1a1a;}
+#nav.stuck .nav-book,#nav.stuck a.nav-book{border-color:#1a1a1a;color:#1a1a1a;}
+#nav.stuck .nav-book:hover,#nav.stuck a.nav-book:hover{background:#1a1a1a;color:#fff;}
+#nav.stuck .nav-book:hover *,#nav.stuck a.nav-book:hover *{color:#fff;}
+/* Subtle shadow keeps light nav text readable over bright heroes */
+#nav:not(.stuck) .logo,#nav:not(.stuck) .nav-links a,#nav:not(.stuck) .nav-book{text-shadow:0 1px 10px rgba(0,0,0,.35);}
+
+/* Booking page has no hero — nav must be opaque from the start */
+body.booking-page #nav{background:rgba(255,255,255,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:rgba(0,0,0,.08);padding:14px 48px;}
+body.booking-page #nav .logo,
+body.booking-page #nav .nav-links a{color:#1a1a1a;text-shadow:none;}
+body.booking-page #nav .nav-book{border-color:#1a1a1a;color:#1a1a1a;text-shadow:none;background:transparent;}
+body.booking-page #nav .nav-book:hover{background:#1a1a1a;color:#fff;}
+body.booking-page #nav .nav-book:hover *{color:#fff;}
 /* Hamburger (mobile only) */
 .nav-ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;}
-.nav-ham span{display:block;width:22px;height:1px;background:#1a1a1a;transition:all .3s;}
+.nav-ham span{display:block;width:22px;height:1px;background:#fff;transition:background .3s,width .3s;}
+#nav.stuck .nav-ham span,
+body.booking-page .nav-ham span{background:#1a1a1a;}
 /* Mobile menu */
 .nav-mob{display:none;position:fixed;inset:0;background:#fff;z-index:490;flex-direction:column;align-items:center;justify-content:center;gap:36px;}
 .nav-mob.open{display:flex;}
