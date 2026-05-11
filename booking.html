@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book — NOA</title>
+<meta name="description" content="Book a seat at NOA — Dubai's floating beach club. Pick your date, time and table on the yacht floor plan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&family=Cormorant:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="booking-page">
+<div id="cur"></div><div id="cur2"></div>
+
+<nav id="nav">
+  <a href="index.html" class="logo">NOA</a>
+  <div class="nav-links">
+    <a href="morning-package.html">Packages</a>
+    <a href="events.html">Events</a>
+    <a href="about.html">About</a>
+    <a href="location.html">Location</a>
+    <a href="faq.html">FAQ</a>
+    <a href="booking.html" class="nav-book">Book Now</a>
+  </div>
+  <div class="nav-ham" id="ham" onclick="openMenu()"><span></span><span></span><span></span></div>
+</nav>
+
+<div class="nav-mob" id="mobmenu">
+  <button class="nav-mob-close" onclick="closeMenu()">×</button>
+  <a href="morning-package.html">Morning Package</a>
+  <a href="afternoon-package.html">Afternoon Package</a>
+  <a href="cabana.html">Private Cabana</a>
+  <a href="events.html">Events</a>
+  <a href="about.html">About</a>
+  <a href="location.html">Location</a>
+  <a href="faq.html">FAQ</a>
+  <a href="contact.html">Contact</a>
+  <a href="booking.html"><button>Book Now</button></a>
+</div>
+
+<!-- Progress stepper -->
+<div class="bk-progress">
+  <div class="bk-step-dot active"><div class="dot"></div><div class="lbl">Choose Date &amp; Time</div></div>
+  <div class="bk-step-dot"><div class="dot"></div><div class="lbl">Select Tables / Tickets</div></div>
+  <div class="bk-step-dot"><div class="dot"></div><div class="lbl">Review &amp; Pay</div></div>
+</div>
+
+<!-- ==================== STEP 1: CALENDAR ==================== -->
+<section id="bkStep1" class="bk-step-section active">
+  <h1 class="bk-h1">CHOOSE YOUR DAY</h1>
+
+  <div class="bk-month-bar">
+    <div class="bk-month-sel">
+      <span id="bkMonthLabel">MAY 2026</span>
+      <span class="arrow">⌄</span>
+    </div>
+    <div class="bk-month-nav">
+      <button id="bkPrevMonth">Previous</button>
+      <button id="bkNextMonth">Next</button>
+    </div>
+  </div>
+
+  <div class="bk-cal-head">
+    <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div>
+  </div>
+  <div class="bk-cal" id="bkCal"></div>
+</section>
+
+<!-- ==================== STEP 2: FLOOR PLAN ==================== -->
+<section id="bkStep2" class="bk-step-section">
+  <div class="bk-floor-head">
+    <button class="bk-floor-back" id="bkBackToStep1">← Change date</button>
+    <h2 class="bk-floor-h">Hover the map for more details</h2>
+    <div class="bk-floor-date"><span id="bkFloorDate"></span> · <span id="bkFloorSlot"></span></div>
+  </div>
+
+  <div class="bk-map-wrap">
+    <svg id="yachtMap" viewBox="0 0 1400 700" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="6" stroke="#1a1a1a" stroke-width=".8"/>
+        </pattern>
+      </defs>
+
+      <!-- Hull outline -->
+      <path class="hull" d="M 80 40 H 1100 Q 1300 40 1370 350 Q 1300 660 1100 660 H 80 Z" />
+      <!-- Swim platform at stern -->
+      <path class="hull" d="M 80 660 L 80 690 L 1100 690 L 1100 660" />
+      <!-- Inner deck line -->
+      <path class="hull" d="M 110 70 H 1090 Q 1265 70 1335 350 Q 1265 630 1090 630 H 110 Z" stroke-width=".6" />
+
+      <!-- ===== TOP ROW: Cabanas ===== -->
+      <rect class="seat cabana"        data-seat="cabana-1"       x="140" y="80"  width="130" height="90" rx="2"/>
+      <rect class="seat cabana"        data-seat="cabana-2"       x="290" y="80"  width="130" height="90" rx="2"/>
+      <rect class="seat cabana"        data-seat="cabana-3"       x="440" y="80"  width="130" height="90" rx="2"/>
+      <rect class="seat front-cabana"  data-seat="front-cabana-1" x="590" y="80"  width="130" height="90" rx="2"/>
+
+      <!-- ===== TOP DAYBEDS (hatched pattern via stripe stroke) ===== -->
+      <g>
+        <rect class="seat daybed" data-seat="daybed-t-1" x="200" y="200" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".9"/>
+        <rect class="seat daybed" data-seat="daybed-t-2" x="285" y="200" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".9"/>
+        <rect class="seat daybed" data-seat="daybed-t-3" x="370" y="200" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".9"/>
+        <rect class="seat daybed" data-seat="daybed-t-4" x="455" y="200" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".9"/>
+        <rect class="seat daybed" data-seat="daybed-t-5" x="540" y="200" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".9"/>
+        <rect class="seat daybed" data-seat="daybed-t-6" x="625" y="200" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".9"/>
+      </g>
+
+      <!-- ===== POOL ===== -->
+      <rect class="pool" x="200" y="270" width="500" height="140" rx="6"/>
+      <!-- Pool inner edge -->
+      <rect class="pool" x="215" y="285" width="470" height="110" rx="3" fill="#e0f0f3" stroke-width=".6"/>
+
+      <!-- ===== BOTTOM DAYBEDS (front-row) ===== -->
+      <g>
+        <rect class="seat front-daybed" data-seat="daybed-b-1" x="200" y="430" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".95"/>
+        <rect class="seat front-daybed" data-seat="daybed-b-2" x="285" y="430" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".95"/>
+        <rect class="seat front-daybed" data-seat="daybed-b-3" x="370" y="430" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".95"/>
+        <rect class="seat front-daybed" data-seat="daybed-b-4" x="455" y="430" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".95"/>
+        <rect class="seat front-daybed" data-seat="daybed-b-5" x="540" y="430" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".95"/>
+        <rect class="seat front-daybed" data-seat="daybed-b-6" x="625" y="430" width="70" height="50" rx="2" fill="url(#hatch)" opacity=".95"/>
+      </g>
+
+      <!-- ===== BOTTOM ROW: Lower-deck cabanas ===== -->
+      <rect class="seat cabana"        data-seat="lower-cabana-1"   x="140" y="520" width="130" height="90" rx="2"/>
+      <rect class="seat cabana"        data-seat="lower-cabana-2"   x="290" y="520" width="130" height="90" rx="2"/>
+      <rect class="seat cabana"        data-seat="lower-cabana-3"   x="440" y="520" width="130" height="90" rx="2"/>
+      <rect class="seat front-cabana"  data-seat="lower-cabana-vip" x="590" y="520" width="130" height="90" rx="2"/>
+
+      <!-- ===== CENTRAL AREA: Bar + cocktail tables (general entry zone) ===== -->
+      <!-- Bar block -->
+      <rect class="fixture" x="780" y="320" width="100" height="60" rx="3"/>
+      <line class="deck-line" x1="785" y1="335" x2="875" y2="335" stroke-width=".6"/>
+      <line class="deck-line" x1="785" y1="350" x2="875" y2="350" stroke-width=".6"/>
+      <line class="deck-line" x1="785" y1="365" x2="875" y2="365" stroke-width=".6"/>
+      <!-- Cocktail tables (general entry, circles) -->
+      <g>
+        <circle class="seat entry" data-seat="entry-1" cx="780" cy="220" r="14"/>
+        <circle class="seat entry" data-seat="entry-2" cx="830" cy="220" r="14"/>
+        <circle class="seat entry" data-seat="entry-3" cx="880" cy="220" r="14"/>
+        <circle class="seat entry" data-seat="entry-4" cx="930" cy="220" r="14"/>
+        <circle class="seat entry" data-seat="entry-5" cx="780" cy="270" r="14"/>
+        <circle class="seat entry" data-seat="entry-6" cx="830" cy="270" r="14"/>
+        <circle class="seat entry" data-seat="entry-7" cx="880" cy="270" r="14"/>
+        <circle class="seat entry" data-seat="entry-8" cx="930" cy="270" r="14"/>
+        <circle class="seat entry" data-seat="entry-9" cx="780" cy="430" r="14"/>
+        <circle class="seat entry" data-seat="entry-10" cx="830" cy="430" r="14"/>
+        <circle class="seat entry" data-seat="entry-11" cx="880" cy="430" r="14"/>
+        <circle class="seat entry" data-seat="entry-12" cx="930" cy="430" r="14"/>
+      </g>
+
+      <!-- ===== BALCONY SOFAS (right side, teal) ===== -->
+      <g>
+        <rect class="seat balcony-sofa" data-seat="balcony-1" x="1010" y="170" width="70" height="55" rx="2"/>
+        <rect class="seat balcony-sofa" data-seat="balcony-2" x="1010" y="240" width="70" height="55" rx="2"/>
+        <rect class="seat balcony-sofa" data-seat="balcony-3" x="1010" y="310" width="70" height="55" rx="2"/>
+        <rect class="seat balcony-sofa" data-seat="balcony-4" x="1010" y="380" width="70" height="55" rx="2"/>
+        <rect class="seat balcony-sofa" data-seat="balcony-5" x="1010" y="450" width="70" height="55" rx="2"/>
+      </g>
+
+      <!-- ===== DJ AREA (bow) ===== -->
+      <!-- DJ booth (decorative) -->
+      <rect class="fixture" x="1230" y="320" width="60" height="60" rx="2"/>
+      <text x="1260" y="356" text-anchor="middle" font-family="Josefin Sans" font-size="10" letter-spacing="2" fill="#1a1a1a">DJ</text>
+      <!-- DJ lounges -->
+      <path class="seat dj-lounge" data-seat="dj-lounge-1" d="M 1130 230 Q 1140 220 1190 220 L 1240 250 Q 1230 280 1180 280 L 1130 280 Q 1115 270 1115 250 Z" />
+      <path class="seat dj-lounge" data-seat="dj-lounge-2" d="M 1130 410 Q 1140 400 1190 400 L 1240 430 Q 1230 460 1180 460 L 1130 460 Q 1115 450 1115 430 Z" />
+      <!-- Bow plant pots / decorative circles -->
+      <circle class="fixture" cx="1290" cy="240" r="8"/>
+      <circle class="fixture" cx="1310" cy="280" r="8"/>
+      <circle class="fixture" cx="1320" cy="350" r="10"/>
+      <circle class="fixture" cx="1310" cy="420" r="8"/>
+      <circle class="fixture" cx="1290" cy="460" r="8"/>
+
+      <!-- Walkway divider -->
+      <line class="deck-line" x1="730" y1="80"  x2="730" y2="620" stroke-dasharray="2 4" stroke-width=".5" opacity=".4"/>
+      <line class="deck-line" x1="990" y1="80"  x2="990" y2="620" stroke-dasharray="2 4" stroke-width=".5" opacity=".4"/>
+    </svg>
+  </div>
+
+  <!-- Legend -->
+  <div style="max-width:1300px;margin:24px auto 0;display:flex;gap:24px;flex-wrap:wrap;justify-content:center;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#555;">
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#d9b78b;border:1px solid #1a1a1a;display:inline-block;"></span>Cabana</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#5d4d44;border:1px solid #1a1a1a;display:inline-block;"></span>Front Cabana</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:url(#hatch),#ede4d3;border:1px solid #1a1a1a;display:inline-block;background-image:repeating-linear-gradient(45deg,#1a1a1a 0,#1a1a1a 1px,#ede4d3 1px,#ede4d3 4px);"></span>Daybed</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#7aa6a8;border:1px solid #1a1a1a;display:inline-block;"></span>Balcony Sofa</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#c9a875;border:1px solid #1a1a1a;display:inline-block;"></span>DJ Lounge</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#fff;border:1px dashed #1a1a1a;display:inline-block;border-radius:50%;"></span>General Entry</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#d8d8d8;border:1px solid #999;display:inline-block;opacity:.55;"></span>Sold</span>
+  </div>
+
+  <div style="text-align:center;margin-top:36px;">
+    <button class="bk-floor-next" id="bkGoToStep3">Proceed to checkout →</button>
+  </div>
+</section>
+
+<!-- ==================== STEP 3: REVIEW & PAY ==================== -->
+<section id="bkStep3" class="bk-step-section">
+  <div style="max-width:1100px;margin:0 auto 30px;display:flex;align-items:center;justify-content:space-between;">
+    <button class="bk-floor-back" id="bkBackToStep2">← Add another seat</button>
+    <h2 class="bk-floor-h" style="flex:1;text-align:center;">Review &amp; pay</h2>
+    <span></span>
+  </div>
+
+  <div class="bk-review-wrap">
+    <div id="bkCartItems"></div>
+
+    <aside class="bk-pay-panel">
+      <h3 class="bk-pay-h">Order Summary</h3>
+      <div class="bk-pay-line"><span>Subtotal</span><span id="bkPaySubtotal">AED 0</span></div>
+      <div class="bk-pay-line"><span>VAT (5%)</span><span id="bkPayVat">AED 0</span></div>
+      <div class="bk-pay-line bk-pay-total"><span>Total</span><span id="bkPayTotal">AED 0</span></div>
+
+      <form id="bkPayForm" class="bk-pay-form">
+        <input type="text" name="name" placeholder="Full Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="tel" name="phone" placeholder="Phone (+971...)" required>
+        <input type="text" name="card" placeholder="Card Number" required>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <input type="text" name="exp" placeholder="MM/YY" required>
+          <input type="text" name="cvv" placeholder="CVV" required>
+        </div>
+        <button type="submit">Confirm Reservation</button>
+      </form>
+    </aside>
+  </div>
+</section>
+
+<!-- ==================== MODAL: DAY PICKER ==================== -->
+<div class="bk-modal" id="dayModal">
+  <div class="bk-modal-inner">
+    <button class="bk-modal-close" id="dayModalClose">×</button>
+    <div class="bk-modal-img" id="dayModalImg"></div>
+    <div class="bk-modal-body">
+      <div class="bk-modal-tag" id="dayModalDate"></div>
+      <h3 class="bk-modal-event" id="dayModalEvent"></h3>
+      <div class="bk-modal-avail">
+        <span class="ok">🎟 Tickets Available</span>
+        <span class="warn">⚠ Less than 5 tables left</span>
+      </div>
+      <div class="bk-modal-tim-lbl">Select Timing:</div>
+      <div class="bk-time-opts">
+        <button class="bk-time" data-time="morning">
+          <div class="top">Morning</div>
+          <div class="bot">9:30AM – 2PM</div>
+        </button>
+        <button class="bk-time" data-time="afternoon">
+          <div class="top">Afternoon</div>
+          <div class="bot">2PM – 9:30PM</div>
+        </button>
+      </div>
+      <button class="bk-modal-cta" id="dayModalCta" disabled>Book Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: SEAT DETAIL ==================== -->
+<div class="bk-modal" id="seatModal">
+  <div class="bk-seat-modal-inner">
+    <button class="bk-modal-close" id="seatModalClose">×</button>
+    <div class="bk-seat-img-col">
+      <img id="seatModalImg" alt="">
+      <div class="bk-seat-img-desc">
+        <div class="bk-seat-img-name" id="seatModalName"></div>
+        <div class="bk-seat-img-date" id="seatModalDate"></div>
+        <p class="bk-seat-img-text" id="seatModalDesc"></p>
+      </div>
+    </div>
+    <div class="bk-seat-info-col">
+      <div class="bk-pkg-row">
+        <div>
+          <div class="bk-pkg-name" id="seatModalPkg">AFTERNOON PACKAGE</div>
+          <div class="bk-pkg-time" id="seatModalTime">2PM – 9:30PM</div>
+        </div>
+        <div class="bk-pkg-vibe"><span id="seatModalVibe">PARTY VIBE</span></div>
+      </div>
+
+      <div class="bk-detail-row">
+        <div>
+          <div class="bk-detail-name" id="seatModalSmallName"></div>
+          <div class="bk-detail-fb" id="seatModalFB"></div>
+        </div>
+        <div class="bk-field">
+          <label>Guest</label>
+          <select id="seatModalGuest"></select>
+        </div>
+        <div class="bk-field">
+          <label>Arrival Time</label>
+          <select id="seatModalArrival"></select>
+        </div>
+      </div>
+
+      <div class="bk-price-row">
+        <div class="bk-price-lbl">Price</div>
+        <div class="bk-price-val" id="seatModalPrice"></div>
+      </div>
+
+      <div class="bk-addon" id="seatModalAddon">
+        <span>Add on passes</span>
+        <span>⌄</span>
+      </div>
+
+      <div class="bk-total-row">
+        <div>
+          <div class="bk-total-lbl">Total</div>
+          <div class="bk-total-pax" id="seatModalTotalPax"></div>
+        </div>
+        <div class="bk-total-val" id="seatModalTotal"></div>
+      </div>
+
+      <button class="bk-add-cart" id="seatModalAddCart">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-grid">
+    <div>
+      <a href="index.html" class="ft-logo">NOA</a>
+      <p class="ft-about">Dubai's first floating beach club. Anchored in the Arabian Gulf. Opening 2026.</p>
+      <div class="ft-socials"><a href="#" class="ft-soc">IG</a><a href="#" class="ft-soc">TK</a><a href="#" class="ft-soc">FB</a><a href="#" class="ft-soc">YT</a></div>
+    </div>
+    <div class="ft-col"><h4>Experience</h4><ul><li><a href="index.html">Beach Club</a></li><li><a href="morning-package.html">Morning Package</a></li><li><a href="afternoon-package.html">Afternoon Package</a></li><li><a href="cabana.html">Private Cabanas</a></li><li><a href="events.html">Events</a></li></ul></div>
+    <div class="ft-col"><h4>Information</h4><ul><li><a href="about.html">About NOA</a></li><li><a href="location.html">How to Arrive</a></li><li><a href="faq.html">Dress Code</a></li><li><a href="faq.html">FAQ</a></li><li><a href="contact.html">Press</a></li></ul></div>
+    <div class="ft-col"><h4>Contact</h4><ul><li><a href="booking.html">Reservations</a></li><li><a href="contact.html">Private Events</a></li><li><a href="contact.html">Group Bookings</a></li><li><a href="contact.html">Partnerships</a></li><li><a href="contact.html">Careers</a></li></ul></div>
+  </div>
+  <div class="ft-bot">
+    <span class="ft-copy">© 2026 NOA Beach Club Dubai. All rights reserved.</span>
+    <div class="ft-legal"><a href="#">Privacy Policy</a><a href="#">Terms and Conditions</a><a href="#">Cookie Policy</a></div>
+  </div>
+</footer>
+
+<!-- Seat hover tooltip -->
+<div class="bk-tooltip" id="seatTooltip"></div>
+
+<script src="script.js"></script>
+<script src="booking.js"></script>
+</body>
+</html>
