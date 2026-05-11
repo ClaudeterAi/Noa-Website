@@ -47,11 +47,23 @@ const SEATS = {
   'daybed-b-5': { type:'Front-Row Daybed', cls:'front-daybed', pax:2, price:3400, mPrice:2400, img:'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=900&q=80', desc:'Front-row daybed at the pool\'s outer edge.' },
   'daybed-b-6': { type:'Front-Row Daybed', cls:'front-daybed', pax:2, price:3400, mPrice:2400, img:'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=900&q=80', desc:'Front-row daybed at the pool\'s outer edge.' },
   // Balcony sofas — right side
-  'balcony-1': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Spacious balcony sofa with a front-row view of the pool and the open Gulf. Includes AED 4,000 F&B credit.' },
-  'balcony-2': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Spacious balcony sofa with a front-row view. Includes AED 4,000 F&B credit.' },
-  'balcony-3': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Spacious balcony sofa with a front-row view. Includes AED 4,000 F&B credit.' },
-  'balcony-4': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Spacious balcony sofa with a front-row view. Includes AED 4,000 F&B credit.' },
-  'balcony-5': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Spacious balcony sofa with a front-row view. Includes AED 4,000 F&B credit.' },
+  'balcony-1': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Upper-deck balcony sofa with a panoramic view of the pool and the open Gulf. Includes AED 4,000 F&B credit.' },
+  'balcony-2': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Upper-deck balcony sofa with a panoramic view. Includes AED 4,000 F&B credit.' },
+  'balcony-3': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Upper-deck balcony sofa with a panoramic view. Includes AED 4,000 F&B credit.' },
+  'balcony-4': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Upper-deck balcony sofa with a panoramic view. Includes AED 4,000 F&B credit.' },
+  'balcony-5': { type:'Balcony Sofa', cls:'balcony-sofa', pax:6, price:6500, mPrice:4500, img:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&q=80', desc:'Upper-deck balcony sofa with a panoramic view. Includes AED 4,000 F&B credit.' },
+  // UPPER DECK — Sundeck loungers
+  'sunbed-1': { type:'Sunbed', cls:'sunbed', pax:1, price:1800, mPrice:1300, img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80', desc:'Upper-deck sunbed on the sundeck — uninterrupted sea view, parasol, side table and drinks service.' },
+  'sunbed-2': { type:'Sunbed', cls:'sunbed', pax:1, price:1800, mPrice:1300, img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80', desc:'Upper-deck sunbed on the sundeck — uninterrupted sea view.' },
+  'sunbed-3': { type:'Sunbed', cls:'sunbed', pax:1, price:1800, mPrice:1300, img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80', desc:'Upper-deck sunbed on the sundeck — uninterrupted sea view.' },
+  'sunbed-4': { type:'Sunbed', cls:'sunbed', pax:1, price:1800, mPrice:1300, img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80', desc:'Upper-deck sunbed on the sundeck — uninterrupted sea view.' },
+  'sunbed-5': { type:'Sunbed', cls:'sunbed', pax:1, price:1800, mPrice:1300, img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80', desc:'Upper-deck sunbed on the sundeck — uninterrupted sea view.' },
+  'sunbed-6': { type:'Sunbed', cls:'sunbed', pax:1, price:1800, mPrice:1300, img:'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=900&q=80', desc:'Upper-deck sunbed on the sundeck — uninterrupted sea view.' },
+  // UPPER DECK — Jacuzzi (single booking, full hot tub)
+  'jacuzzi-1': { type:'Jacuzzi', cls:'jacuzzi', pax:6, price:5500, mPrice:3800, img:'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=900&q=80', desc:'Private upper-deck jacuzzi — heated saltwater hot tub for up to 6 with sea view and drinks service. Includes AED 3,000 F&B credit.' },
+  // UPPER DECK — VIP Lounges (premium daybed-style, upper deck only)
+  'vip-lounge-1': { type:'VIP Lounge', cls:'vip-lounge', pax:4, price:4500, mPrice:3200, img:'https://images.unsplash.com/photo-1571266028243-d220bc1b3e29?w=900&q=80', desc:'Upper-deck VIP lounge — premium daybed seating with dedicated host. Includes AED 2,000 F&B credit.' },
+  'vip-lounge-2': { type:'VIP Lounge', cls:'vip-lounge', pax:4, price:4500, mPrice:3200, img:'https://images.unsplash.com/photo-1571266028243-d220bc1b3e29?w=900&q=80', desc:'Upper-deck VIP lounge — premium daybed seating with dedicated host. Includes AED 2,000 F&B credit.' },
   // DJ Lounge — bow stern area
   'dj-lounge-1': { type:'DJ Lounge', cls:'dj-lounge', pax:4, price:5500, mPrice:3800, img:'https://images.unsplash.com/photo-1571266028243-d220bc1b3e29?w=900&q=80', desc:'Lounge seating directly facing the DJ booth at the bow. Includes AED 2,500 F&B credit.' },
   'dj-lounge-2': { type:'DJ Lounge', cls:'dj-lounge', pax:4, price:5500, mPrice:3800, img:'https://images.unsplash.com/photo-1571266028243-d220bc1b3e29?w=900&q=80', desc:'Lounge seating directly facing the DJ booth at the bow.' },
@@ -205,7 +217,7 @@ function goStep2(){
 }
 
 function paintTakenSeats(){
-  $$('#yachtMap .seat').forEach(s => {
+  $$('.yacht-map .seat').forEach(s => {
     s.classList.toggle('taken', taken.has(s.dataset.seat));
   });
 }
@@ -213,7 +225,7 @@ function paintTakenSeats(){
 // ---- Seat hover + click ----------------------------------------------
 function attachSeatHandlers(){
   const tt = $('#seatTooltip');
-  $$('#yachtMap .seat').forEach(el => {
+  $$('.yacht-map .seat').forEach(el => {
     const id = el.dataset.seat;
     const seat = SEATS[id];
     if (!seat) return;

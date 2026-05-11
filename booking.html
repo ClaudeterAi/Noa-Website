@@ -75,8 +75,162 @@
     <div class="bk-floor-date"><span id="bkFloorDate"></span> · <span id="bkFloorSlot"></span></div>
   </div>
 
-  <div class="bk-map-wrap">
-    <svg id="yachtMap" viewBox="0 0 1400 700" xmlns="http://www.w3.org/2000/svg">
+  <div class="bk-decks">
+    <!-- ============================================================
+         UPPER DECK — Balcony, Sundeck, Jacuzzi, VIP Lounges
+         ============================================================ -->
+    <div class="bk-deck-col">
+      <div class="bk-deck-title">UPPER DECK</div>
+      <div class="bk-map-wrap">
+        <svg class="yacht-map" data-deck="upper" viewBox="0 0 1400 700" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Jacuzzi water gradient — a touch deeper than the main-deck pool -->
+            <linearGradient id="jacuzziGrad" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%"   stop-color="#9ec5d0"/>
+              <stop offset="100%" stop-color="#cfe2e8"/>
+            </linearGradient>
+            <!-- VIP lounge fabric — darker, premium tone -->
+            <linearGradient id="vipFabric" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%"  stop-color="#c4956c"/>
+              <stop offset="100%" stop-color="#a87c52"/>
+            </linearGradient>
+          </defs>
+
+          <!-- ===== HULL (upper deck — smaller than main, stern recessed) ===== -->
+          <path d="M 200 60 H 1080 Q 1270 60 1340 350 Q 1270 640 1080 640 H 200 Z"
+                fill="#fdfaf3" stroke="#1a1a1a" stroke-width="2"/>
+          <path d="M 200 60 H 1080 Q 1270 60 1340 350 Q 1270 640 1080 640 H 200 Z"
+                fill="url(#deckwood)" opacity=".65" pointer-events="none"/>
+          <!-- Inner deck rail -->
+          <path d="M 220 80 H 1075 Q 1255 80 1325 350 Q 1255 620 1075 620 H 220 Z"
+                fill="none" stroke="#1a1a1a" stroke-width=".4" opacity=".3" pointer-events="none"/>
+          <!-- Walkway dividers -->
+          <line x1="640"  y1="80" x2="640"  y2="620" stroke="#1a1a1a" stroke-dasharray="2 5" stroke-width=".4" opacity=".22" pointer-events="none"/>
+          <line x1="900"  y1="80" x2="900"  y2="620" stroke="#1a1a1a" stroke-dasharray="2 5" stroke-width=".4" opacity=".22" pointer-events="none"/>
+
+          <!-- ===== STAIRS (stern — access from main deck below) ===== -->
+          <g pointer-events="none">
+            <rect x="225" y="305" width="60" height="90" rx="3" fill="#f3ede0" stroke="#1a1a1a" stroke-width=".8"/>
+            <!-- Step lines -->
+            <line x1="230" y1="320" x2="280" y2="320" stroke="#8a7c66" stroke-width=".7"/>
+            <line x1="230" y1="335" x2="280" y2="335" stroke="#8a7c66" stroke-width=".7"/>
+            <line x1="230" y1="350" x2="280" y2="350" stroke="#8a7c66" stroke-width=".7"/>
+            <line x1="230" y1="365" x2="280" y2="365" stroke="#8a7c66" stroke-width=".7"/>
+            <line x1="230" y1="380" x2="280" y2="380" stroke="#8a7c66" stroke-width=".7"/>
+            <!-- Down-arrow indicator -->
+            <text x="255" y="290" text-anchor="middle" font-family="Josefin Sans" font-size="8" letter-spacing="3" fill="#8a7c66">STAIRS ↓</text>
+            <text x="255" y="412" text-anchor="middle" font-family="Josefin Sans" font-size="7" letter-spacing="2" fill="#8a7c66" opacity=".7">to main</text>
+          </g>
+
+          <!-- ===== SUNDECK — 6 sunbeds in a row (top of upper deck) ===== -->
+          <g>
+            <rect class="seat sunbed" data-seat="sunbed-1" x="335" y="130" width="100" height="55" rx="4" fill="#ead8b8"/>
+            <rect x="335" y="130" width="100" height="55" rx="4" fill="url(#hatch)" pointer-events="none" opacity=".55"/>
+            <text class="seat-lbl sm" x="385" y="165" pointer-events="none">S1</text>
+
+            <rect class="seat sunbed" data-seat="sunbed-2" x="455" y="130" width="100" height="55" rx="4" fill="#ead8b8"/>
+            <rect x="455" y="130" width="100" height="55" rx="4" fill="url(#hatch)" pointer-events="none" opacity=".55"/>
+            <text class="seat-lbl sm" x="505" y="165" pointer-events="none">S2</text>
+
+            <rect class="seat sunbed" data-seat="sunbed-3" x="575" y="130" width="100" height="55" rx="4" fill="#ead8b8"/>
+            <rect x="575" y="130" width="100" height="55" rx="4" fill="url(#hatch)" pointer-events="none" opacity=".55"/>
+            <text class="seat-lbl sm" x="625" y="165" pointer-events="none">S3</text>
+
+            <rect class="seat sunbed" data-seat="sunbed-4" x="695" y="130" width="100" height="55" rx="4" fill="#ead8b8"/>
+            <rect x="695" y="130" width="100" height="55" rx="4" fill="url(#hatch)" pointer-events="none" opacity=".55"/>
+            <text class="seat-lbl sm" x="745" y="165" pointer-events="none">S4</text>
+
+            <rect class="seat sunbed" data-seat="sunbed-5" x="815" y="130" width="100" height="55" rx="4" fill="#ead8b8"/>
+            <rect x="815" y="130" width="100" height="55" rx="4" fill="url(#hatch)" pointer-events="none" opacity=".55"/>
+            <text class="seat-lbl sm" x="865" y="165" pointer-events="none">S5</text>
+
+            <rect class="seat sunbed" data-seat="sunbed-6" x="935" y="130" width="100" height="55" rx="4" fill="#ead8b8"/>
+            <rect x="935" y="130" width="100" height="55" rx="4" fill="url(#hatch)" pointer-events="none" opacity=".55"/>
+            <text class="seat-lbl sm" x="985" y="165" pointer-events="none">S6</text>
+          </g>
+
+          <!-- ===== JACUZZI — large oval hot tub in centre ===== -->
+          <ellipse class="seat jacuzzi" data-seat="jacuzzi-1" cx="500" cy="335" rx="160" ry="62" fill="url(#jacuzziGrad)" stroke="#1a1a1a" stroke-width="1.2"/>
+          <!-- Inner rim -->
+          <ellipse cx="500" cy="335" rx="148" ry="50" fill="#dceaee" stroke="#7fb1bf" stroke-width=".5" opacity=".75" pointer-events="none"/>
+          <!-- Bubble decorations -->
+          <g pointer-events="none" stroke="#7fb1bf" stroke-width=".5" fill="none" opacity=".5">
+            <circle cx="430" cy="320" r="3"/>
+            <circle cx="480" cy="345" r="2.5"/>
+            <circle cx="540" cy="318" r="3"/>
+            <circle cx="560" cy="345" r="2"/>
+            <circle cx="450" cy="350" r="2"/>
+            <circle cx="520" cy="350" r="2.5"/>
+          </g>
+
+          <!-- ===== VIP LOUNGES — 2 premium lounges on the right ===== -->
+          <g>
+            <rect class="seat vip-lounge" data-seat="vip-lounge-1" x="700" y="265" width="150" height="140" rx="6" fill="url(#vipFabric)"/>
+            <!-- Stitch lines -->
+            <line x1="700" y1="285" x2="850" y2="285" stroke="#1a1a1a" stroke-width=".5" opacity=".5" pointer-events="none"/>
+            <line x1="700" y1="385" x2="850" y2="385" stroke="#1a1a1a" stroke-width=".5" opacity=".5" pointer-events="none"/>
+            <text class="seat-lbl light" x="775" y="345" pointer-events="none">V1</text>
+
+            <rect class="seat vip-lounge" data-seat="vip-lounge-2" x="880" y="265" width="150" height="140" rx="6" fill="url(#vipFabric)"/>
+            <line x1="880" y1="285" x2="1030" y2="285" stroke="#1a1a1a" stroke-width=".5" opacity=".5" pointer-events="none"/>
+            <line x1="880" y1="385" x2="1030" y2="385" stroke="#1a1a1a" stroke-width=".5" opacity=".5" pointer-events="none"/>
+            <text class="seat-lbl light" x="955" y="345" pointer-events="none">V2</text>
+          </g>
+
+          <!-- ===== BALCONY SOFAS (B1–B5) — moved here from main deck ===== -->
+          <g>
+            <rect class="seat balcony-sofa" data-seat="balcony-1" x="270" y="490" width="120" height="70" rx="5" fill="#7ba1a3"/>
+            <line x1="270" y1="525" x2="390" y2="525" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
+            <text class="seat-lbl light" x="330" y="535" pointer-events="none">B1</text>
+
+            <rect class="seat balcony-sofa" data-seat="balcony-2" x="410" y="490" width="120" height="70" rx="5" fill="#7ba1a3"/>
+            <line x1="410" y1="525" x2="530" y2="525" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
+            <text class="seat-lbl light" x="470" y="535" pointer-events="none">B2</text>
+
+            <rect class="seat balcony-sofa" data-seat="balcony-3" x="550" y="490" width="120" height="70" rx="5" fill="#7ba1a3"/>
+            <line x1="550" y1="525" x2="670" y2="525" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
+            <text class="seat-lbl light" x="610" y="535" pointer-events="none">B3</text>
+
+            <rect class="seat balcony-sofa" data-seat="balcony-4" x="690" y="490" width="120" height="70" rx="5" fill="#7ba1a3"/>
+            <line x1="690" y1="525" x2="810" y2="525" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
+            <text class="seat-lbl light" x="750" y="535" pointer-events="none">B4</text>
+
+            <rect class="seat balcony-sofa" data-seat="balcony-5" x="830" y="490" width="120" height="70" rx="5" fill="#7ba1a3"/>
+            <line x1="830" y1="525" x2="950" y2="525" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
+            <text class="seat-lbl light" x="890" y="535" pointer-events="none">B5</text>
+          </g>
+
+          <!-- ===== BOW DECORATIONS — palms ===== -->
+          <g pointer-events="none">
+            <circle cx="1280" cy="180" r="9" fill="#6d8c54" opacity=".85"/>
+            <circle cx="1295" cy="195" r="6" fill="#7ea463" opacity=".85"/>
+            <circle cx="1268" cy="198" r="5" fill="#5a7747" opacity=".85"/>
+            <circle cx="1280" cy="520" r="9" fill="#6d8c54" opacity=".85"/>
+            <circle cx="1295" cy="505" r="6" fill="#7ea463" opacity=".85"/>
+            <circle cx="1268" cy="502" r="5" fill="#5a7747" opacity=".85"/>
+            <!-- Bow viewing accent -->
+            <circle cx="1310" cy="350" r="10" fill="#fdf6df" stroke="#1a1a1a" stroke-width=".5"/>
+            <circle cx="1310" cy="350" r="5"  fill="#6d8c54" opacity=".7"/>
+          </g>
+
+          <!-- ===== SECTION LABELS (top layer) ===== -->
+          <g pointer-events="none" font-family="Josefin Sans" fill="#8a7c66" font-weight="400">
+            <text x="685" y="112" font-size="11" letter-spacing="6" text-anchor="middle">SUNDECK</text>
+            <text x="500" y="295" font-size="10" letter-spacing="5" text-anchor="middle" fill="#5a7480" opacity=".75">JACUZZI</text>
+            <text x="865" y="245" font-size="10" letter-spacing="5" text-anchor="middle">VIP LOUNGE</text>
+            <text x="610" y="478" font-size="10" letter-spacing="5" text-anchor="middle">BALCONY</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         MAIN DECK — Pool, Cabanas, Daybeds, DJ booth, Entry, J1/J2
+         ============================================================ -->
+    <div class="bk-deck-col">
+      <div class="bk-deck-title">MAIN DECK</div>
+      <div class="bk-map-wrap">
+    <svg class="yacht-map" data-deck="main" viewBox="0 0 1400 700" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <!-- Diagonal hatching for daybed stripes -->
         <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
@@ -291,28 +445,7 @@
         <text class="seat-lbl xs" x="930" y="444" pointer-events="none">16</text>
       </g>
 
-      <!-- ===== BALCONY SOFAS (right side) ===== -->
-      <g>
-        <rect class="seat balcony-sofa" data-seat="balcony-1" x="1010" y="170" width="70" height="55" rx="4" fill="#7ba1a3"/>
-        <line x1="1010" y1="200" x2="1080" y2="200" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
-        <text class="seat-lbl light sm" x="1045" y="206" pointer-events="none">B1</text>
-
-        <rect class="seat balcony-sofa" data-seat="balcony-2" x="1010" y="240" width="70" height="55" rx="4" fill="#7ba1a3"/>
-        <line x1="1010" y1="270" x2="1080" y2="270" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
-        <text class="seat-lbl light sm" x="1045" y="276" pointer-events="none">B2</text>
-
-        <rect class="seat balcony-sofa" data-seat="balcony-3" x="1010" y="310" width="70" height="55" rx="4" fill="#7ba1a3"/>
-        <line x1="1010" y1="340" x2="1080" y2="340" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
-        <text class="seat-lbl light sm" x="1045" y="346" pointer-events="none">B3</text>
-
-        <rect class="seat balcony-sofa" data-seat="balcony-4" x="1010" y="380" width="70" height="55" rx="4" fill="#7ba1a3"/>
-        <line x1="1010" y1="410" x2="1080" y2="410" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
-        <text class="seat-lbl light sm" x="1045" y="416" pointer-events="none">B4</text>
-
-        <rect class="seat balcony-sofa" data-seat="balcony-5" x="1010" y="450" width="70" height="55" rx="4" fill="#7ba1a3"/>
-        <line x1="1010" y1="480" x2="1080" y2="480" stroke="#1a1a1a" stroke-width=".4" opacity=".4" pointer-events="none"/>
-        <text class="seat-lbl light sm" x="1045" y="486" pointer-events="none">B5</text>
-      </g>
+      <!-- ===== BALCONY SOFAS moved to UPPER DECK ===== -->
 
       <!-- ===== BOW LOUNGES (J1/J2) — DJ booth moved to centre, lounges stay as bow seating ===== -->
       <g>
@@ -353,16 +486,20 @@
         <text x="450" y="345" font-size="20" letter-spacing="10" text-anchor="middle" fill="#5a7480" opacity=".75">POOL</text>
         <text x="450" y="365" font-size="8"  letter-spacing="3"  text-anchor="middle" fill="#5a7480" opacity=".55">22m · saltwater · infinity edge</text>
         <text x="865" y="190" font-size="11" letter-spacing="6"  text-anchor="middle">ENTRY</text>
-        <text x="1045" y="155" font-size="10" letter-spacing="4" text-anchor="middle">BALCONY</text>
       </g>
     </svg>
+      </div>
+    </div>
   </div>
 
   <!-- Legend -->
-  <div style="max-width:1300px;margin:24px auto 0;display:flex;gap:24px;flex-wrap:wrap;justify-content:center;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#555;">
+  <div style="max-width:1400px;margin:24px auto 0;display:flex;gap:20px 24px;flex-wrap:wrap;justify-content:center;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#555;">
     <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#d9b78b;border:1px solid #1a1a1a;display:inline-block;"></span>Cabana</span>
     <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#5d4d44;border:1px solid #1a1a1a;display:inline-block;"></span>Front Cabana</span>
     <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:url(#hatch),#ede4d3;border:1px solid #1a1a1a;display:inline-block;background-image:repeating-linear-gradient(45deg,#1a1a1a 0,#1a1a1a 1px,#ede4d3 1px,#ede4d3 4px);"></span>Daybed</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#ead8b8;border:1px solid #1a1a1a;display:inline-block;background-image:repeating-linear-gradient(45deg,#1a1a1a 0,#1a1a1a 1px,#ead8b8 1px,#ead8b8 4px);"></span>Sunbed</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#cfe2e8;border:1px solid #1a1a1a;display:inline-block;border-radius:50%;"></span>Jacuzzi</span>
+    <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#b08866;border:1px solid #1a1a1a;display:inline-block;"></span>VIP Lounge</span>
     <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#7aa6a8;border:1px solid #1a1a1a;display:inline-block;"></span>Balcony Sofa</span>
     <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#c9a875;border:1px solid #1a1a1a;display:inline-block;"></span>DJ Lounge</span>
     <span style="display:flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;background:#fff;border:1px dashed #1a1a1a;display:inline-block;border-radius:50%;"></span>General Entry</span>
