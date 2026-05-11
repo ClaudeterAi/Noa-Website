@@ -582,30 +582,8 @@ body.booking-page { padding-top: 96px; }
 }
 .bk-floor-back:hover, .bk-floor-next:hover { background: #1a1a1a; color: #fff; }
 
-/* Two-deck side-by-side layout (UPPER on the left, MAIN on the right) */
-.bk-decks {
-  max-width: 1500px;
-  margin: 0 auto;
-  display: flex;
-  gap: 28px;
-  align-items: flex-start;
-  justify-content: center;
-}
-.bk-deck-col { flex: 1 1 0; min-width: 0; }
-.bk-deck-title {
-  font-family: 'Josefin Sans', sans-serif;
-  font-size: .82rem;
-  letter-spacing: .42em;
-  text-transform: uppercase;
-  color: #1a1a1a;
-  text-align: center;
-  margin: 0 0 14px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #1a1a1a;
-  opacity: .85;
-}
-.bk-map-wrap { width: 100%; margin: 0 auto; overflow-x: auto; }
-.yacht-map { width: 100%; min-width: 0; height: auto; display: block; }
+.bk-map-wrap { max-width: 1300px; margin: 0 auto; overflow-x: auto; }
+.yacht-map { width: 100%; height: auto; display: block; }
 
 /* Yacht seats — fills set inline in SVG (so gradients render); CSS only handles stroke + interaction */
 .seat { cursor: pointer; transition: opacity .2s, filter .2s; }
@@ -974,34 +952,29 @@ input,select,textarea{font-size:16px;}
   .bk-day-n{font-size:1.8rem;}
   .bk-day-ev-label{font-size:.5rem;}
 
-  /* Two-deck stack on mobile (UPPER on top, MAIN below) */
-  .bk-decks{flex-direction:column;gap:36px;align-items:center;}
-  .bk-deck-col{width:100%;display:flex;flex-direction:column;align-items:center;}
-  .bk-deck-title{font-size:.74rem;letter-spacing:.36em;margin-bottom:10px;}
-
   /* Floor plan: rotate the yacht 90° left so it reads as a long portrait
-     boat on phones (bow points down). No horizontal scroll needed. */
+     boat on phones (bow points down). Aspect is now 1400×1000 = 1.4:1. */
   .bk-map-wrap{
     --bkw: min(86vw, 360px);
-    margin: 8px auto 12px;
+    margin: 24px auto 12px;
     padding: 0;
     overflow: visible;
     position: relative;
     width: var(--bkw);
-    height: calc(var(--bkw) * 2);
+    height: calc(var(--bkw) * 1400 / 1000);
   }
   .yacht-map{
     position: absolute;
     top: 50%;
     left: 50%;
-    width: calc(var(--bkw) * 2);
+    width: calc(var(--bkw) * 1400 / 1000);
     height: var(--bkw);
     min-width: 0;
     max-width: none;
     transform: translate(-50%, -50%) rotate(-90deg);
     transform-origin: center center;
   }
-  /* Counter-rotate every text label so it reads upright after the SVG rotates */
+  /* Counter-rotate every text label so it reads upright after SVG rotates */
   .yacht-map text{
     transform: rotate(90deg);
     transform-origin: center;
