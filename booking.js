@@ -68,6 +68,10 @@ const SEATS = {
   'entry-10': { type:'General Entry', cls:'entry', pax:1, price:900, mPrice:650, img:'https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=900&q=80', desc:'Standing entry — full pool, deck and DJ access.' },
   'entry-11': { type:'General Entry', cls:'entry', pax:1, price:900, mPrice:650, img:'https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=900&q=80', desc:'Standing entry — full pool, deck and DJ access.' },
   'entry-12': { type:'General Entry', cls:'entry', pax:1, price:900, mPrice:650, img:'https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=900&q=80', desc:'Standing entry — full pool, deck and DJ access.' },
+  'entry-13': { type:'General Entry', cls:'entry', pax:1, price:900, mPrice:650, img:'https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=900&q=80', desc:'Standing entry — full pool, deck and DJ access.' },
+  'entry-14': { type:'General Entry', cls:'entry', pax:1, price:900, mPrice:650, img:'https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=900&q=80', desc:'Standing entry — full pool, deck and DJ access.' },
+  'entry-15': { type:'General Entry', cls:'entry', pax:1, price:900, mPrice:650, img:'https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=900&q=80', desc:'Standing entry — full pool, deck and DJ access.' },
+  'entry-16': { type:'General Entry', cls:'entry', pax:1, price:900, mPrice:650, img:'https://images.unsplash.com/photo-1551918120-9739cb430c6d?w=900&q=80', desc:'Standing entry — full pool, deck and DJ access.' },
 };
 
 // Headliner Friday events
