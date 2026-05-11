@@ -21,7 +21,7 @@ body.hl #cur2{width:40px;height:40px;}
 .nav-links a{font-size:.66rem;letter-spacing:.28em;text-transform:uppercase;color:#fff;font-weight:400;transition:color .3s,opacity .2s;}
 #nav.stuck .nav-links a{color:#1a1a1a;}
 .nav-links a:hover{opacity:.7;}
-.nav-book,a.nav-book{font-size:.66rem;letter-spacing:.22em;text-indent:.22em;text-transform:uppercase;padding:11px 22px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-weight:400;transition:background .25s,color .25s,border-color .3s;white-space:nowrap;display:inline-block;}
+.nav-book,a.nav-book{font-size:.66rem;line-height:1;letter-spacing:.22em;text-indent:.22em;text-transform:uppercase;padding:13px 22px 9px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-weight:400;transition:background .25s,color .25s,border-color .3s;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;}
 .nav-book:hover,a.nav-book:hover{background:#fff;color:#1a1a1a;}
 .nav-book:hover *,a.nav-book:hover *{color:#1a1a1a;}
 #nav.stuck .nav-book,#nav.stuck a.nav-book{border-color:#1a1a1a;color:#1a1a1a;}
