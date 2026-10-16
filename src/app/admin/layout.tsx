@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { Cormorant, Josefin_Sans } from "next/font/google";
 import { authOptions, type AdminSession } from "@/server/admin/auth";
+import { cormorant, josefin } from "@/fonts";
 import "@/styles/globals.css";
 import "./admin.css";
 
-const josefin = Josefin_Sans({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-josefin", display: "swap" });
-const cormorant = Cormorant({ subsets: ["latin"], weight: ["300", "400"], variable: "--font-cormorant", display: "swap" });
 
 export const metadata: Metadata = { title: "NOA Admin", robots: { index: false, follow: false } };
 

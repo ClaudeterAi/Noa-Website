@@ -113,3 +113,8 @@ The layout is data. A new boat = a new SVG + one command:
    map so past bookings keep their history. Unknown prefixes are reported as `unmapped`; add the type in admin first.
 3. Capacities, prices, tiers and members-priority are rows in `unit_types` / `inventory_units` (admin), never code.
    The client reads names, capacity and prices from the API — nothing in the UI is tied to 52 seats.
+
+## Fonts
+
+Self-hosted in `src/fonts/` (SIL OFL): Josefin Sans, Cormorant, IBM Plex Sans Arabic, Noto Naskh Arabic — 12 woff2 files, 552 KB.
+Builds have no dependency on fonts.googleapis.com (a Vercel preview build failed on that fetch on 16 Oct); visitors load fonts from Vercel's edge.
