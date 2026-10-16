@@ -34,6 +34,16 @@ export async function getOrCreateSession(date: string, slot: Slot, conn: DbOrTx 
   return again[0];
 }
 
+/* --------------------------------------------------------------- unit types */
+
+export interface UnitTypeInfo { id: string; nameEn: string; nameAr: string; descEn: string; descAr: string; pax: number; perPerson: boolean; tier: number; imageSlot: string | null }
+
+export async function listUnitTypes(conn: DbOrTx = db): Promise<Record<string, UnitTypeInfo>> {
+  const rows = await conn.select({ id: unitTypes.id, nameEn: unitTypes.nameEn, nameAr: unitTypes.nameAr, descEn: unitTypes.descEn, descAr: unitTypes.descAr, pax: unitTypes.pax, perPerson: unitTypes.perPerson, tier: unitTypes.tier, imageSlot: unitTypes.imageSlot })
+    .from(unitTypes).where(eq(unitTypes.active, true));
+  return Object.fromEntries(rows.map((r) => [r.id, r]));
+}
+
 /* --------------------------------------------------------------- availability */
 
 export interface UnitAvailability {

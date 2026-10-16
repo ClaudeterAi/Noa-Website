@@ -102,3 +102,14 @@ cron every minute          ──→ worker sends due rows: Resend (email + .ics
 Pages: dashboard (today + 14 days, live holds), bookings (filters, detail, refund via Stripe, cancel), guests (tier, CSV export),
 inventory & pricing, messages (retry), settings, audit trail. Every mutation writes `audit_log` (who, before, after).
 Code: `src/server/admin/`, `src/app/admin/`. Tests: `tests/admin.test.ts`. Migration `0002` adds `audit_log` only.
+
+## Changing the boat layout (expected — the map is not final)
+
+The layout is data. A new boat = a new SVG + one command:
+
+1. Replace the drawing in `src/components/booking/YachtMap.tsx` (any tappable shape carries `data-seat="<id>"`; id prefix = type,
+   e.g. `sunbed-7`, `jacuzzi-2`, `cabana-9`, `entry-20`). Deck labels stay bilingual via the `labels` prop.
+2. `npx tsx src/db/sync-units.ts` — adds new seats, reactivates returning ones, **deactivates** (never deletes) seats that left the
+   map so past bookings keep their history. Unknown prefixes are reported as `unmapped`; add the type in admin first.
+3. Capacities, prices, tiers and members-priority are rows in `unit_types` / `inventory_units` (admin), never code.
+   The client reads names, capacity and prices from the API — nothing in the UI is tied to 52 seats.

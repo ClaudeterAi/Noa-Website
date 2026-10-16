@@ -6,8 +6,8 @@ import type { Locale } from "@/i18n/routing";
 import { pick, registry } from "@/content/registry";
 import YachtMap from "./YachtMap";
 import PaymentPanel, { paymentsConfigured } from "./PaymentPanel";
-import { api, isApiError, type UnitAvailability } from "./api";
-import { ARRIVALS, DAY_IMG, priceFor, unitType, type Slot } from "./inventory";
+import { api, isApiError, type UnitAvailability, type UnitTypeInfo } from "./api";
+import { ARRIVALS, DAY_IMG, unitTypes as placeholderTypes, type Slot } from "./inventory";
 
 /* ---------- helpers ---------- */
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -16,7 +16,7 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 const aed = (n: number, locale: string) => `AED ${n.toLocaleString(locale === "ar" ? "ar-AE-u-nu-latn" : "en-US")}`;
 const mmss = (ms: number) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
 
-interface CartItem { holdId: string; unitId: string; date: string; slot: Slot; guests: number; arrival: string; price: number; expiresAt: string }
+interface CartItem { holdId: string; unitId: string; typeId: string; name: string; img: string; date: string; slot: Slot; guests: number; arrival: string; price: number; expiresAt: string }
 const CART_KEY = "noa-cart-v2";
 
 export default function BookingApp() {
@@ -44,6 +44,7 @@ export default function BookingApp() {
   const [notice, setNotice] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [holdMinutes, setHoldMinutes] = useState(7);
+  const [types, setTypes] = useState<Record<string, UnitTypeInfo>>({});
   const skew = useRef(0); // serverTime − clientTime, so the countdown follows the server clock
 
   /* body class drives the opaque nav (legacy body.booking-page) */
@@ -71,6 +72,7 @@ export default function BookingApp() {
       const r = await api.availability(date, slot);
       skew.current = new Date(r.serverTime).getTime() - Date.now();
       setHoldMinutes(r.holdMinutes);
+      setTypes(r.types);
       setAvail(new Map(r.units.map((u) => [u.unitId, u])));
     } catch { /* keep last known state */ }
   }, [date, slot]);
@@ -83,6 +85,13 @@ export default function BookingApp() {
     return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); };
   }, [step, refresh]);
 
+  /** Seat → type info from the database. Images are placeholders keyed by type until media slots are filled (Day 4). */
+  const infoOf = useCallback((unitId: string) => {
+    const typeId = avail.get(unitId)?.unitTypeId ?? cart.find((c) => c.unitId === unitId)?.typeId;
+    const ty = typeId ? types[typeId] : undefined;
+    const img = typeId ? placeholderTypes[typeId]?.img ?? "" : "";
+    return ty ? { ...ty, name: locale === "ar" ? ty.nameAr : ty.nameEn, desc: locale === "ar" ? ty.descAr : ty.descEn, img } : null;
+  }, [avail, cart, types, locale]);
   const inCart = useMemo(() => new Set(cart.map((c) => c.unitId)), [cart]);
   const taken = useMemo(() => new Set([...avail.values()].filter((u) => (u.state === "held" || u.state === "booked") && !inCart.has(u.unitId)).map((u) => u.unitId)), [avail, inCart]);
   const reserved = useMemo(() => new Set([...avail.values()].filter((u) => u.state === "reserved").map((u) => u.unitId)), [avail]);
@@ -131,9 +140,9 @@ export default function BookingApp() {
     try {
       const h = await api.hold(date, slot, unitId);
       skew.current = new Date(h.serverTime).getTime() - Date.now();
-      const ty = unitType(unitId);
+      const ty = infoOf(unitId);
       setSeatModal({ unitId, holdId: h.holdId, expiresAt: h.expiresAt });
-      setGuests(ty.pax); setArrival(ARRIVALS[slot][0]);
+      setGuests(ty?.pax ?? 1); setArrival(ARRIVALS[slot][0]);
     } catch (e) {
       const r = e as { code?: string; message: string };
       setNotice(r.code === "UNIT_UNAVAILABLE" ? t("seatTaken") : r.code === "UNIT_RESERVED" ? t("seatReserved", { time: u?.releaseAt ? releaseLabel(u.releaseAt) : "" }) : r.code === "CART_LIMIT" ? t("cartLimit") : r.message);
@@ -146,12 +155,13 @@ export default function BookingApp() {
     try { await api.release(h.holdId); } catch { /* already gone */ }
     void refresh();
   };
-  const seatType = seatModal ? unitType(seatModal.unitId) : null;
-  const seatPrice = seatType && slot && seatModal ? (avail.get(seatModal.unitId)?.price ?? priceFor(seatType, slot)) : 0;
+  const seatType = seatModal ? infoOf(seatModal.unitId) : null;
+  const seatPrice = seatModal ? (avail.get(seatModal.unitId)?.price ?? 0) : 0;
   const seatTotal = seatType?.perPerson ? seatPrice * guests : seatPrice;
   const addToCart = () => {
     if (!seatModal || !date || !slot) return;
-    setCart((c) => [...c, { holdId: seatModal.holdId, unitId: seatModal.unitId, date, slot, guests, arrival, price: seatTotal, expiresAt: seatModal.expiresAt }]);
+    const ty = infoOf(seatModal.unitId);
+    setCart((c) => [...c, { holdId: seatModal.holdId, unitId: seatModal.unitId, typeId: ty?.id ?? "", name: ty?.name ?? seatModal.unitId, img: ty?.img ?? "", date, slot, guests, arrival, price: seatTotal, expiresAt: seatModal.expiresAt }]);
     setSeatModal(null);
     goStep(3);
   };
@@ -272,12 +282,11 @@ export default function BookingApp() {
             {cart.length === 0 ? (
               <div className="bk-cart-empty">{t("cartEmpty")}</div>
             ) : cart.map((c) => {
-              const ty = unitType(c.unitId);
               return (
                 <div className="bk-cart-item" key={c.holdId}>
-                  <div className="bk-cart-img" style={{ backgroundImage: `url('${ty.img}')` }} />
+                  <div className="bk-cart-img" style={{ backgroundImage: `url('${c.img}')` }} />
                   <div>
-                    <div className="bk-cart-name">{pick(ty.name, locale)}</div>
+                    <div className="bk-cart-name">{c.name}</div>
                     <div className="bk-cart-meta">{shortDate(c.date).toUpperCase()} · {(c.slot === "morning" ? t("morning") : t("afternoon")).toUpperCase()} · {t("guest", { count: c.guests })} · {t("arrive")} {c.arrival}</div>
                   </div>
                   <div style={{ textAlign: "end" }}>
@@ -317,15 +326,15 @@ export default function BookingApp() {
       </section>
 
       {/* tooltip */}
-      {tip && slot && (() => {
-        const ty = unitType(tip.id);
+      {tip && slot && infoOf(tip.id) && (() => {
+        const ty = infoOf(tip.id)!;
         return (
           <div className="bk-tooltip show" style={{ left: tip.x, top: tip.y }}>
             <div className="bk-tt-img" style={{ backgroundImage: `url('${ty.img}')` }} />
             <div className="bk-tt-row">
-              <div className="bk-tt-name">{pick(ty.name, locale).toUpperCase()}</div>
+              <div className="bk-tt-name">{ty.name.toUpperCase()}</div>
               <div className="bk-tt-pax">{ty.pax} <span style={{ opacity: 0.55 }}>👤</span></div>
-              <div className="bk-tt-price">{(avail.get(tip.id)?.price ?? priceFor(ty, slot)).toLocaleString("en-US")}</div>
+              <div className="bk-tt-price">{(avail.get(tip.id)?.price ?? 0).toLocaleString("en-US")}</div>
             </div>
             <div className="bk-tt-btn">{t("viewMore")}</div>
           </div>
@@ -365,9 +374,9 @@ export default function BookingApp() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={seatType.img} alt="" />
               <div className="bk-seat-img-desc">
-                <div className="bk-seat-img-name">{pick(seatType.name, locale)}</div>
+                <div className="bk-seat-img-name">{seatType.name}</div>
                 <div className="bk-seat-img-date">{longDate(date).toUpperCase()}</div>
-                <p className="bk-seat-img-text">{pick(seatType.desc, locale)}</p>
+                <p className="bk-seat-img-text">{seatType.desc}</p>
               </div>
             </div>
             <div className="bk-seat-info-col">
@@ -380,7 +389,7 @@ export default function BookingApp() {
               </div>
               <div className="bk-detail-row">
                 <div>
-                  <div className="bk-detail-name">{pick(seatType.name, locale)}</div>
+                  <div className="bk-detail-name">{seatType.name}</div>
                   <div className="bk-detail-fb">{seatType.perPerson ? t("noMinimum") : t("includesCredit", { amount: (seatPrice / 2).toLocaleString("en-US") })}</div>
                 </div>
                 <div className="bk-field">
