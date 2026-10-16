@@ -1063,3 +1063,9 @@ section.prose[data-placeholder="legal"]{padding-top:160px;}
 .bk-legend-swatch{width:14px;height:14px;border:1px solid #1a1a1a;display:inline-block;}
 /* Fix carried from the static site: .nav-mob button (0,1,1) out-specified .nav-mob-close (0,1,0), drawing a bordered box around the × */
 .nav-mob button.nav-mob-close{border:none;padding:0;}
+/* Day 2 — live booking states */
+.yacht-map .seat.mine{stroke:#1a1a1a;stroke-width:3;filter:drop-shadow(0 0 6px rgba(26,26,26,.35));}
+.bk-map-wrap.is-holding{cursor:progress;}
+.bk-hold-bar{position:sticky;top:74px;z-index:400;margin:0 auto 18px;width:max-content;max-width:90%;padding:10px 22px;background:#1a1a1a;color:#fff;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;text-align:center;}
+.bk-notice{text-align:center;color:#a33;margin:0 auto 18px;max-width:900px;}
+.bk-result{max-width:720px;margin:0 auto;padding:180px 24px 120px;text-align:center;}

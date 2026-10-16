@@ -69,15 +69,6 @@ export const ARRIVALS: Record<Slot, string[]> = {
   afternoon: ["14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "19:00", "20:00"],
 };
 
-/** Day 1 only: deterministic "sold" seats per date, as on the live mock. Day 2 replaces with real availability. */
-export function mockTaken(date: Date): Set<string> {
-  const ids = Object.keys(units);
-  const seed = date.getDate() + date.getMonth() * 31;
-  const out = new Set<string>();
-  ids.forEach((id, i) => { if ((i * 7 + seed) % 11 < 2) out.add(id); });
-  return out;
-}
-
 /* Weekday imagery for the calendar (placeholders) */
 export const DAY_IMG: Record<number, string> = {
   0: "https://images.unsplash.com/photo-1530541930197-ff16ac917b0e?w=400&q=80",

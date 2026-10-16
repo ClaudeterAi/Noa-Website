@@ -46,3 +46,23 @@ legacy-static/             the previous static site, preserved for reference (no
 | 3 | Live seat map (API Gateway WebSockets), WhatsApp + email, admin, VIP tiering |
 | 4 | Claude chatbot, ElevenLabs voice with site navigation, NOA content, Arabic review |
 | 5 | QA matrix, hardening, go-live, handover |
+
+## Booking engine (Day 2)
+
+```
+Guest taps a seat → POST /api/holds (5-minute hold, server clock) → seat modal → cart
+Cart → POST /api/bookings (prices from DB, VAT 5%, holds extended once by 3 min) → Stripe PaymentIntent (AED)
+Stripe Payment Element (cards, Apple Pay, Google Pay, 3-D Secure) → redirect to /booking/confirmation
+Stripe webhook payment_intent.succeeded → booking confirmed · late payment (holds expired) → automatic refund
+Cron every minute → /api/cron/expire-holds releases expired holds, expires stale pending bookings
+```
+
+Exclusivity is enforced in Postgres (`holds_live_unit_uq`, `booking_items_live_unit_uq`), not in the UI.
+
+- Schema: `src/db/schema.ts` · migration SQL: `drizzle/` · engine: `src/server/booking.ts`
+- Local Postgres for development/tests (no root needed): `pip install pgserver`, then
+  `python3 scripts/with-local-pg.py npx tsx src/db/migrate.ts && python3 scripts/with-local-pg.py npx tsx src/db/seed.ts`
+- Integration tests on real Postgres: `python3 scripts/with-local-pg.py npx vitest run`
+- Install with npm 12 (`npx npm@12 install`); npm 10 hits a tree bug with this dependency set.
+
+Environment: see `.env.example`. Without Stripe keys the checkout stops with "Payments are not configured" — nothing is faked.

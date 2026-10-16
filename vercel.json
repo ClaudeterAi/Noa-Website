@@ -1,5 +1,12 @@
 {
   "framework": "nextjs",
-  "regions": ["dxb1"],
-  "crons": []
+  "regions": [
+    "dxb1"
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/expire-holds",
+      "schedule": "* * * * *"
+    }
+  ]
 }

@@ -1,23 +1,23 @@
 "use client";
 
-import { useEffect, useMemo, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { pick, registry } from "@/content/registry";
 import YachtMap from "./YachtMap";
-import { ARRIVALS, DAY_IMG, mockTaken, priceFor, unitType, type Slot } from "./inventory";
+import PaymentPanel, { paymentsConfigured } from "./PaymentPanel";
+import { api, isApiError, type UnitAvailability } from "./api";
+import { ARRIVALS, DAY_IMG, priceFor, unitType, type Slot } from "./inventory";
 
 /* ---------- helpers ---------- */
 const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const fromIso = (s: string) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const aed = (n: number, locale: string) => `AED ${n.toLocaleString(locale === "ar" ? "ar-AE-u-nu-latn" : "en-US")}`;
+const mmss = (ms: number) => { const s = Math.max(0, Math.floor(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
 
-interface CartItem {
-  id: number; unitId: string; date: string; slot: Slot; guests: number; arrival: string; price: number;
-}
-const CART_KEY = "noa-cart";
+interface CartItem { holdId: string; unitId: string; date: string; slot: Slot; guests: number; arrival: string; price: number; expiresAt: string }
+const CART_KEY = "noa-cart-v2";
 
 export default function BookingApp() {
   const t = useTranslations("booking");
@@ -31,42 +31,78 @@ export default function BookingApp() {
   const [slot, setSlot] = useState<Slot | null>(null);
   const [dayModal, setDayModal] = useState<string | null>(null);
   const [pendingSlot, setPendingSlot] = useState<Slot | null>(null);
-  const [seatModal, setSeatModal] = useState<string | null>(null);
+  const [avail, setAvail] = useState<Map<string, UnitAvailability>>(new Map());
+  const [seatModal, setSeatModal] = useState<{ unitId: string; holdId: string; expiresAt: string } | null>(null);
+  const [holding, setHolding] = useState<string | null>(null);
   const [guests, setGuests] = useState(1);
   const [arrival, setArrival] = useState("");
   const [tip, setTip] = useState<{ id: string; x: number; y: number } | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [details, setDetails] = useState({ name: "", email: "", phone: "" });
-  const [payMethod, setPayMethod] = useState<"card" | null>(null);
-  const [done, setDone] = useState<{ ref: string; email: string } | null>(null);
+  const [payment, setPayment] = useState<{ clientSecret: string; total: number; ref: string; until: string } | null>(null);
+  const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+  const skew = useRef(0); // serverTime − clientTime, so the countdown follows the server clock
 
   /* body class drives the opaque nav (legacy body.booking-page) */
-  useEffect(() => {
-    document.body.classList.add("booking-page");
-    return () => document.body.classList.remove("booking-page");
-  }, []);
+  useEffect(() => { document.body.classList.add("booking-page"); return () => document.body.classList.remove("booking-page"); }, []);
 
-  /* cart persistence — same key as the static mock */
+  /* cart persistence (hold ids survive a reload; the server decides expiry) */
   useEffect(() => {
     try {
       const saved = JSON.parse(sessionStorage.getItem(CART_KEY) || "[]") as CartItem[];
-      if (Array.isArray(saved) && saved.length) { setCart(saved); setStep(3); }
-    } catch { /* ignore corrupt storage */ }
+      const live = Array.isArray(saved) ? saved.filter((c) => new Date(c.expiresAt).getTime() > Date.now()) : [];
+      if (live.length) { setCart(live); setDate(live[0].date); setSlot(live[0].slot); setStep(3); }
+    } catch { /* ignore */ }
   }, []);
   useEffect(() => { try { sessionStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* ignore */ } }, [cart]);
-
   useEffect(() => { document.body.style.overflow = dayModal || seatModal ? "hidden" : ""; }, [dayModal, seatModal]);
 
-  const taken = useMemo(() => (date ? mockTaken(fromIso(date)) : new Set<string>()), [date]);
+  /* 1-second tick for countdowns */
+  useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
+  const serverNow = now + skew.current;
+
+  /* ---------- availability (poll every 10 s on the map; Day 3 replaces polling with WebSockets) ---------- */
+  const refresh = useCallback(async () => {
+    if (!date || !slot) return;
+    try {
+      const r = await api.availability(date, slot);
+      skew.current = new Date(r.serverTime).getTime() - Date.now();
+      setAvail(new Map(r.units.map((u) => [u.unitId, u])));
+    } catch { /* keep last known state */ }
+  }, [date, slot]);
+  useEffect(() => {
+    if (step !== 2) return;
+    void refresh();
+    const id = setInterval(() => void refresh(), 10_000);
+    return () => clearInterval(id);
+  }, [step, refresh]);
+
+  const inCart = useMemo(() => new Set(cart.map((c) => c.unitId)), [cart]);
+  const taken = useMemo(() => new Set([...avail.values()].filter((u) => (u.state === "held" || u.state === "booked") && !inCart.has(u.unitId)).map((u) => u.unitId)), [avail, inCart]);
+
+  /* ---------- hold expiry: drop expired items, tell the guest ---------- */
+  useEffect(() => {
+    const deadline = payment ? new Date(payment.until).getTime() : null;
+    const expired = cart.filter((c) => (deadline ?? new Date(c.expiresAt).getTime()) <= serverNow);
+    if (!expired.length) return;
+    setCart((cc) => cc.filter((c) => !expired.includes(c)));
+    setPayment(null);
+    setNotice(t("holdExpired"));
+    void refresh();
+    if (seatModal && expired.some((c) => c.holdId === seatModal.holdId)) setSeatModal(null);
+  }, [serverNow, cart, payment, refresh, seatModal, t]);
+
+  const earliest = cart.length ? Math.min(...cart.map((c) => new Date(payment?.until ?? c.expiresAt).getTime())) : null;
+  const countdown = earliest ? mmss(earliest - serverNow) : null;
 
   /* ---------- calendar ---------- */
   const monthLabel = new Intl.DateTimeFormat(fmtLocale, { month: "long", year: "numeric" }).format(new Date(view.y, view.m, 1));
   const prevDisabled = view.y < today.getFullYear() || (view.y === today.getFullYear() && view.m <= today.getMonth());
   const shift = (n: number) => { const d = new Date(view.y, view.m + n, 1); setView({ y: d.getFullYear(), m: d.getMonth() }); };
   const weekdays = t.raw("weekdays") as string[];
-  const firstDow = new Date(view.y, view.m, 1).getDay();
-  const offset = (firstDow + 6) % 7;
+  const offset = (new Date(view.y, view.m, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(view.y, view.m + 1, 0).getDate();
   const eventsByDate = useMemo(() => Object.fromEntries(Object.values(registry.events).map((e) => [e.date, e])), []);
   const dayLabel = (d: Date) => {
@@ -77,43 +113,67 @@ export default function BookingApp() {
   };
   const longDate = (s: string) => new Intl.DateTimeFormat(fmtLocale, { weekday: "long", day: "2-digit", month: "long", year: "numeric" }).format(fromIso(s));
   const shortDate = (s: string) => new Intl.DateTimeFormat(fmtLocale, { weekday: "short", day: "2-digit", month: "short", year: "numeric" }).format(fromIso(s));
+  const goStep = (n: 1 | 2 | 3) => { setStep(n); setNotice(null); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
-  const goStep = (n: 1 | 2 | 3) => { setStep(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
-
-  /* ---------- seat modal ---------- */
-  const openSeat = (id: string) => {
-    const ty = unitType(id);
-    setSeatModal(id); setGuests(ty.pax); setArrival(ARRIVALS[slot!][0]); setTip(null);
+  /* ---------- seat → hold → modal ---------- */
+  const onSeat = async (unitId: string) => {
+    if (!date || !slot || holding) return;
+    if (inCart.has(unitId)) { goStep(3); return; }
+    setTip(null); setHolding(unitId); setNotice(null);
+    try {
+      const h = await api.hold(date, slot, unitId);
+      skew.current = new Date(h.serverTime).getTime() - Date.now();
+      const ty = unitType(unitId);
+      setSeatModal({ unitId, holdId: h.holdId, expiresAt: h.expiresAt });
+      setGuests(ty.pax); setArrival(ARRIVALS[slot][0]);
+    } catch (e) {
+      setNotice(isApiError(e, "UNIT_UNAVAILABLE") ? t("seatTaken") : (e as Error).message);
+      void refresh();
+    } finally { setHolding(null); }
   };
-  const seatType = seatModal ? unitType(seatModal) : null;
-  const seatPrice = seatType && slot ? priceFor(seatType, slot) : 0;
+  const closeSeatModal = async () => {
+    if (!seatModal) return;
+    const h = seatModal; setSeatModal(null);
+    try { await api.release(h.holdId); } catch { /* already gone */ }
+    void refresh();
+  };
+  const seatType = seatModal ? unitType(seatModal.unitId) : null;
+  const seatPrice = seatType && slot && seatModal ? (avail.get(seatModal.unitId)?.price ?? priceFor(seatType, slot)) : 0;
   const seatTotal = seatType?.perPerson ? seatPrice * guests : seatPrice;
-
   const addToCart = () => {
     if (!seatModal || !date || !slot) return;
-    setCart((c) => [...c, { id: Date.now(), unitId: seatModal, date, slot, guests, arrival, price: seatTotal }]);
+    setCart((c) => [...c, { holdId: seatModal.holdId, unitId: seatModal.unitId, date, slot, guests, arrival, price: seatTotal, expiresAt: seatModal.expiresAt }]);
     setSeatModal(null);
     goStep(3);
   };
+  const removeItem = async (c: CartItem) => {
+    setCart((cc) => cc.filter((x) => x.holdId !== c.holdId));
+    setPayment(null);
+    try { await api.release(c.holdId); } catch { /* already gone */ }
+  };
 
+  /* ---------- checkout ---------- */
   const subtotal = cart.reduce((s, c) => s + c.price, 0);
   const vat = Math.round(subtotal * 0.05);
   const total = subtotal + vat;
   const totalGuests = cart.reduce((s, c) => s + c.guests, 0);
 
-  const onTipMove = (id: string, e: MouseEvent) => {
-    setTip({ id, x: Math.min(e.clientX + 18, window.innerWidth - 300), y: Math.min(e.clientY + 18, window.innerHeight - 250) });
-  };
-
-  const confirm = (e: React.FormEvent) => {
+  const checkout = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!payMethod) { setNotice(t("choosePayment")); return; }
-    const ref = "NOA-" + Date.now().toString(36).toUpperCase();
-    setDone({ ref, email: details.email });
-    setCart([]);
-    sessionStorage.removeItem(CART_KEY);
+    if (!cart.length || busy) return;
+    if (!paymentsConfigured) { setNotice(t("paymentsOff")); return; }
+    setBusy(true); setNotice(null);
+    try {
+      const r = await api.book(cart.map((c) => ({ holdId: c.holdId, guests: c.guests, arrivalTime: c.arrival })), details, locale);
+      setPayment({ clientSecret: r.clientSecret, total: r.total, ref: r.ref, until: r.holdsExtendedUntil });
+    } catch (e) {
+      if (isApiError(e, "PAYMENTS_NOT_CONFIGURED")) setNotice(t("paymentsOff"));
+      else if (isApiError(e, "UNIT_UNAVAILABLE")) { setNotice(t("seatTaken")); void refresh(); }
+      else setNotice((e as Error).message);
+    } finally { setBusy(false); }
   };
 
+  const onTipMove = (id: string, e: MouseEvent) => setTip({ id, x: Math.min(e.clientX + 18, window.innerWidth - 300), y: Math.min(e.clientY + 18, window.innerHeight - 250) });
   const slotLabel = (s: Slot) => (s === "morning" ? `${t("morning")} · ${t("morningTime")}` : `${t("afternoon")} · ${t("afternoonTime")}`);
   const legend: [string, React.CSSProperties][] = [
     ["cabana", { background: "#d9b78b" }], ["frontCabana", { background: "#5d4d44" }],
@@ -130,12 +190,15 @@ export default function BookingApp() {
 
   return (
     <main>
-      {/* progress */}
       <div className="bk-progress">
         {(["date", "seats", "pay"] as const).map((k, i) => (
           <div key={k} className={`bk-step-dot${step === i + 1 ? " active" : step > i + 1 ? " done" : ""}`}><div className="dot" /><div className="lbl">{t(`steps.${k}`)}</div></div>
         ))}
       </div>
+
+      {countdown && step !== 1 && (
+        <div className="bk-hold-bar" role="status" aria-live="polite">{t("holdTimer", { time: countdown })}</div>
+      )}
 
       {/* STEP 1 — calendar */}
       <section id="bkStep1" className={`bk-step-section${step === 1 ? " active" : ""}`}>
@@ -154,10 +217,10 @@ export default function BookingApp() {
             const d = new Date(view.y, view.m, i + 1);
             const past = d < today;
             const ev = eventsByDate[iso(d)];
+            const open = () => { if (!past) { setDayModal(iso(d)); setPendingSlot(null); } };
             return (
               <div key={i} className={`bk-day${past ? " disabled" : ""}`} role={past ? undefined : "button"} tabIndex={past ? -1 : 0}
-                onClick={() => { if (!past) { setDayModal(iso(d)); setPendingSlot(null); } }}
-                onKeyDown={(e) => { if (!past && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); setDayModal(iso(d)); setPendingSlot(null); } }}>
+                onClick={open} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}>
                 <div className="bk-day-n">{String(i + 1).padStart(2, "0")}</div>
                 <div className="bk-day-ev" style={{ backgroundImage: `url('${(ev?.media && registry.media[ev.media]?.url) || DAY_IMG[d.getDay()]}')` }} />
                 <div className="bk-day-ev-label">{dayLabel(d).toUpperCase()}</div>
@@ -174,13 +237,15 @@ export default function BookingApp() {
           <h2 className="bk-floor-h">{t("hoverMap")}</h2>
           <div className="bk-floor-date">{date && slot ? `${shortDate(date).toUpperCase()} · ${slotLabel(slot).toUpperCase()}` : ""}</div>
         </div>
-        <div className="bk-map-wrap">
-          <YachtMap labels={yachtLabels} taken={taken} onSeatClick={openSeat} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
+        {notice && step === 2 && <p className="form-meta bk-notice" role="alert">{notice}</p>}
+        <div className={`bk-map-wrap${holding ? " is-holding" : ""}`}>
+          <YachtMap labels={yachtLabels} taken={taken} mine={inCart} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
         </div>
         <div className="bk-legend">
           {legend.map(([k, style]) => <span key={k}><span className="bk-legend-swatch" style={style} />{t(`legend.${k}`)}</span>)}
         </div>
-        <div style={{ textAlign: "center", marginTop: 36 }}>
+        <p className="form-meta" style={{ textAlign: "center", marginTop: 18 }}>{t("holdNote")}</p>
+        <div style={{ textAlign: "center", marginTop: 24 }}>
           <button type="button" className="bk-floor-next" onClick={() => (cart.length ? goStep(3) : setNotice(t("pickSeatFirst")))}>{t("proceed")}</button>
         </div>
       </section>
@@ -193,68 +258,51 @@ export default function BookingApp() {
           <span />
         </div>
         <div className="bk-review-wrap">
-          {done ? (
-            <div className="bk-confirm" style={{ gridColumn: "1/-1" }}>
-              <h2>{t("confirmed.title")}</h2>
-              <p>{t("confirmed.body", { email: done.email })} {t("confirmed.ref")}: <strong>{done.ref}</strong></p>
-              <p className="form-meta">{t("confirmed.mock")}</p>
-              <Link href="/" className="pkg-btn" style={{ background: "#1a1a1a", color: "#fff", display: "inline-block" }}>{t("confirmed.back")}</Link>
-            </div>
-          ) : (
-            <>
-              <div>
-                {cart.length === 0 ? (
-                  <div className="bk-cart-empty">{t("cartEmpty")}</div>
-                ) : cart.map((c, i) => {
-                  const ty = unitType(c.unitId);
-                  return (
-                    <div className="bk-cart-item" key={c.id}>
-                      <div className="bk-cart-img" style={{ backgroundImage: `url('${ty.img}')` }} />
-                      <div>
-                        <div className="bk-cart-name">{pick(ty.name, locale)}</div>
-                        <div className="bk-cart-meta">{shortDate(c.date).toUpperCase()} · {(c.slot === "morning" ? t("morning") : t("afternoon")).toUpperCase()} · {t("guest", { count: c.guests })} · {t("arrive")} {c.arrival}</div>
-                      </div>
-                      <div style={{ textAlign: "end" }}>
-                        <div className="bk-cart-price">{aed(c.price, locale)}</div>
-                        <a className="bk-cart-remove" role="button" tabIndex={0} onClick={() => setCart((cc) => cc.filter((_, j) => j !== i))}>{t("remove")}</a>
-                      </div>
-                    </div>
-                  );
-                })}
+          <div>
+            {cart.length === 0 ? (
+              <div className="bk-cart-empty">{t("cartEmpty")}</div>
+            ) : cart.map((c) => {
+              const ty = unitType(c.unitId);
+              return (
+                <div className="bk-cart-item" key={c.holdId}>
+                  <div className="bk-cart-img" style={{ backgroundImage: `url('${ty.img}')` }} />
+                  <div>
+                    <div className="bk-cart-name">{pick(ty.name, locale)}</div>
+                    <div className="bk-cart-meta">{shortDate(c.date).toUpperCase()} · {(c.slot === "morning" ? t("morning") : t("afternoon")).toUpperCase()} · {t("guest", { count: c.guests })} · {t("arrive")} {c.arrival}</div>
+                  </div>
+                  <div style={{ textAlign: "end" }}>
+                    <div className="bk-cart-price">{aed(c.price, locale)}</div>
+                    {!payment && <a className="bk-cart-remove" role="button" tabIndex={0} onClick={() => void removeItem(c)}>{t("remove")}</a>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <aside className="bk-pay-panel">
+            <h3 className="bk-pay-h">{t("orderSummary")}</h3>
+            <div className="bk-pay-line"><span>{t("subtotal")}</span><span>{aed(subtotal, locale)}</span></div>
+            <div className="bk-pay-line"><span>{t("vat")}</span><span>{aed(vat, locale)}</span></div>
+            <div className="bk-pay-line"><span>{t("guests")}</span><span>{totalGuests}</span></div>
+            <div className="bk-pay-line bk-pay-total"><span>{t("total")}</span><span>{aed(payment?.total ?? total, locale)}</span></div>
+            {payment ? (
+              <div className="bk-pay-form">
+                <h4 className="bk-section-h">{t("paymentMethod")} · {payment.ref}</h4>
+                <PaymentPanel clientSecret={payment.clientSecret} amountLabel={aed(payment.total, locale)} locale={locale}
+                  returnUrl={`${window.location.origin}/${locale}/booking/confirmation`}
+                  labels={{ pay: t("payNow", { amount: "{amount}" }), paying: t("paying"), failed: t("paymentFailed") }} />
               </div>
-              <aside className="bk-pay-panel">
-                <h3 className="bk-pay-h">{t("orderSummary")}</h3>
-                <div className="bk-pay-line"><span>{t("subtotal")}</span><span>{aed(subtotal, locale)}</span></div>
-                <div className="bk-pay-line"><span>{t("vat")}</span><span>{aed(vat, locale)}</span></div>
-                <div className="bk-pay-line"><span>{t("guests")}</span><span>{totalGuests}</span></div>
-                <div className="bk-pay-line bk-pay-total"><span>{t("total")}</span><span>{aed(total, locale)}</span></div>
-                <form className="bk-pay-form" onSubmit={confirm}>
-                  <h4 className="bk-section-h">{t("yourDetails")}</h4>
-                  <input type="text" name="name" placeholder={t("fullName")} required value={details.name} onChange={(e) => setDetails({ ...details, name: e.target.value })} />
-                  <input type="email" name="email" placeholder={t("email")} required value={details.email} onChange={(e) => setDetails({ ...details, email: e.target.value })} />
-                  <input type="tel" name="phone" placeholder={t("phone")} required value={details.phone} onChange={(e) => setDetails({ ...details, phone: e.target.value })} />
-                  <h4 className="bk-section-h">{t("paymentMethod")}</h4>
-                  <div className="bk-pay-methods">
-                    <button type="button" className={`bk-pay-opt${payMethod === "card" ? " selected" : ""}`} onClick={() => { setPayMethod("card"); setNotice(null); }}>
-                      <div className="bk-pay-opt-icon">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.2"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>
-                      </div>
-                      <div className="bk-pay-opt-text">
-                        <div className="bk-pay-opt-lbl">{t("card")}</div>
-                        <div className="bk-pay-opt-sub">{t("cardSub")}</div>
-                      </div>
-                    </button>
-                  </div>
-                  <div className={`bk-pay-detail${payMethod === "card" ? " show" : ""}`}>
-                    {/* Day 2 mounts the Stripe Payment Element here. No card data is ever typed into this site. */}
-                    <p className="form-meta" data-stripe-mount="payment-element">{t("cardNote")}</p>
-                  </div>
-                  {notice && <p className="form-meta" role="alert" style={{ color: "#a33" }}>{notice}</p>}
-                  <button type="submit" className="bk-confirm-btn" disabled={cart.length === 0}>{t("confirm")}</button>
-                </form>
-              </aside>
-            </>
-          )}
+            ) : (
+              <form className="bk-pay-form" onSubmit={checkout}>
+                <h4 className="bk-section-h">{t("yourDetails")}</h4>
+                <input type="text" name="name" placeholder={t("fullName")} required minLength={2} value={details.name} onChange={(e) => setDetails({ ...details, name: e.target.value })} />
+                <input type="email" name="email" placeholder={t("email")} required value={details.email} onChange={(e) => setDetails({ ...details, email: e.target.value })} />
+                <input type="tel" name="phone" placeholder={t("phone")} required minLength={6} value={details.phone} onChange={(e) => setDetails({ ...details, phone: e.target.value })} />
+                <p className="form-meta">{t("cardSub")}</p>
+                {notice && step === 3 && <p className="form-meta" role="alert" style={{ color: "#a33" }}>{notice}</p>}
+                <button type="submit" className="bk-confirm-btn" disabled={cart.length === 0 || busy}>{busy ? t("paying") : t("confirm")}</button>
+              </form>
+            )}
+          </aside>
         </div>
       </section>
 
@@ -267,7 +315,7 @@ export default function BookingApp() {
             <div className="bk-tt-row">
               <div className="bk-tt-name">{pick(ty.name, locale).toUpperCase()}</div>
               <div className="bk-tt-pax">{ty.pax} <span style={{ opacity: 0.55 }}>👤</span></div>
-              <div className="bk-tt-price">{priceFor(ty, slot).toLocaleString("en-US")}</div>
+              <div className="bk-tt-price">{(avail.get(tip.id)?.price ?? priceFor(ty, slot)).toLocaleString("en-US")}</div>
             </div>
             <div className="bk-tt-btn">{t("viewMore")}</div>
           </div>
@@ -283,18 +331,14 @@ export default function BookingApp() {
             <div className="bk-modal-body">
               <div className="bk-modal-tag">{longDate(dayModal).toUpperCase()}</div>
               <h3 className="bk-modal-event">{dayLabel(fromIso(dayModal)).toUpperCase()}</h3>
-              <div className="bk-modal-avail"><span className="ok">{t("ticketsAvailable")}</span><span className="warn">{t("fewLeft")}</span></div>
               <div className="bk-modal-tim-lbl">{t("selectTiming")}</div>
               <div className="bk-time-opts">
-                {(["morning", "afternoon"] as const).map((s) => {
-                  const soldOut = s === "morning" && fromIso(dayModal).getDay() === 0; // mock rule carried over from the static site
-                  return (
-                    <button key={s} type="button" className={`bk-time${pendingSlot === s ? " selected" : ""}${soldOut ? " sold-out" : ""}`} disabled={soldOut} onClick={() => setPendingSlot(s)}>
-                      <div className="top">{t(s)}</div>
-                      <div className="bot">{soldOut ? t("soldOut") : t(`${s}Time`)}</div>
-                    </button>
-                  );
-                })}
+                {(["morning", "afternoon"] as const).map((s) => (
+                  <button key={s} type="button" className={`bk-time${pendingSlot === s ? " selected" : ""}`} onClick={() => setPendingSlot(s)}>
+                    <div className="top">{t(s)}</div>
+                    <div className="bot">{t(`${s}Time`)}</div>
+                  </button>
+                ))}
               </div>
               <button type="button" className="bk-modal-cta" disabled={!pendingSlot} onClick={() => { setDate(dayModal); setSlot(pendingSlot); setDayModal(null); goStep(2); }}>{t("bookNow")}</button>
             </div>
@@ -302,11 +346,11 @@ export default function BookingApp() {
         </div>
       )}
 
-      {/* seat modal */}
+      {/* seat modal — the seat is already held for this guest while it is open */}
       {seatModal && seatType && slot && date && (
-        <div className="bk-modal open" onClick={(e) => { if (e.target === e.currentTarget) setSeatModal(null); }}>
+        <div className="bk-modal open" onClick={(e) => { if (e.target === e.currentTarget) void closeSeatModal(); }}>
           <div className="bk-seat-modal-inner">
-            <button type="button" className="bk-modal-close" onClick={() => setSeatModal(null)}>×</button>
+            <button type="button" className="bk-modal-close" onClick={() => void closeSeatModal()}>×</button>
             <div className="bk-seat-img-col">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={seatType.img} alt="" />
@@ -343,9 +387,8 @@ export default function BookingApp() {
                 </div>
               </div>
               <div className="bk-price-row"><div className="bk-price-lbl">{t("price")}</div><div className="bk-price-val">{aed(seatPrice, locale)}</div></div>
-              <div className="bk-addon"><span>{t("addons")}</span><span>⌄</span></div>
               <div className="bk-total-row">
-                <div><div className="bk-total-lbl">{t("total")}</div><div className="bk-total-pax">{t("guestsCount", { count: guests })}</div></div>
+                <div><div className="bk-total-lbl">{t("total")}</div><div className="bk-total-pax">{t("guestsCount", { count: guests })} · {t("holdTimer", { time: mmss(new Date(seatModal.expiresAt).getTime() - serverNow) })}</div></div>
                 <div className="bk-total-val">{aed(seatTotal, locale)}</div>
               </div>
               <button type="button" className="bk-add-cart" onClick={addToCart}>{t("addToCart")}</button>

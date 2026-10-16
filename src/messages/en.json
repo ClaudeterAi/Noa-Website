@@ -1,10 +1,22 @@
 {
   "booking": {
-    "steps": { "date": "Choose Date & Time", "seats": "Select Tables / Tickets", "pay": "Review & Pay" },
+    "steps": {
+      "date": "Choose Date & Time",
+      "seats": "Select Tables / Tickets",
+      "pay": "Review & Pay"
+    },
     "chooseDay": "CHOOSE YOUR DAY",
     "prev": "Previous",
     "next": "Next",
-    "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "weekdays": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
+    ],
     "changeDate": "← Change date",
     "hoverMap": "Hover the map for more details",
     "proceed": "Proceed to checkout →",
@@ -52,7 +64,36 @@
     "includesCredit": "Includes AED {amount} F&B Credit",
     "guestsCount": "{count, plural, one {# guest} other {# guests}}",
     "viewMore": "VIEW MORE",
-    "legend": { "cabana": "Cabana", "frontCabana": "Front Cabana", "daybed": "Daybed", "sunbed": "Sunbed", "jacuzzi": "Jacuzzi", "vip": "VIP Lounge", "balcony": "Balcony Sofa", "dj": "DJ Lounge", "entry": "General Entry", "sold": "Sold" },
-    "confirmed": { "title": "Reservation Confirmed", "ref": "Reference", "body": "A confirmation has been sent to {email}. Show the reference at the Marina Pier check-in lounge.", "mock": "Demo mode — no payment was taken. Live payments connect on Day 2.", "back": "Back to NOA" }
+    "legend": {
+      "cabana": "Cabana",
+      "frontCabana": "Front Cabana",
+      "daybed": "Daybed",
+      "sunbed": "Sunbed",
+      "jacuzzi": "Jacuzzi",
+      "vip": "VIP Lounge",
+      "balcony": "Balcony Sofa",
+      "dj": "DJ Lounge",
+      "entry": "General Entry",
+      "sold": "Sold"
+    },
+    "confirmed": {
+      "title": "Reservation Confirmed",
+      "ref": "Reference",
+      "body": "A confirmation has been sent to {email}. Show the reference at the Marina Pier check-in lounge.",
+      "mock": "Demo mode — no payment was taken. Live payments connect on Day 2.",
+      "back": "Back to NOA"
+    },
+    "holdTimer": "Seats held for {time}",
+    "holdExpired": "Your hold expired and the seat was released. Please choose again.",
+    "seatTaken": "Someone just took that seat. Pick another.",
+    "payNow": "Pay {amount}",
+    "paying": "Processing…",
+    "paymentsOff": "Payments are not configured on this preview yet.",
+    "paymentFailed": "Payment did not go through. Please try again.",
+    "checking": "Confirming your reservation…",
+    "confirmedBody": "Your seats are confirmed. A confirmation is on its way to your email and WhatsApp. Show the reference at the Marina Pier check-in lounge.",
+    "lateBody": "Your payment arrived after the hold had expired and the seat was taken. The payment has been refunded automatically.",
+    "pendingBody": "We are waiting for the bank's confirmation. This page updates automatically.",
+    "holdNote": "Seats are held for 5 minutes while you complete your reservation."
   }
 }
