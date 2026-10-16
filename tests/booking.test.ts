@@ -12,7 +12,7 @@ import { db, pool } from "@/db/client";
 import { holds, settings } from "@/db/schema";
 import { seed } from "@/db/seed";
 import {
-  attachPaymentIntent, confirmBookingByPaymentIntent, createHold, createPendingBooking, getAvailability, releaseHold, sweepExpired, UnitUnavailableError,
+  attachPaymentIntent, CartLimitError, confirmBookingByPaymentIntent, createHold, createPendingBooking, getAvailability, releaseHold, sweepExpired, UnitUnavailableError,
 } from "@/server/booking";
 
 const DATE = "2027-01-15";
@@ -43,14 +43,14 @@ describe("holds", () => {
     expect(b.holdId).toBe(a.holdId);
   });
 
-  it("availability marks held/yours/free correctly and hold length follows settings (5 min)", async () => {
+  it("availability marks held/yours/free correctly and hold length follows settings (7 min)", async () => {
     const av = await getAvailability(DATE, "afternoon", "cart-C");
     expect(av.find((u) => u.unitId === "cabana-1")?.state).toBe("held");
     expect(av.find((u) => u.unitId === "daybed-t-1")?.state).toBe("yours");
     expect(av.find((u) => u.unitId === "daybed-t-2")?.state).toBe("free");
     const until = new Date(av.find((u) => u.unitId === "daybed-t-1")!.heldUntil!).getTime() - Date.now();
-    expect(until).toBeGreaterThan(4 * 60_000);
-    expect(until).toBeLessThanOrEqual(5 * 60_000 + 2000);
+    expect(until).toBeGreaterThan(6 * 60_000);
+    expect(until).toBeLessThanOrEqual(7 * 60_000 + 2000);
   });
 
   it("an expired hold frees the seat for the next guest, even before the sweeper runs", async () => {
@@ -115,6 +115,15 @@ describe("bookings", () => {
     await db.update(settings).set({ value: 10 }).where(sql`${settings.key} = 'hold_minutes'`);
     const h = await createHold({ date: DATE, slot: "morning", unitId: "sunbed-3", cartToken: "cart-L" });
     expect(new Date(h.expiresAt).getTime() - Date.now()).toBeGreaterThan(9 * 60_000);
-    await db.update(settings).set({ value: 5 }).where(sql`${settings.key} = 'hold_minutes'`);
+    await db.update(settings).set({ value: 7 }).where(sql`${settings.key} = 'hold_minutes'`);
+  });
+
+  it("cinema rule: a cart cannot hold more than max_holds_per_cart live seats", async () => {
+    await db.update(settings).set({ value: 2 }).where(sql`${settings.key} = 'max_holds_per_cart'`);
+    await createHold({ date: DATE, slot: "afternoon", unitId: "entry-10", cartToken: "cart-M" });
+    await createHold({ date: DATE, slot: "afternoon", unitId: "entry-11", cartToken: "cart-M" });
+    await expect(createHold({ date: DATE, slot: "afternoon", unitId: "entry-12", cartToken: "cart-M" })).rejects.toBeInstanceOf(CartLimitError);
+    expect((await createHold({ date: DATE, slot: "afternoon", unitId: "entry-12", cartToken: "cart-N" })).holdId).toBeTruthy(); // another cart is unaffected
+    await db.update(settings).set({ value: 6 }).where(sql`${settings.key} = 'max_holds_per_cart'`);
   });
 });

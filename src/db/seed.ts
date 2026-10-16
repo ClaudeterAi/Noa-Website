@@ -18,7 +18,8 @@ export async function seed() {
   await db.insert(inventoryUnits).values(rows).onConflictDoUpdate({ target: inventoryUnits.id, set: { unitTypeId: sql`excluded.unit_type_id`, label: sql`excluded.label`, deck: sql`excluded.deck`, sort: sql`excluded.sort` } });
 
   await db.insert(settings).values([
-    { key: "hold_minutes", value: 5 },
+    { key: "hold_minutes", value: 7 },
+    { key: "max_holds_per_cart", value: 6 },
     { key: "hold_extension_minutes", value: 3 },
     { key: "vat_rate", value: 0.05 },
     { key: "vip_release_hours", value: 24 },

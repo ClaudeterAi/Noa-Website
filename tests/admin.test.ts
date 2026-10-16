@@ -86,7 +86,7 @@ describe("inventory, sessions, settings", () => {
     await expect(updateSetting(actor, "hold_minutes", 0)).rejects.toThrow(/1–1440/);
     await expect(updateSetting(actor, "vat_rate", 5)).rejects.toThrow(/between 0 and 1/);
     expect((await lastAudit()).entityId).toBe("hold_minutes");
-    await updateSetting(actor, "hold_minutes", 5);
+    await updateSetting(actor, "hold_minutes", 7);
     const [t] = await db.select().from(unitTypes).where(eq(unitTypes.id, "sunbed")); await updateUnitType(actor, "sunbed", { priceAfternoon: 1800 }); expect(t.priceAfternoon).toBe(2000);
   });
 });

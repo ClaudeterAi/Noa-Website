@@ -139,7 +139,7 @@ export async function listSessions(from: string, to: string) {
 
 /* ---------- settings ---------- */
 
-const SETTING_KEYS = ["hold_minutes", "hold_extension_minutes", "vat_rate", "vip_release_hours", "tier_rules"] as const;
+const SETTING_KEYS = ["hold_minutes", "hold_extension_minutes", "vat_rate", "vip_release_hours", "tier_rules", "max_holds_per_cart"] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
 export async function listSettings() {
@@ -149,7 +149,7 @@ export async function listSettings() {
 
 export async function updateSetting(actor: Actor, key: SettingKey, value: unknown) {
   if (!SETTING_KEYS.includes(key)) throw new Error("Unknown setting");
-  if (["hold_minutes", "hold_extension_minutes", "vip_release_hours"].includes(key) && (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 1440)) throw new Error(`${key} must be 1–1440`);
+  if (["hold_minutes", "hold_extension_minutes", "vip_release_hours", "max_holds_per_cart"].includes(key) && (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 1440)) throw new Error(`${key} must be 1–1440`);
   if (key === "vat_rate" && (typeof value !== "number" || value < 0 || value > 1)) throw new Error("vat_rate must be between 0 and 1");
   const [before] = await db.select().from(settings).where(eq(settings.key, key));
   const [after] = await db.insert(settings).values({ key, value: value as Record<string, unknown> }).onConflictDoUpdate({ target: settings.key, set: { value: value as Record<string, unknown>, updatedAt: sql`now()` } }).returning();

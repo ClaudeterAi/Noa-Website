@@ -43,6 +43,7 @@ export default function BookingApp() {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [holdMinutes, setHoldMinutes] = useState(7);
   const skew = useRef(0); // serverTime − clientTime, so the countdown follows the server clock
 
   /* body class drives the opaque nav (legacy body.booking-page) */
@@ -69,14 +70,17 @@ export default function BookingApp() {
     try {
       const r = await api.availability(date, slot);
       skew.current = new Date(r.serverTime).getTime() - Date.now();
+      setHoldMinutes(r.holdMinutes);
       setAvail(new Map(r.units.map((u) => [u.unitId, u])));
     } catch { /* keep last known state */ }
   }, [date, slot]);
   useEffect(() => {
     if (step !== 2) return;
     void refresh();
-    const id = setInterval(() => void refresh(), 10_000);
-    return () => clearInterval(id);
+    const id = setInterval(() => { if (document.visibilityState === "visible") void refresh(); }, 4_000);
+    const onVis = () => { if (document.visibilityState === "visible") void refresh(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); };
   }, [step, refresh]);
 
   const inCart = useMemo(() => new Set(cart.map((c) => c.unitId)), [cart]);
@@ -132,7 +136,7 @@ export default function BookingApp() {
       setGuests(ty.pax); setArrival(ARRIVALS[slot][0]);
     } catch (e) {
       const r = e as { code?: string; message: string };
-      setNotice(r.code === "UNIT_UNAVAILABLE" ? t("seatTaken") : r.code === "UNIT_RESERVED" ? t("seatReserved", { time: u?.releaseAt ? releaseLabel(u.releaseAt) : "" }) : r.message);
+      setNotice(r.code === "UNIT_UNAVAILABLE" ? t("seatTaken") : r.code === "UNIT_RESERVED" ? t("seatReserved", { time: u?.releaseAt ? releaseLabel(u.releaseAt) : "" }) : r.code === "CART_LIMIT" ? t("cartLimit") : r.message);
       void refresh();
     } finally { setHolding(null); }
   };
@@ -250,7 +254,7 @@ export default function BookingApp() {
         <div className="bk-legend">
           {legend.map(([k, style]) => <span key={k}><span className="bk-legend-swatch" style={style} />{t(`legend.${k}`)}</span>)}
         </div>
-        <p className="form-meta" style={{ textAlign: "center", marginTop: 18 }}>{t("holdNote")}</p>
+        <p className="form-meta" style={{ textAlign: "center", marginTop: 18 }}>{t("holdNote", { minutes: holdMinutes })}</p>
         <div style={{ textAlign: "center", marginTop: 24 }}>
           <button type="button" className="bk-floor-next" onClick={() => (cart.length ? goStep(3) : setNotice(t("pickSeatFirst")))}>{t("proceed")}</button>
         </div>

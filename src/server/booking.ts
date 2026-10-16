@@ -10,7 +10,7 @@ type DbOrTx = Db | Tx;
 
 /* ------------------------------------------------------------------ settings */
 
-const DEFAULTS = { hold_minutes: 5, hold_extension_minutes: 3, vat_rate: 0.05 } as const;
+const DEFAULTS = { hold_minutes: 7, hold_extension_minutes: 3, vat_rate: 0.05, max_holds_per_cart: 6 } as const;
 type SettingKey = keyof typeof DEFAULTS;
 
 export async function getSetting<K extends SettingKey>(key: K, conn: DbOrTx = db): Promise<(typeof DEFAULTS)[K]> {
@@ -85,6 +85,9 @@ export async function getAvailability(date: string, slot: Slot, cartToken?: stri
 export class UnitUnavailableError extends Error {
   constructor(public unitId: string) { super(`Unit ${unitId} is no longer available`); }
 }
+export class CartLimitError extends Error {
+  constructor(public limit: number) { super(`A cart can hold at most ${limit} seats at a time`); }
+}
 export class UnitReservedError extends Error {
   constructor(public unitId: string, public releaseAt: Date) { super(`Unit ${unitId} is reserved for members until ${releaseAt.toISOString()}`); }
 }
@@ -100,6 +103,7 @@ export interface HoldResult { holdId: string; sessionId: string; unitId: string;
  */
 export async function createHold(input: { date: string; slot: Slot; unitId: string; cartToken: string; guestId?: string; tier?: Tier }): Promise<HoldResult> {
   const holdMinutes = await getSetting("hold_minutes");
+  const maxPerCart = await getSetting("max_holds_per_cart");
   return db.transaction(async (tx) => {
     const session = await getOrCreateSession(input.date, input.slot, tx);
     if (session.status !== "open") throw new UnitUnavailableError(input.unitId);
@@ -122,6 +126,11 @@ export async function createHold(input: { date: string; slot: Slot; unitId: stri
     const mine = await tx.select().from(holds)
       .where(and(eq(holds.sessionId, session.id), eq(holds.unitId, input.unitId), isNull(holds.releasedAt), eq(holds.cartToken, input.cartToken))).limit(1);
     if (mine[0]) return { holdId: mine[0].id, sessionId: session.id, unitId: input.unitId, expiresAt: mine[0].expiresAt.toISOString() };
+
+    // cinema rule: a cart may hold at most N live seats
+    const live = await tx.select({ n: sql<number>`count(*)::int` }).from(holds)
+      .where(and(eq(holds.cartToken, input.cartToken), isNull(holds.releasedAt), gt(holds.expiresAt, sql`now()`), isNull(holds.bookingId)));
+    if (live[0].n >= maxPerCart) throw new CartLimitError(maxPerCart);
 
     try {
       const [row] = await tx.insert(holds).values({

@@ -57,7 +57,7 @@ export function Toggle({ on, label, onToggle }: { on: boolean; label: string; on
 export const UnitVipToggle = ({ id, on }: { id: string; on: boolean }) => <Toggle on={on} label="Members priority" onToggle={(n) => updateUnitAction(id, { vipPriority: n })} />;
 export const UnitActiveToggle = ({ id, on }: { id: string; on: boolean }) => <Toggle on={on} label="Active" onToggle={(n) => updateUnitAction(id, { active: n })} />;
 
-export function SettingField({ k, value, kind }: { k: "hold_minutes" | "hold_extension_minutes" | "vat_rate" | "vip_release_hours" | "tier_rules"; value: unknown; kind: "int" | "rate" | "json" }) {
+export function SettingField({ k, value, kind }: { k: "hold_minutes" | "hold_extension_minutes" | "vat_rate" | "vip_release_hours" | "tier_rules" | "max_holds_per_cart"; value: unknown; kind: "int" | "rate" | "json" }) {
   const { pending, err, run } = useAct();
   const [v, setV] = useState(kind === "json" ? JSON.stringify(value, null, 2) : String(value ?? ""));
   const save = () => run(async () => {

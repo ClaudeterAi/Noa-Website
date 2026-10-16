@@ -60,8 +60,12 @@ Cron every minute → /api/cron/expire-holds releases expired holds, expires sta
 Exclusivity is enforced in Postgres (`holds_live_unit_uq`, `booking_items_live_unit_uq`), not in the UI.
 
 - Schema: `src/db/schema.ts` · migration SQL: `drizzle/` · engine: `src/server/booking.ts`
-- Local Postgres for development/tests (no root needed): `pip install pgserver`, then
-  `python3 scripts/with-local-pg.py npx tsx src/db/migrate.ts && python3 scripts/with-local-pg.py npx tsx src/db/seed.ts`
+- **Run everything locally** (real Postgres, no AWS): `./scripts/dev-local.sh` → http://localhost:3000. Same code goes live by
+  pointing `DATABASE_URL` at RDS and running `npm run db:migrate` + `npx tsx src/db/seed.ts`.
+- Cinema-hall rules (all admin settings): tapping a seat holds it for `hold_minutes` (default 7); one extension of
+  `hold_extension_minutes` (3) at the payment step; at most `max_holds_per_cart` (6) live seats per guest; expired holds
+  free themselves; a payment that lands after expiry is refunded automatically. Others see a held seat within 4 s
+  (polling) today; the WebSocket push layer lands with AWS.
 - Integration tests on real Postgres: `python3 scripts/with-local-pg.py npx vitest run`
 - Install with npm 12 (`npx npm@12 install`); npm 10 hits a tree bug with this dependency set.
 
