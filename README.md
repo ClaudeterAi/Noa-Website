@@ -79,3 +79,14 @@ cron every minute          ──→ worker sends due rows: Resend (email + .ics
 
 - Code: `src/server/notifications/` (templates EN/AR, ICS, providers, outbox). Tests: `tests/notifications.test.ts` (fake providers).
 - WhatsApp template SIDs come from `WHATSAPP_CONTENT_SIDS` (JSON, per `template:locale`) once Meta approves NOA's templates.
+
+## VIP tiering & priority inventory (Day 3)
+
+- Tiers `guest → preferred → vip` recomputed nightly (`/api/cron/tiers`) from confirmed bookings using `settings.tier_rules`
+  (defaults: preferred = 2 visits in 12 months or a balcony-class seat; vip = AED 25,000 lifetime or any front cabana).
+  A tier NOA sets by hand (`tier_manual`) is never overridden by the job.
+- Units flagged `vip_priority` show as **reserved** to ordinary guests until `sessions.vip_release_at`
+  (session start − `settings.vip_release_hours`, default 24 h, Dubai time); preferred/vip guests book them any time.
+  The rule is enforced in `createHold`, not just in the UI.
+- Guest identity comes from the signed `noa_guest` cookie (`src/server/guest-session.ts`), issued by passwordless sign-in (Day 4).
+  Without a session the site is guest-checkout only. Code: `src/server/vip.ts`. Tests: `tests/vip.test.ts`.

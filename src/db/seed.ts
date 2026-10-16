@@ -21,6 +21,8 @@ export async function seed() {
     { key: "hold_minutes", value: 5 },
     { key: "hold_extension_minutes", value: 3 },
     { key: "vat_rate", value: 0.05 },
+    { key: "vip_release_hours", value: 24 },
+    { key: "tier_rules", value: { preferred: { visits12m: 2, minUnitTier: 4 }, vip: { lifetimeSpend: 25000, minUnitTier: 6 } } },
   ]).onConflictDoNothing();
 }
 

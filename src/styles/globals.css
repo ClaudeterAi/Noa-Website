@@ -1069,3 +1069,6 @@ section.prose[data-placeholder="legal"]{padding-top:160px;}
 .bk-hold-bar{position:sticky;top:74px;z-index:400;margin:0 auto 18px;width:max-content;max-width:90%;padding:10px 22px;background:#1a1a1a;color:#fff;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;text-align:center;}
 .bk-notice{text-align:center;color:#a33;margin:0 auto 18px;max-width:900px;}
 .bk-result{max-width:720px;margin:0 auto;padding:180px 24px 120px;text-align:center;}
+/* Day 3 — VIP-priority units before their release time */
+.yacht-map .seat.reserved{opacity:.45;stroke-dasharray:4 3;cursor:not-allowed;}
+.yacht-map .seat.reserved ~ text.seat-lbl{opacity:.5;}

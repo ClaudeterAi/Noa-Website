@@ -1,6 +1,6 @@
 import type { Slot } from "./inventory";
 
-export interface UnitAvailability { unitId: string; unitTypeId: string; price: number; pax: number; state: "free" | "held" | "booked" | "yours"; heldUntil?: string; vipPriority: boolean }
+export interface UnitAvailability { unitId: string; unitTypeId: string; price: number; pax: number; state: "free" | "held" | "booked" | "yours" | "reserved"; heldUntil?: string; releaseAt?: string; vipPriority: boolean }
 export interface ApiError { code: string; message: string; details?: unknown }
 
 async function req<T>(input: string, init?: RequestInit): Promise<T> {
@@ -11,7 +11,7 @@ async function req<T>(input: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  availability: (date: string, slot: Slot) => req<{ units: UnitAvailability[]; serverTime: string }>(`/api/availability?date=${date}&slot=${slot}`),
+  availability: (date: string, slot: Slot) => req<{ units: UnitAvailability[]; serverTime: string; tier: "guest" | "preferred" | "vip" }>(`/api/availability?date=${date}&slot=${slot}`),
   hold: (date: string, slot: Slot, unitId: string) => req<{ holdId: string; expiresAt: string; serverTime: string }>("/api/holds", { method: "POST", body: JSON.stringify({ date, slot, unitId }) }),
   release: (holdId: string) => req<{ released: boolean }>(`/api/holds/${holdId}`, { method: "DELETE" }),
   book: (lines: { holdId: string; guests: number; arrivalTime: string }[], guest: { name: string; email: string; phone: string }, locale: string) =>

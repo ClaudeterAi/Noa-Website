@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { getAvailability } from "@/server/booking";
 import { getCartToken } from "@/server/cart-cookie";
+import { getCurrentGuest } from "@/server/guest-session";
 import { error, handle, json } from "@/server/http";
 
 export const runtime = "nodejs";
@@ -13,7 +14,8 @@ export async function GET(req: Request) {
     const url = new URL(req.url);
     const parsed = Query.safeParse({ date: url.searchParams.get("date"), slot: url.searchParams.get("slot") });
     if (!parsed.success) return error(422, "VALIDATION_ERROR", "date (YYYY-MM-DD) and slot (morning|afternoon) are required", parsed.error.issues);
-    const units = await getAvailability(parsed.data.date, parsed.data.slot, await getCartToken());
-    return json({ date: parsed.data.date, slot: parsed.data.slot, serverTime: new Date().toISOString(), units }, { headers: { "Cache-Control": "no-store" } });
+    const me = await getCurrentGuest();
+    const units = await getAvailability(parsed.data.date, parsed.data.slot, await getCartToken(), me?.tier ?? "guest");
+    return json({ date: parsed.data.date, slot: parsed.data.slot, serverTime: new Date().toISOString(), tier: me?.tier ?? "guest", units }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) { return handle(e); }
 }

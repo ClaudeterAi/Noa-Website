@@ -74,7 +74,8 @@
       "balcony": "Balcony Sofa",
       "dj": "DJ Lounge",
       "entry": "General Entry",
-      "sold": "Sold"
+      "sold": "Sold",
+      "reserved": "Members' priority"
     },
     "confirmed": {
       "title": "Reservation Confirmed",
@@ -94,6 +95,8 @@
     "confirmedBody": "Your seats are confirmed. A confirmation is on its way to your email and WhatsApp. Show the reference at the Marina Pier check-in lounge.",
     "lateBody": "Your payment arrived after the hold had expired and the seat was taken. The payment has been refunded automatically.",
     "pendingBody": "We are waiting for the bank's confirmation. This page updates automatically.",
-    "holdNote": "Seats are held for 5 minutes while you complete your reservation."
+    "holdNote": "Seats are held for 5 minutes while you complete your reservation.",
+    "seatReserved": "This seat is reserved for returning guests until {time}. It opens to everyone after that.",
+    "legendReserved": "Members' priority"
   }
 }

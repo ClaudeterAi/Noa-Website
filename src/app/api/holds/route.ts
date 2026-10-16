@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createHold } from "@/server/booking";
 import { getOrSetCartToken } from "@/server/cart-cookie";
+import { getCurrentGuest } from "@/server/guest-session";
 import { handle, json, parseBody } from "@/server/http";
 
 export const runtime = "nodejs";
@@ -16,7 +17,8 @@ export async function POST(req: Request) {
   try {
     const body = await parseBody(req, Body);
     const cartToken = await getOrSetCartToken(req);
-    const hold = await createHold({ ...body, cartToken });
+    const me = await getCurrentGuest();
+    const hold = await createHold({ ...body, cartToken, guestId: me?.id, tier: me?.tier ?? "guest" });
     return json({ ...hold, serverTime: new Date().toISOString() }, { status: 201 });
   } catch (e) { return handle(e); }
 }
