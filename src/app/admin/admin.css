@@ -1,0 +1,28 @@
+/* NOA admin — staff tool. Plain, dense, same typefaces as the site. */
+.ad{font-family:var(--font-sans);color:#1a1a1a;background:#fafaf8;min-height:100vh;}
+.ad *{box-sizing:border-box;}
+.ad-nav{display:flex;gap:22px;align-items:center;padding:14px 28px;border-bottom:1px solid #e6e2db;background:#fff;position:sticky;top:0;z-index:5;}
+.ad-nav .logo{font-size:1.1rem;letter-spacing:.45em;}
+.ad-nav a{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:#1a1a1a;text-decoration:none;}
+.ad-nav .who{margin-inline-start:auto;font-size:.68rem;color:#777;}
+.ad-main{padding:28px;max-width:1280px;margin:0 auto;}
+.ad h1{font-family:var(--font-serif);font-weight:300;font-size:2rem;margin:0 0 18px;}
+.ad h2{font-family:var(--font-serif);font-weight:300;font-size:1.4rem;margin:28px 0 12px;}
+.ad table{width:100%;border-collapse:collapse;background:#fff;font-size:.8rem;}
+.ad th{text-align:start;font-weight:400;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#777;padding:10px 12px;border-bottom:1px solid #e6e2db;}
+.ad td{padding:10px 12px;border-bottom:1px solid #f0ece6;vertical-align:top;}
+.ad .pill{display:inline-block;padding:3px 8px;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;border:1px solid #1a1a1a;}
+.ad .pill.ok{background:#1a1a1a;color:#fff;} .ad .pill.warn{border-color:#a33;color:#a33;} .ad .pill.muted{border-color:#bbb;color:#888;}
+.ad input,.ad select{font:inherit;padding:8px 10px;border:1px solid #d6d1c8;background:#fff;}
+.ad button{font:inherit;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;padding:9px 16px;border:1px solid #1a1a1a;background:#1a1a1a;color:#fff;cursor:pointer;}
+.ad button.ghost{background:transparent;color:#1a1a1a;}
+.ad button:disabled{opacity:.4;cursor:default;}
+.ad .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.ad .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;}
+.ad .card{background:#fff;border:1px solid #e6e2db;padding:16px;}
+.ad .card .n{font-family:var(--font-serif);font-size:2rem;font-weight:300;}
+.ad .card .l{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:#777;}
+.ad .err{color:#a33;font-size:.78rem;}
+.ad .note{color:#777;font-size:.78rem;}
+.ad pre{font-size:.72rem;background:#f4f1ec;padding:10px;overflow:auto;}
+.ad-signin{min-height:100vh;display:grid;place-items:center;}
