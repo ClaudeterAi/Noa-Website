@@ -7,6 +7,8 @@ import { hrefPath, getPage, pick, registry } from "@/content/registry";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import Effects from "@/components/layout/Effects";
+import ChatConcierge from "@/components/concierge/ChatConcierge";
+import VoiceConcierge from "@/components/concierge/VoiceConcierge";
 import { cormorant, josefin, naskh, plexArabic } from "@/fonts";
 import "@/styles/globals.css";
 
@@ -51,6 +53,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           />
           {children}
           <Footer locale={loc} />
+          <VoiceConcierge />
+          <ChatConcierge />
         </NextIntlClientProvider>
       </body>
     </html>

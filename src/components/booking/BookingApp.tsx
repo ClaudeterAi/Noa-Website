@@ -50,14 +50,23 @@ export default function BookingApp() {
   /* body class drives the opaque nav (legacy body.booking-page) */
   useEffect(() => { document.body.classList.add("booking-page"); return () => document.body.classList.remove("booking-page"); }, []);
 
-  /* cart persistence (hold ids survive a reload; the server decides expiry) */
+  /* cart = the server's live holds for this browser (chat and voice fill the same cart); sessionStorage only keeps guest count / arrival choices */
   useEffect(() => {
-    try {
-      const saved = JSON.parse(sessionStorage.getItem(CART_KEY) || "[]") as CartItem[];
-      const live = Array.isArray(saved) ? saved.filter((c) => new Date(c.expiresAt).getTime() > Date.now()) : [];
-      if (live.length) { setCart(live); setDate(live[0].date); setSlot(live[0].slot); setStep(3); }
-    } catch { /* ignore */ }
-  }, []);
+    (async () => {
+      let saved: CartItem[] = [];
+      try { saved = JSON.parse(sessionStorage.getItem(CART_KEY) || "[]") as CartItem[]; } catch { /* ignore */ }
+      try {
+        const r = await fetch(`/api/cart?locale=${locale}`, { credentials: "same-origin", cache: "no-store" });
+        const c = (await r.json()) as { items: { hold_id: string; unit_id: string; seat: string; date: string; session: string; price_aed: number; expires_at: string }[] };
+        const live: CartItem[] = c.items.map((i) => {
+          const prev = saved.find((s) => s.holdId === i.hold_id);
+          const slotOf: Slot = /9:30|صباح|Morning/.test(i.session) ? "morning" : "afternoon";
+          return prev ? { ...prev, expiresAt: i.expires_at } : { holdId: i.hold_id, unitId: i.unit_id, typeId: "", name: i.seat, img: "", date: i.date, slot: slotOf, guests: 1, arrival: ARRIVALS[slotOf][0], price: i.price_aed, expiresAt: i.expires_at };
+        });
+        if (live.length) { setCart(live); setDate(live[0].date); setSlot(live[0].slot); setStep(3); }
+      } catch { /* offline: keep whatever is in sessionStorage */ }
+    })();
+  }, [locale]);
   useEffect(() => { try { sessionStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* ignore */ } }, [cart]);
   useEffect(() => { document.body.style.overflow = dayModal || seatModal ? "hidden" : ""; }, [dayModal, seatModal]);
 
