@@ -90,3 +90,11 @@ cron every minute          ──→ worker sends due rows: Resend (email + .ics
   The rule is enforced in `createHold`, not just in the UI.
 - Guest identity comes from the signed `noa_guest` cookie (`src/server/guest-session.ts`), issued by passwordless sign-in (Day 4).
   Without a session the site is guest-checkout only. Code: `src/server/vip.ts`. Tests: `tests/vip.test.ts`.
+
+## Admin (Day 3)
+
+`/admin` — staff only. Sign-in via Amazon Cognito admin user pool (next-auth, OIDC); roles from Cognito groups:
+`frontdesk` (read, retry messages) < `editor` (refunds, cancel, tiers, prices, VIP flags, close sessions) < `owner` (+ settings).
+Pages: dashboard (today + 14 days, live holds), bookings (filters, detail, refund via Stripe, cancel), guests (tier, CSV export),
+inventory & pricing, messages (retry), settings, audit trail. Every mutation writes `audit_log` (who, before, after).
+Code: `src/server/admin/`, `src/app/admin/`. Tests: `tests/admin.test.ts`. Migration `0002` adds `audit_log` only.

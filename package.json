@@ -24,7 +24,8 @@
     "@stripe/stripe-js": "10.0.0",
     "@stripe/react-stripe-js": "7.0.0",
     "resend": "6.32.0",
-    "twilio": "6.1.2"
+    "twilio": "6.1.2",
+    "next-auth": "4.24.15"
   },
   "devDependencies": {
     "@types/node": "22.20.5",

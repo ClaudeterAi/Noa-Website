@@ -197,3 +197,17 @@ export const sessionPriceOverrides = pgTable("session_price_overrides", {
   unitTypeId: text("unit_type_id").notNull().references(() => unitTypes.id),
   price: numeric("price", { precision: 10, scale: 2 }).notNull(),
 }, (t) => [primaryKey({ columns: [t.sessionId, t.unitTypeId] })]);
+
+/* ---------------- admin audit trail ---------------- */
+
+export const auditLog = pgTable("audit_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  actor: text("actor").notNull(),              // admin email (from Cognito) or 'system'
+  role: text("role").notNull(),                // owner | editor | frontdesk | system
+  action: text("action").notNull(),            // 'booking.refund' | 'guest.tier.set' | 'settings.update' | 'unit.update' | ...
+  entity: text("entity").notNull(),            // table name
+  entityId: text("entity_id").notNull(),
+  before: jsonb("before"),
+  after: jsonb("after"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("audit_entity_idx").on(t.entity, t.entityId), index("audit_created_idx").on(t.createdAt)]);
