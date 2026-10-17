@@ -1,0 +1,164 @@
+{
+  "josefin-sans": [
+    {
+      "file": "josefin-sans-latin-ext-200.woff2",
+      "weight": "200",
+      "style": "normal",
+      "subset": "latin-ext",
+      "bytes": 21300
+    },
+    {
+      "file": "josefin-sans-latin-200.woff2",
+      "weight": "200",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 28676
+    },
+    {
+      "file": "josefin-sans-latin-ext-300.woff2",
+      "weight": "300",
+      "style": "normal",
+      "subset": "latin-ext",
+      "bytes": 21300
+    },
+    {
+      "file": "josefin-sans-latin-300.woff2",
+      "weight": "300",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 28676
+    },
+    {
+      "file": "josefin-sans-latin-ext-400.woff2",
+      "weight": "400",
+      "style": "normal",
+      "subset": "latin-ext",
+      "bytes": 21300
+    },
+    {
+      "file": "josefin-sans-latin-400.woff2",
+      "weight": "400",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 28676
+    }
+  ],
+  "cormorant": [
+    {
+      "file": "cormorant-latin-ext-300-italic.woff2",
+      "weight": "300",
+      "style": "italic",
+      "subset": "latin-ext",
+      "bytes": 31264
+    },
+    {
+      "file": "cormorant-latin-300-italic.woff2",
+      "weight": "300",
+      "style": "italic",
+      "subset": "latin",
+      "bytes": 38076
+    },
+    {
+      "file": "cormorant-latin-ext-400-italic.woff2",
+      "weight": "400",
+      "style": "italic",
+      "subset": "latin-ext",
+      "bytes": 31264
+    },
+    {
+      "file": "cormorant-latin-400-italic.woff2",
+      "weight": "400",
+      "style": "italic",
+      "subset": "latin",
+      "bytes": 38076
+    },
+    {
+      "file": "cormorant-latin-ext-300.woff2",
+      "weight": "300",
+      "style": "normal",
+      "subset": "latin-ext",
+      "bytes": 30304
+    },
+    {
+      "file": "cormorant-latin-300.woff2",
+      "weight": "300",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 35280
+    },
+    {
+      "file": "cormorant-latin-ext-400.woff2",
+      "weight": "400",
+      "style": "normal",
+      "subset": "latin-ext",
+      "bytes": 30304
+    },
+    {
+      "file": "cormorant-latin-400.woff2",
+      "weight": "400",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 35280
+    }
+  ],
+  "ibm-plex-sans-arabic": [
+    {
+      "file": "ibm-plex-sans-arabic-arabic-200.woff2",
+      "weight": "200",
+      "style": "normal",
+      "subset": "arabic",
+      "bytes": 35276
+    },
+    {
+      "file": "ibm-plex-sans-arabic-latin-200.woff2",
+      "weight": "200",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 14680
+    },
+    {
+      "file": "ibm-plex-sans-arabic-arabic-300.woff2",
+      "weight": "300",
+      "style": "normal",
+      "subset": "arabic",
+      "bytes": 35432
+    },
+    {
+      "file": "ibm-plex-sans-arabic-latin-300.woff2",
+      "weight": "300",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 14832
+    },
+    {
+      "file": "ibm-plex-sans-arabic-arabic-400.woff2",
+      "weight": "400",
+      "style": "normal",
+      "subset": "arabic",
+      "bytes": 33512
+    },
+    {
+      "file": "ibm-plex-sans-arabic-latin-400.woff2",
+      "weight": "400",
+      "style": "normal",
+      "subset": "latin",
+      "bytes": 13944
+    }
+  ],
+  "noto-naskh-arabic": [
+    {
+      "file": "noto-naskh-arabic-arabic-400.woff2",
+      "weight": "400",
+      "style": "normal",
+      "subset": "arabic",
+      "bytes": 93960
+    },
+    {
+      "file": "noto-naskh-arabic-arabic-500.woff2",
+      "weight": "500",
+      "style": "normal",
+      "subset": "arabic",
+      "bytes": 93960
+    }
+  ]
+}
