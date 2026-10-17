@@ -1,7 +1,17 @@
 # NOA Voice Concierge — ElevenLabs Agents configuration
 
-Set this up once in NOA's ElevenLabs workspace (Agents → Create). Everything the agent *knows* comes from
-`GET /api/agent/knowledge` and everything it *does* goes through `POST /api/agent/tools` — both served by this app.
+**This is configured from code.** `scripts/elevenlabs-setup.ts` creates/updates the tools, uploads the knowledge document and
+patches the agent through the ElevenLabs API — idempotent, re-run after every content publish or when the site URL changes:
+
+```bash
+ELEVENLABS_API_KEY=… ELEVENLABS_AGENT_ID=agent_… ELEVENLABS_TOOL_SECRET=… SITE_URL=https://noa-dubai.com \
+  python3 scripts/with-local-pg.py npx tsx scripts/elevenlabs-setup.ts        # (or with DATABASE_URL set)
+```
+
+Applied on 17 Oct 2026 to the workspace agent `NOA Concierge` (previously the blank "Noa" agent): 3 client tools, 6 webhook tools,
+one KB document (EN + AR), prompt, EN first message + Arabic preset, LLM `claude-haiku-4-5`, 7 s turn timeout, 60 s silence hang-up,
+10-minute max call. Webhook URL is `https://noa-website-two.vercel.app/api/agent/tools` until NOA's domain exists.
+The sections below describe what the script sets, for review.
 
 ## 1. Agent
 - Name: `NOA Concierge` · Languages: English (default) + Arabic · Voices: one EN, one AR (NOA to pick)
