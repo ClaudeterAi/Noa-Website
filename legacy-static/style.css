@@ -583,7 +583,7 @@ body.booking-page { padding-top: 96px; }
 .bk-floor-back:hover, .bk-floor-next:hover { background: #1a1a1a; color: #fff; }
 
 .bk-map-wrap { max-width: 1300px; margin: 0 auto; overflow-x: auto; }
-#yachtMap { width: 100%; min-width: 900px; height: auto; display: block; }
+.yacht-map { width: 100%; height: auto; display: block; }
 
 /* Yacht seats — fills set inline in SVG (so gradients render); CSS only handles stroke + interaction */
 .seat { cursor: pointer; transition: opacity .2s, filter .2s; }
@@ -593,7 +593,10 @@ body.booking-page { padding-top: 96px; }
 .seat.cabana,
 .seat.front-cabana,
 .seat.balcony-sofa,
-.seat.dj-lounge { stroke: #1a1a1a; stroke-width: 1; }
+.seat.dj-lounge,
+.seat.sunbed,
+.seat.vip-lounge,
+.seat.jacuzzi { stroke: #1a1a1a; stroke-width: 1; }
 .seat.entry { fill: #fff; stroke: #1a1a1a; stroke-width: .8; stroke-dasharray: 3 2; }
 
 /* SOLD state — strong overrides so grey is unmistakable, including over gradient fills */
@@ -949,9 +952,8 @@ input,select,textarea{font-size:16px;}
   .bk-day-n{font-size:1.8rem;}
   .bk-day-ev-label{font-size:.5rem;}
 
-  /* Floor plan: scroll horizontally if needed */
   /* Floor plan: rotate the yacht 90° left so it reads as a long portrait
-     boat on phones (bow points down). No horizontal scroll needed. */
+     boat on phones (bow points down). Aspect is now 1400×1000 = 1.4:1. */
   .bk-map-wrap{
     --bkw: min(86vw, 360px);
     margin: 24px auto 12px;
@@ -959,21 +961,21 @@ input,select,textarea{font-size:16px;}
     overflow: visible;
     position: relative;
     width: var(--bkw);
-    height: calc(var(--bkw) * 2);
+    height: calc(var(--bkw) * 1400 / 1000);
   }
-  #yachtMap{
+  .yacht-map{
     position: absolute;
     top: 50%;
     left: 50%;
-    width: calc(var(--bkw) * 2);
+    width: calc(var(--bkw) * 1400 / 1000);
     height: var(--bkw);
     min-width: 0;
     max-width: none;
     transform: translate(-50%, -50%) rotate(-90deg);
     transform-origin: center center;
   }
-  /* Counter-rotate the lone DJ text label so it reads upright */
-  #yachtMap text{
+  /* Counter-rotate every text label so it reads upright after SVG rotates */
+  .yacht-map text{
     transform: rotate(90deg);
     transform-origin: center;
     transform-box: fill-box;
