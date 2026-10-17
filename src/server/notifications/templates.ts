@@ -7,7 +7,7 @@ import { buildIcs } from "./ics";
  * itself lives in Twilio Content and is referenced by SID from env (see providers/whatsapp.ts).
  */
 const PIER = { en: "Dubai Marina Pier, Berth 7", ar: "رصيف مرسى دبي، المرسى 7" };
-const SLOT = { morning: { en: "Morning · 9:30 AM – 2:00 PM", ar: "الصباح · 9:30 ص – 2:00 م" }, afternoon: { en: "Afternoon · 2:00 PM – 9:30 PM", ar: "بعد الظهر · 2:00 م – 9:30 م" } };
+const SLOT = { morning: { en: "Morning · 9:30 AM – 2:00 PM", ar: "الصباح · 9:30 ص – 2:00 م" }, afternoon: { en: "Afternoon · 2:00 PM – 9:30 PM", ar: "بعد الظهر · 2:00 م – 9:30 م" }, night: { en: "Night session", ar: "الجلسة الليلية" }, full: { en: "Full day", ar: "يوم كامل" } } as const;
 const CHECKIN = { en: "Check in at the Marina Pier lounge 30 minutes before your arrival time.", ar: "سجّل وصولك في صالة رصيف المرسى قبل 30 دقيقة من موعد وصولك." };
 
 const fmtDate = (d: string, locale: Locale) =>

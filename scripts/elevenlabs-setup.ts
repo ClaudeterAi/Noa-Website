@@ -11,7 +11,7 @@
  * Nothing is deleted except the previous NOA knowledge document it created itself.
  */
 import { toolDefinitions } from "../src/server/concierge/tools";
-import { systemPrompt } from "../src/server/concierge/chat";
+import { readFileSync } from "node:fs";
 import { buildKnowledge } from "../src/server/concierge/knowledge";
 import { pool } from "../src/db/client";
 
@@ -116,18 +116,23 @@ async function ensureKnowledge(): Promise<{ id: string; name: string }> {
 /* ---------- 4. agent ---------- */
 async function patchAgent(agentId: string, toolIds: Record<string, string>, kb: { id: string; name: string }) {
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
-  const base = systemPrompt("en", "", "voice", "{{today}}").replace(`Today is {{today}}`, "Today is {{today}}");
-  const prompt = `${base}
-
-You are on the NOA website together with the guest; the guest is on {{current_page}}. The site language is {{locale}}.
-When the guest asks where something is, call find_page then navigate. When seats are held and the guest wants to pay, call checkout_link then open_booking.
-If {{guest_name}} is not empty, greet them by name once. If {{guest_tier}} is vip or preferred, members-priority seats are available to them.
-The guest's cart already holds {{cart_items}} seat(s) totalling AED {{cart_total_aed}}; mention it only if relevant.
-Every server tool automatically receives cart_token and locale; never ask the guest for them.
-Answer in Arabic when the guest speaks Arabic and call switch_language("ar"); switch back the same way.
-Use the knowledge base for hours, packages, policies, directions and prices; never invent events or artists.`;
+  const prompt = readFileSync(new URL("../agent/prompt.voice.md", import.meta.url), "utf-8");
   const firstEn = "Welcome to NOA. I can tell you about the day, check seats, or hold a place for you — what would you like?";
-  const firstAr = "أهلاً بك في نوا. يمكنني أن أخبرك عن اليوم، أو أتحقق من المقاعد، أو أحجز لك مكاناً — ماذا تريد؟";
+  /* First messages per language. Dubai's main visitor languages; NOA can add more in the dashboard — presets set by hand are kept. */
+  const firstMessages: Record<string, string> = {
+    ar: "أهلاً بك في نوا. يمكنني أن أخبرك عن اليوم، أو أتحقق من المقاعد، أو أحجز لك مكاناً — ماذا تريد؟",
+    ru: "Добро пожаловать в NOA. Я могу рассказать о дне, проверить места или забронировать их для вас — что вы хотите?",
+    hi: "NOA में आपका स्वागत है। मैं आपको दिन के बारे में बता सकता हूँ, सीटें देख सकता हूँ, या आपके लिए जगह रोक सकता हूँ — आप क्या चाहेंगे?",
+    zh: "欢迎来到 NOA。我可以为您介绍当天安排、查看座位，或为您预留位置——您想了解什么？",
+    fr: "Bienvenue à NOA. Je peux vous présenter la journée, vérifier les places ou vous en réserver une — que souhaitez-vous ?",
+    de: "Willkommen bei NOA. Ich kann Ihnen den Tag vorstellen, Plätze prüfen oder einen für Sie reservieren — was möchten Sie?",
+    es: "Bienvenido a NOA. Puedo contarle sobre el día, comprobar asientos o reservarle un lugar — ¿qué desea?",
+    it: "Benvenuto a NOA. Posso raccontarle la giornata, controllare i posti o riservarne uno per lei — cosa desidera?",
+    tr: "NOA'ya hoş geldiniz. Size günü anlatabilir, koltukları kontrol edebilir veya sizin için yer ayırabilirim — ne istersiniz?",
+  };
+  const current = await el<{ conversation_config: { language_presets?: Record<string, unknown> } }>(`/v1/convai/agents/${agentId}`);
+  const presets: Record<string, unknown> = { ...(current.conversation_config.language_presets ?? {}) };
+  for (const [code, msg] of Object.entries(firstMessages)) if (!presets[code]) presets[code] = { overrides: { agent: { first_message: msg } } };
   const body = {
     name: "NOA Concierge",
     conversation_config: {
@@ -142,12 +147,13 @@ Use the knowledge base for hours, packages, policies, directions and prices; nev
           built_in_tools: { end_call: { name: "end_call", description: "", type: "system", params: { system_tool_type: "end_call" } }, language_detection: { name: "language_detection", description: "", type: "system", params: { system_tool_type: "language_detection" } }, skip_turn: { name: "skip_turn", description: "", type: "system", params: { system_tool_type: "skip_turn" } } },
         },
       },
-      language_presets: { ar: { overrides: { agent: { first_message: firstAr } } } },
+      language_presets: presets,
       turn: { turn_timeout: 7, silence_end_call_timeout: 60 },
       conversation: { max_duration_seconds: 600 },
     },
   };
   if (DRY) { console.log(JSON.stringify(body, null, 2).slice(0, 1500)); return; }
+  void today;
   await el(`/v1/convai/agents/${agentId}`, { method: "PATCH", json: body });
 }
 

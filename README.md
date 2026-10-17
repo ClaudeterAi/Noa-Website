@@ -131,3 +131,20 @@ Voice client tools: navigate · open_booking · switch_language (src/components/
 
 Setup for the voice agent: `agent/elevenlabs-agent.md`. Without `ANTHROPIC_API_KEY` / `ELEVENLABS_AGENT_ID` the buttons say the concierge isn't configured — nothing is faked.
 Tests: `tests/concierge.test.ts` (tools on Postgres, chat loop against a fake model).
+
+## Events → website, chat and voice, automatically (Day 4)
+
+```
+Admin creates/edits an event  ──"Auto-fill with AI"──→ Claude fills what's missing (bios via web search, pitch, Arabic, tags, SEO,
+                                                        talking points); every AI field is marked with a confidence for review
+Save & publish
+  → events table + kb_sync_jobs row (same transaction, coalesced per event)
+  → public pages revalidate (home card, events page, EN + AR)            ← instant; ISR 60 s is the safety net
+  → chat concierge reads events live                                     ← instant
+  → worker (right away + /api/cron/kb-sync every minute) renders ONE document per event and pushes it to the
+    ElevenLabs agent (create → attach → delete previous); unchanged content is a no-op; cancel removes the document
+Kind: regular · main (featured upcoming) · highlight (best past — kept in the knowledge base as social proof)
+```
+
+Code: `src/server/events/` (enrich, kb-sync, repo, public), admin at `/admin/events`. Tests: `tests/events.test.ts`.
+Session enum gained `night` and `full` for event sessions; booking-page support for those slots is a follow-up.

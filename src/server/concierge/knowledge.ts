@@ -2,6 +2,7 @@ import { registry } from "@/content/registry";
 import type { L, Locale, Section } from "@/content/types";
 import { getSetting, listUnitTypes } from "@/server/booking";
 import { navTargets } from "./sitemap";
+import { eventsKnowledge } from "@/server/events/kb-sync";
 
 /**
  * One document, regenerated on demand, that both agents read:
@@ -67,8 +68,12 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
     for (const s of page.sections) lines.push(...sectionText(s, locale));
   }
 
-  lines.push(ar ? "## الفعاليات (بيانات مؤقتة حتى تأكيد نوا)" : "## Events (placeholder data until NOA confirms)");
-  for (const e of Object.values(events)) lines.push(`- ${pick(e.dateLabel, locale)}: ${pick(e.name, locale)} — ${pick(e.artist, locale)}`);
+  const live = await eventsKnowledge();
+  if (live) lines.push(live);
+  else {
+    lines.push(ar ? "## الفعاليات (بيانات مؤقتة حتى تأكيد نوا)" : "## Events (placeholder data until NOA confirms)");
+    for (const e of Object.values(events)) lines.push(`- ${pick(e.dateLabel, locale)}: ${pick(e.name, locale)} — ${pick(e.artist, locale)}`);
+  }
 
   return lines.join("\n");
 }
