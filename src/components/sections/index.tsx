@@ -6,6 +6,8 @@ import { Rich } from "@/components/Text";
 import { AmenityIcon } from "./Icons";
 import FaqList from "./FaqList";
 import ContactForm from "./ContactForm";
+import { publishedEvents } from "@/server/events/public";
+import type { EventItem } from "@/content/types";
 
 const bg = (mediaId: string): CSSProperties => {
   const url = mediaUrl(mediaId);
@@ -19,7 +21,13 @@ function CtaButton({ link, locale, className = "pkg-btn" }: { link: CtaLink; loc
   return <Link href={hrefPath(link.href)}><button type="button" className={className}>{pick(link.label, locale)}</button></Link>;
 }
 
-export function SectionRenderer({ section: s, locale }: { section: Section; locale: Locale }) {
+export async function SectionRenderer({ section: s, locale }: { section: Section; locale: Locale }) {
+  const live = s.type === "eventsGrid" || s.type === "eventStrip" ? await publishedEvents() : null;
+  const liveList = (ids: string[], take?: number): EventItem[] => {
+    const fromDb = live?.upcoming ?? [];
+    if (fromDb.length) return take ? fromDb.slice(0, take) : fromDb;
+    return ids.map((id) => registry.events[id]);
+  };
   switch (s.type) {
     case "hero": {
       const video = registry.media[s.media];
@@ -112,8 +120,8 @@ export function SectionRenderer({ section: s, locale }: { section: Section; loca
             {s.all && <CtaButton link={s.all} locale={locale} className="events-all" />}
           </div>
           <div className="events-grid">
-            {s.eventIds.map((id, i) => {
-              const e = registry.events[id];
+            {liveList(s.eventIds, 3).map((e, i) => {
+              const id = e.id;
               return (
                 <Link key={id} href={hrefPath(s.cardHref)} className={`evt rv${i ? ` d${i}` : ""}`} data-placeholder={e.isPlaceholder ? "event" : undefined}>
                   <div className="evt-img">
@@ -137,8 +145,8 @@ export function SectionRenderer({ section: s, locale }: { section: Section; loca
       return (
         <section className="event-strip" id={s.id} style={s.noTopBorder ? { borderTop: "none", paddingTop: 0 } : undefined}>
           <div className="event-strip-h rv">{pick(s.heading, locale)}</div>
-          {s.eventIds.map((id) => {
-            const e = registry.events[id];
+          {(live?.upcoming.length ? liveList(s.eventIds).slice(3) : s.eventIds.map((id) => registry.events[id])).map((e) => {
+            const id = e.id;
             return (
               <Link key={id} href={hrefPath(s.href)} className="event-row rv" data-placeholder={e.isPlaceholder ? "event" : undefined}>
                 <div className="event-row-date">{pick(e.shortDate, locale)}</div>

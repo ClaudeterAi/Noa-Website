@@ -10,7 +10,7 @@ export interface BookingContext {
   phone: string | null;
   locale: Locale;
   total: number;                 // AED, whole dirhams
-  items: { unitName: string; date: string; slot: "morning" | "afternoon"; guests: number; arrivalTime: string }[];
+  items: { unitName: string; date: string; slot: "morning" | "afternoon" | "night" | "full"; guests: number; arrivalTime: string }[];
   manageUrl: string;
 }
 

@@ -12,7 +12,7 @@ import { navTargets } from "./sitemap";
  */
 export interface AgentContext { cartToken: string; locale: "en" | "ar"; tier: Tier; guestId?: string }
 
-const SLOT = { morning: { en: "Morning (9:30 AM–2:00 PM)", ar: "الصباح (9:30 ص–2:00 م)" }, afternoon: { en: "Afternoon (2:00–9:30 PM)", ar: "بعد الظهر (2:00–9:30 م)" } };
+const SLOT = { morning: { en: "Morning (9:30 AM–2:00 PM)", ar: "الصباح (9:30 ص–2:00 م)" }, afternoon: { en: "Afternoon (2:00–9:30 PM)", ar: "بعد الظهر (2:00–9:30 م)" }, night: { en: "Night session", ar: "الجلسة الليلية" }, full: { en: "Full day", ar: "يوم كامل" } } as const;
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 
 export const toolDefinitions = [

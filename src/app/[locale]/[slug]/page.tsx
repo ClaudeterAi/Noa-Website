@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
+
+export const revalidate = 60; // event publishes also call revalidatePath; this is the safety net
 import { routing, type Locale } from "@/i18n/routing";
 import { getPageBySlug, pick, slugPages } from "@/content/registry";
 import { SectionRenderer } from "@/components/sections";

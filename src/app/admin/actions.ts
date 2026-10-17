@@ -23,7 +23,7 @@ export async function updateUnitTypeAction(id: string, patch: { priceMorning?: n
 export async function updateUnitAction(id: string, patch: { vipPriority?: boolean; active?: boolean }) {
   try { const actor = await requireAdmin("editor"); await A.updateUnit(actor, id, patch); revalidatePath("/admin/inventory"); return ok(); } catch (e) { return fail(e); }
 }
-export async function setSessionStatusAction(date: string, slot: "morning" | "afternoon", status: "open" | "closed") {
+export async function setSessionStatusAction(date: string, slot: "morning" | "afternoon" | "night" | "full", status: "open" | "closed") {
   try { const actor = await requireAdmin("editor"); await A.setSessionStatus(actor, date, slot, status); revalidatePath("/admin"); return ok(); } catch (e) { return fail(e); }
 }
 export async function updateSettingAction(key: A.SettingKey, value: unknown) {
@@ -31,4 +31,18 @@ export async function updateSettingAction(key: A.SettingKey, value: unknown) {
 }
 export async function retryNotificationAction(id: string) {
   try { const actor = await requireAdmin("frontdesk"); await A.retryNotification(actor, id); revalidatePath("/admin/notifications"); return ok(); } catch (e) { return fail(e); }
+}
+
+/* ---------- events ---------- */
+import { autofillEvent, saveEvent, setEventStatus, type EventInput } from "@/server/events/repo";
+import type { EventDraft } from "@/server/events/enrich";
+
+export async function saveEventAction(id: string | null, input: EventInput) {
+  try { const actor = await requireAdmin("editor"); const row = await saveEvent(actor, id, input); revalidatePath("/admin/events"); revalidatePath("/en/events"); revalidatePath("/ar/events"); return ok({ id: row.id }); } catch (e) { return fail(e); }
+}
+export async function setEventStatusAction(id: string, status: "draft" | "published" | "past" | "cancelled") {
+  try { const actor = await requireAdmin("editor"); await setEventStatus(actor, id, status); revalidatePath("/admin/events"); revalidatePath(`/admin/events/${id}`); revalidatePath("/en/events"); revalidatePath("/ar/events"); revalidatePath("/en"); revalidatePath("/ar"); return ok(); } catch (e) { return fail(e); }
+}
+export async function autofillEventAction(draft: EventDraft) {
+  try { await requireAdmin("editor"); return ok(await autofillEvent(draft)); } catch (e) { return fail(e); }
 }

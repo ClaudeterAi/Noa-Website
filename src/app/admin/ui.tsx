@@ -11,7 +11,7 @@ function useAct() {
   return { pending, err, run };
 }
 
-export function SessionToggle({ date, slot, status }: { date: string; slot: "morning" | "afternoon"; status: string }) {
+export function SessionToggle({ date, slot, status }: { date: string; slot: "morning" | "afternoon" | "night" | "full"; status: string }) {
   const { pending, err, run } = useAct();
   const next = status === "open" ? "closed" : "open";
   return <span className="row"><button type="button" className="ghost" disabled={pending} onClick={() => run(() => setSessionStatusAction(date, slot, next))}>{next === "closed" ? "Close" : "Reopen"}</button>{err && <span className="err">{err}</span>}</span>;

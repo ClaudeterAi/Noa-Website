@@ -13,7 +13,7 @@ import {
  *   Expired holds are treated as free by every read and swept by a cron.
  */
 
-export const slotEnum = pgEnum("slot", ["morning", "afternoon"]);
+export const slotEnum = pgEnum("slot", ["morning", "afternoon", "night", "full"]); // night/full: event sessions (UI support follows)
 export const sessionStatusEnum = pgEnum("session_status", ["open", "closed"]);
 export const bookingStatusEnum = pgEnum("booking_status", ["pending", "confirmed", "cancelled", "refunded", "expired"]);
 export const paymentStatusEnum = pgEnum("payment_status", ["requires_payment", "succeeded", "failed", "refunded", "partially_refunded"]);
@@ -211,3 +211,79 @@ export const auditLog = pgTable("audit_log", {
   after: jsonb("after"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index("audit_entity_idx").on(t.entity, t.entityId), index("audit_created_idx").on(t.createdAt)]);
+
+/* ---------------- events (sales content for site + agents) ---------------- */
+
+export const eventStatusEnum = pgEnum("event_status", ["draft", "published", "past", "cancelled"]);
+export const eventKindEnum = pgEnum("event_kind", ["regular", "main", "highlight"]);
+
+export const events = pgTable("events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull(),
+  status: eventStatusEnum("status").notNull().default("draft"),
+  kind: eventKindEnum("kind").notNull().default("regular"),   // main = featured upcoming; highlight = best past (social proof)
+  sortWeight: smallint("sort_weight").notNull().default(0),
+  featuredUntil: date("featured_until"),
+  // when & where
+  date: date("date").notNull(),
+  session: slotEnum("session").notNull().default("afternoon"),
+  doorsAt: text("doors_at"), startsAt: text("starts_at"), endsAt: text("ends_at"),   // "14:00"
+  area: text("area"),                                                                  // deck / stage
+  sessionId: uuid("session_id").references(() => sessions.id),                        // link to the bookable session, if any
+  // copy (EN authored, AR drafted by AI until reviewed)
+  titleEn: text("title_en").notNull(), titleAr: text("title_ar"),
+  pitchEn: text("pitch_en"), pitchAr: text("pitch_ar"),                 // one-liner the agent says first
+  descriptionEn: text("description_en"), descriptionAr: text("description_ar"),
+  vibeTags: jsonb("vibe_tags").$type<string[]>().notNull().default([]),
+  dressCodeOverride: text("dress_code_override"), ageRuleOverride: text("age_rule_override"),
+  // structured groups
+  lineup: jsonb("lineup").$type<EventArtist[]>().notNull().default([]),
+  ticketing: jsonb("ticketing").$type<EventTicketing>().notNull().default({}),
+  media: jsonb("media").$type<EventMedia>().notNull().default({}),
+  agentGuidance: jsonb("agent_guidance").$type<EventAgentGuidance>().notNull().default({}),
+  recap: jsonb("recap").$type<EventRecap>().notNull().default({}),
+  ops: jsonb("ops").$type<EventOps>().notNull().default({}),
+  seo: jsonb("seo").$type<{ title?: string; description?: string; ogImageSlot?: string }>().notNull().default({}),
+  announceOnPublish: boolean("announce_on_publish").notNull().default(false),
+  /** fields the AI filled, awaiting human review: { field: { confidence, source } } */
+  aiFilled: jsonb("ai_filled").$type<Record<string, { confidence: number; source: string }>>().notNull().default({}),
+  arStatus: text("ar_status").notNull().default("draft"),   // draft | reviewed
+  createdBy: text("created_by"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  publishedAt: timestamp("published_at", { withTimezone: true }),
+}, (t) => [uniqueIndex("events_slug_uq").on(t.slug), index("events_date_idx").on(t.date), index("events_status_kind_idx").on(t.status, t.kind)]);
+
+export interface EventArtist { name: string; role?: "headliner" | "support" | "resident"; origin?: string; genre?: string; setTime?: string; bio?: string; photoSlot?: string; links?: string[] }
+export interface EventTicketing { seatTypes?: string[]; prices?: Record<string, number>; surchargeAed?: number; minSpendCabanaAed?: number; capacityCap?: number; salesOpenAt?: string; salesCloseAt?: string; memberPresaleHours?: number; addOns?: { name: string; priceAed: number }[] }
+export interface EventMedia { poster?: string; gallery?: string[]; teaser?: string; aftermovie?: string }
+export interface EventAgentGuidance { talkingPoints?: string[]; objections?: { q: string; a: string }[]; doNotPromise?: string[] }
+export interface EventRecap { highlightsEn?: string; highlightsAr?: string; attendance?: string; quotes?: string[]; pressLinks?: string[]; photos?: string[] }
+export interface EventOps { faqs?: { q: string; a: string }[]; shuttleNotes?: string; checkinNotes?: string; sponsor?: string; internalNotes?: string }
+
+/* ---------------- knowledge-base sync (outbox) ---------------- */
+
+export const kbSyncJobs = pgTable("kb_sync_jobs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  entity: text("entity").notNull(),            // 'event' | 'site'
+  entityId: text("entity_id").notNull(),       // event id or 'site'
+  action: text("action").notNull(),            // 'upsert' | 'delete'
+  status: text("status").notNull().default("queued"),   // queued | sending | done | failed | skipped
+  attempts: smallint("attempts").notNull().default(0),
+  nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
+  error: text("error"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  doneAt: timestamp("done_at", { withTimezone: true }),
+}, (t) => [
+  uniqueIndex("kb_sync_pending_uq").on(t.entity, t.entityId).where(sql`${t.status} IN ('queued','sending')`), // coalesce repeated saves
+  index("kb_sync_due_idx").on(t.nextAttemptAt).where(sql`${t.status} = 'queued'`),
+]);
+
+export const kbDocuments = pgTable("kb_documents", {
+  entity: text("entity").notNull(),
+  entityId: text("entity_id").notNull(),
+  provider: text("provider").notNull().default("elevenlabs"),
+  documentId: text("document_id").notNull(),
+  contentHash: text("content_hash").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [primaryKey({ columns: [t.entity, t.entityId, t.provider] })]);

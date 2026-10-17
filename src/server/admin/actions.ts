@@ -120,7 +120,7 @@ export async function updateUnit(actor: Actor, id: string, patch: Partial<{ vipP
 
 /* ---------- sessions (close a day / slot) ---------- */
 
-export async function setSessionStatus(actor: Actor, date: string, slot: "morning" | "afternoon", status: "open" | "closed") {
+export async function setSessionStatus(actor: Actor, date: string, slot: "morning" | "afternoon" | "night" | "full", status: "open" | "closed") {
   const [before] = await db.select().from(sessions).where(and(eq(sessions.date, date), eq(sessions.slot, slot)));
   const [after] = before
     ? await db.update(sessions).set({ status }).where(eq(sessions.id, before.id)).returning()

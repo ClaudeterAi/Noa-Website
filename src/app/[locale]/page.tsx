@@ -1,4 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
+
+export const revalidate = 60; // event publishes also call revalidatePath; this is the safety net
 import type { Locale } from "@/i18n/routing";
 import { getPage } from "@/content/registry";
 import { SectionRenderer } from "@/components/sections";
