@@ -13,6 +13,8 @@ interface Props {
   taken: ReadonlySet<string>;
   /** unit ids held by this guest (in the cart) */
   mine?: ReadonlySet<string>;
+  /** VIP-priority units not yet released to this guest */
+  reserved?: ReadonlySet<string>;
   onSeatClick: (id: string) => void;
   onSeatMove?: (id: string, e: MouseEvent) => void;
   onSeatLeave?: () => void;
@@ -23,8 +25,8 @@ interface Props {
  * (branch feat/two-decks). Interaction uses event delegation on the <svg>, so the
  * drawing itself stays a plain, editable SVG.
  */
-export default function YachtMap({ labels, taken, mine, onSeatClick, onSeatMove, onSeatLeave }: Props) {
-  const sc = (base: string, id: string) => (taken.has(id) ? `${base} taken` : mine?.has(id) ? `${base} mine` : base);
+export default function YachtMap({ labels, taken, mine, reserved, onSeatClick, onSeatMove, onSeatLeave }: Props) {
+  const sc = (base: string, id: string) => (taken.has(id) ? `${base} taken` : mine?.has(id) ? `${base} mine` : reserved?.has(id) ? `${base} reserved` : base);
   const seatOf = (e: MouseEvent): string | null =>
     (e.target as Element).closest?.("[data-seat]")?.getAttribute("data-seat") ?? null;
   const onClick = (e: MouseEvent) => { const id = seatOf(e); if (id && !taken.has(id)) onSeatClick(id); };

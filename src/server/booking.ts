@@ -3,6 +3,7 @@ import { db, type Db, type Tx } from "@/db/client";
 import {
   bookingItems, bookings, guests, holds, inventoryUnits, sessions, settings, unitTypes,
 } from "@/db/schema";
+import { canBookPriority, getVipReleaseHours, type Tier } from "./vip";
 
 export type Slot = "morning" | "afternoon";
 type DbOrTx = Db | Tx;
@@ -22,8 +23,12 @@ export async function getSetting<K extends SettingKey>(key: K, conn: DbOrTx = db
 export async function getOrCreateSession(date: string, slot: Slot, conn: DbOrTx = db) {
   const found = await conn.select().from(sessions).where(and(eq(sessions.date, date), eq(sessions.slot, slot))).limit(1);
   if (found[0]) return found[0];
-  const inserted = await conn.insert(sessions).values({ date, slot })
-    .onConflictDoNothing({ target: [sessions.date, sessions.slot] }).returning();
+  const hours = await getVipReleaseHours(conn);
+  const start = slot === "morning" ? "09:30" : "14:00";
+  const inserted = await conn.insert(sessions).values({
+    date, slot,
+    vipReleaseAt: sql`(${date}::date + ${start}::time) AT TIME ZONE 'Asia/Dubai' - make_interval(hours => ${hours})`,
+  }).onConflictDoNothing({ target: [sessions.date, sessions.slot] }).returning();
   if (inserted[0]) return inserted[0];
   const again = await conn.select().from(sessions).where(and(eq(sessions.date, date), eq(sessions.slot, slot))).limit(1);
   return again[0];
@@ -36,17 +41,20 @@ export interface UnitAvailability {
   unitTypeId: string;
   price: number;
   pax: number;
-  state: "free" | "held" | "booked" | "yours";
+  state: "free" | "held" | "booked" | "yours" | "reserved";
   heldUntil?: string;
   vipPriority: boolean;
+  /** when a VIP-priority unit opens to everyone */
+  releaseAt?: string;
 }
 
 /**
  * Availability for one session. `cartToken` marks the caller's own holds as "yours".
  * Expired holds count as free even before the sweeper runs.
  */
-export async function getAvailability(date: string, slot: Slot, cartToken?: string): Promise<UnitAvailability[]> {
+export async function getAvailability(date: string, slot: Slot, cartToken?: string, tier: Tier = "guest"): Promise<UnitAvailability[]> {
   const session = await getOrCreateSession(date, slot);
+  const reservedNow = !!session.vipReleaseAt && session.vipReleaseAt.getTime() > Date.now() && !canBookPriority(tier);
   const rows = await db.execute<{
     unit_id: string; unit_type_id: string; pax: number; price_morning: number; price_afternoon: number;
     vip_priority: boolean; hold_token: string | null; hold_expires: string | null; booked: boolean;
@@ -66,8 +74,9 @@ export async function getAvailability(date: string, slot: Slot, cartToken?: stri
     pax: r.pax,
     price: slot === "morning" ? r.price_morning : r.price_afternoon,
     vipPriority: r.vip_priority,
-    state: r.booked ? "booked" : r.hold_token ? (cartToken && r.hold_token === cartToken ? "yours" : "held") : "free",
+    state: r.booked ? "booked" : r.hold_token ? (cartToken && r.hold_token === cartToken ? "yours" : "held") : r.vip_priority && reservedNow ? "reserved" : "free",
     heldUntil: r.hold_expires ? new Date(r.hold_expires).toISOString() : undefined,
+    releaseAt: r.vip_priority && session.vipReleaseAt ? session.vipReleaseAt.toISOString() : undefined,
   }));
 }
 
@@ -75,6 +84,9 @@ export async function getAvailability(date: string, slot: Slot, cartToken?: stri
 
 export class UnitUnavailableError extends Error {
   constructor(public unitId: string) { super(`Unit ${unitId} is no longer available`); }
+}
+export class UnitReservedError extends Error {
+  constructor(public unitId: string, public releaseAt: Date) { super(`Unit ${unitId} is reserved for members until ${releaseAt.toISOString()}`); }
 }
 
 export interface HoldResult { holdId: string; sessionId: string; unitId: string; expiresAt: string }
@@ -86,11 +98,17 @@ export interface HoldResult { holdId: string; sessionId: string; unitId: string;
  *   3. insert — the unique index `holds_live_unit_uq` is the real lock: two guests racing for the
  *      same unit produce exactly one row; the loser gets UnitUnavailableError.
  */
-export async function createHold(input: { date: string; slot: Slot; unitId: string; cartToken: string; guestId?: string }): Promise<HoldResult> {
+export async function createHold(input: { date: string; slot: Slot; unitId: string; cartToken: string; guestId?: string; tier?: Tier }): Promise<HoldResult> {
   const holdMinutes = await getSetting("hold_minutes");
   return db.transaction(async (tx) => {
     const session = await getOrCreateSession(input.date, input.slot, tx);
     if (session.status !== "open") throw new UnitUnavailableError(input.unitId);
+
+    const [unit] = await tx.select({ vipPriority: inventoryUnits.vipPriority, active: inventoryUnits.active }).from(inventoryUnits).where(eq(inventoryUnits.id, input.unitId));
+    if (!unit || !unit.active) throw new UnitUnavailableError(input.unitId);
+    if (unit.vipPriority && session.vipReleaseAt && session.vipReleaseAt.getTime() > Date.now() && !canBookPriority(input.tier ?? "guest")) {
+      throw new UnitReservedError(input.unitId, session.vipReleaseAt);
+    }
 
     await tx.update(holds)
       .set({ releasedAt: sql`now()`, releaseReason: "expired" })

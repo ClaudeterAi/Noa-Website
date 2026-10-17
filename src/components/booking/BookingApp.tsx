@@ -81,6 +81,7 @@ export default function BookingApp() {
 
   const inCart = useMemo(() => new Set(cart.map((c) => c.unitId)), [cart]);
   const taken = useMemo(() => new Set([...avail.values()].filter((u) => (u.state === "held" || u.state === "booked") && !inCart.has(u.unitId)).map((u) => u.unitId)), [avail, inCart]);
+  const reserved = useMemo(() => new Set([...avail.values()].filter((u) => u.state === "reserved").map((u) => u.unitId)), [avail]);
 
   /* ---------- hold expiry: drop expired items, tell the guest ---------- */
   useEffect(() => {
@@ -116,9 +117,12 @@ export default function BookingApp() {
   const goStep = (n: 1 | 2 | 3) => { setStep(n); setNotice(null); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   /* ---------- seat → hold → modal ---------- */
+  const releaseLabel = (iso: string) => new Intl.DateTimeFormat(fmtLocale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Dubai" }).format(new Date(iso));
   const onSeat = async (unitId: string) => {
     if (!date || !slot || holding) return;
     if (inCart.has(unitId)) { goStep(3); return; }
+    const u = avail.get(unitId);
+    if (u?.state === "reserved" && u.releaseAt) { setNotice(t("seatReserved", { time: releaseLabel(u.releaseAt) })); return; }
     setTip(null); setHolding(unitId); setNotice(null);
     try {
       const h = await api.hold(date, slot, unitId);
@@ -127,7 +131,8 @@ export default function BookingApp() {
       setSeatModal({ unitId, holdId: h.holdId, expiresAt: h.expiresAt });
       setGuests(ty.pax); setArrival(ARRIVALS[slot][0]);
     } catch (e) {
-      setNotice(isApiError(e, "UNIT_UNAVAILABLE") ? t("seatTaken") : (e as Error).message);
+      const r = e as { code?: string; message: string };
+      setNotice(r.code === "UNIT_UNAVAILABLE" ? t("seatTaken") : r.code === "UNIT_RESERVED" ? t("seatReserved", { time: u?.releaseAt ? releaseLabel(u.releaseAt) : "" }) : r.message);
       void refresh();
     } finally { setHolding(null); }
   };
@@ -183,6 +188,7 @@ export default function BookingApp() {
     ["balcony", { background: "#7aa6a8" }], ["dj", { background: "#c9a875" }],
     ["entry", { background: "#fff", border: "1px dashed #1a1a1a", borderRadius: "50%" }],
     ["sold", { background: "#d8d8d8", border: "1px solid #999", opacity: 0.55 }],
+    ["reserved", { background: "#fff", border: "1px solid #1a1a1a", backgroundImage: "repeating-linear-gradient(135deg,#1a1a1a 0,#1a1a1a 1px,#fff 1px,#fff 5px)", opacity: 0.6 }],
   ];
   const yachtLabels = locale === "ar"
     ? { upperDeck: "السطح العلوي", stairs: "الدرج ↓", sundeck: "سطح الشمس", jacuzzi: "جاكوزي", vipLounge: "صالة VIP", balcony: "الشرفة", dj: "دي جيه", pool: "المسبح", poolSub: "22 م · مياه مالحة · حافة لا متناهية", entry: "الدخول" }
@@ -239,7 +245,7 @@ export default function BookingApp() {
         </div>
         {notice && step === 2 && <p className="form-meta bk-notice" role="alert">{notice}</p>}
         <div className={`bk-map-wrap${holding ? " is-holding" : ""}`}>
-          <YachtMap labels={yachtLabels} taken={taken} mine={inCart} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
+          <YachtMap labels={yachtLabels} taken={taken} mine={inCart} reserved={reserved} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
         </div>
         <div className="bk-legend">
           {legend.map(([k, style]) => <span key={k}><span className="bk-legend-swatch" style={style} />{t(`legend.${k}`)}</span>)}
