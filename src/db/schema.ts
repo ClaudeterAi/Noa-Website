@@ -165,13 +165,23 @@ export const notificationLog = pgTable("notification_log", {
   id: uuid("id").primaryKey().defaultRandom(),
   bookingId: uuid("booking_id").references(() => bookings.id),
   channel: channelEnum("channel").notNull(),
-  template: text("template").notNull(),        // 'booking_confirmed' | 'reminder_24h' | ...
+  template: text("template").notNull(),        // 'booking_confirmed' | 'booking_reminder_24h' | 'booking_late_refunded' | 'shuttle_alert'
   to: text("to").notNull(),
-  status: text("status").notNull(),            // 'queued' | 'sent' | 'delivered' | 'failed'
+  locale: text("locale").notNull().default("en"),
+  status: text("status").notNull(),            // 'queued' | 'sending' | 'sent' | 'failed' | 'skipped'
+  attempts: smallint("attempts").notNull().default(0),
+  nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
+  payload: jsonb("payload"),                   // rendered message (subject/body/variables) for audit and replay
   providerId: text("provider_id"),
   error: text("error"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-}, (t) => [index("notification_booking_idx").on(t.bookingId)]);
+  sentAt: timestamp("sent_at", { withTimezone: true }),
+}, (t) => [
+  index("notification_booking_idx").on(t.bookingId),
+  index("notification_queue_idx").on(t.nextAttemptAt).where(sql`${t.status} = 'queued'`),
+  // one message per booking × template × channel — reminders and confirmations can never double-send
+  uniqueIndex("notification_once_uq").on(t.bookingId, t.template, t.channel).where(sql`${t.bookingId} IS NOT NULL`),
+]);
 
 /* ---------------- settings ---------------- */
 

@@ -66,3 +66,16 @@ Exclusivity is enforced in Postgres (`holds_live_unit_uq`, `booking_items_live_u
 - Install with npm 12 (`npx npm@12 install`); npm 10 hits a tree bug with this dependency set.
 
 Environment: see `.env.example`. Without Stripe keys the checkout stops with "Payments are not configured" — nothing is faked.
+
+## Notifications (Day 3)
+
+```
+booking confirmed (webhook) ──→ notification_log rows: queued (email + WhatsApp)   ← exactly once per booking × template × channel
+late payment refunded      ──→ queued "booking_late_refunded"
+cron hourly                ──→ queue "booking_reminder_24h" for tomorrow's confirmed bookings (Asia/Dubai)
+cron every minute          ──→ worker sends due rows: Resend (email + .ics) · Twilio WhatsApp (Meta-approved Content Template SIDs)
+                               failure → retry at 1, 5, 30, 120, 720 min, then failed · provider missing → skipped (never lost)
+```
+
+- Code: `src/server/notifications/` (templates EN/AR, ICS, providers, outbox). Tests: `tests/notifications.test.ts` (fake providers).
+- WhatsApp template SIDs come from `WHATSAPP_CONTENT_SIDS` (JSON, per `template:locale`) once Meta approves NOA's templates.

@@ -1,5 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "crons": [{ "path": "/api/cron/expire-holds", "schedule": "* * * * *" }]
+  "crons": [
+    {
+      "path": "/api/cron/expire-holds",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/notifications",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/reminders",
+      "schedule": "0 * * * *"
+    }
+  ]
 }
