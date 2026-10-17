@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { authOptions, hasRole, type AdminRole, type AdminSession } from "@/server/admin/auth";
+import { adminConfigured, authOptions, hasRole, type AdminRole, type AdminSession } from "@/server/admin/auth";
 
 /** Page-level guard: no session → sign-in; insufficient role → 403 text. */
 export async function guard(min: AdminRole = "frontdesk") {
-  const s = (await getServerSession(authOptions)) as AdminSession | null;
+  const s = adminConfigured() ? ((await getServerSession(authOptions)) as AdminSession | null) : null;
   if (!s?.user?.email) redirect("/admin/sign-in");
   if (!hasRole(s.role, min)) return { session: s, denied: true as const };
   return { session: s, denied: false as const };

@@ -15,6 +15,7 @@ export async function parseBody<T>(req: Request, schema: ZodType<T>): Promise<T>
 
 /** Maps domain errors to HTTP without leaking stack traces. */
 export function handle(e: unknown) {
+  if (e instanceof Error && e.message === "DATABASE_URL is not set") return error(503, "NOT_CONFIGURED", "The booking engine is not configured on this deployment yet");
   if (e instanceof ZodError) return error(422, "VALIDATION_ERROR", "Invalid request", e.issues);
   if (e instanceof CartLimitError) return error(409, "CART_LIMIT", e.message, { limit: e.limit });
   if (e instanceof UnitReservedError) return error(409, "UNIT_RESERVED", e.message, { unitId: e.unitId, releaseAt: e.releaseAt.toISOString() });
