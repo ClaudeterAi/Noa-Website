@@ -1,7 +1,7 @@
 import type { Slot } from "./inventory";
 
 export interface UnitAvailability { unitId: string; unitTypeId: string; price: number; pax: number; state: "free" | "held" | "booked" | "yours" | "reserved"; heldUntil?: string; releaseAt?: string; vipPriority: boolean }
-export interface UnitTypeInfo { id: string; nameEn: string; nameAr: string; descEn: string; descAr: string; pax: number; perPerson: boolean; tier: number; imageSlot: string | null }
+export interface UnitTypeInfo { id: string; nameEn: string; nameAr: string; descEn: string; descAr: string; pax: number; perPerson: boolean; tier: number; imageSlot: string | null; priceMorning: number; priceAfternoon: number }
 export interface ApiError { code: string; message: string; details?: unknown }
 
 async function req<T>(input: string, init?: RequestInit): Promise<T> {

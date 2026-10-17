@@ -118,3 +118,16 @@ The layout is data. A new boat = a new SVG + one command:
 
 Self-hosted in `src/fonts/` (SIL OFL): Josefin Sans, Cormorant, IBM Plex Sans Arabic, Noto Naskh Arabic — 12 woff2 files, 552 KB.
 Builds have no dependency on fonts.googleapis.com (a Vercel preview build failed on that fetch on 16 Oct); visitors load fonts from Vercel's edge.
+
+## Concierge — chat (Claude) and voice (ElevenLabs) (Day 4)
+
+```
+Guest ─ chat panel ─→ POST /api/chat ─→ Claude (tools) ─┐
+Guest ─ voice button ─→ ElevenLabs agent ─→ POST /api/agent/tools (secret) ─┤→ same tools (src/server/concierge/tools.ts)
+                                                                        └→ same cart token → /booking shows the held seats → Stripe
+Knowledge for both: GET /api/agent/knowledge (rendered from the registry + database, EN + AR)
+Voice client tools: navigate · open_booking · switch_language (src/components/concierge/VoiceConcierge.tsx)
+```
+
+Setup for the voice agent: `agent/elevenlabs-agent.md`. Without `ANTHROPIC_API_KEY` / `ELEVENLABS_AGENT_ID` the buttons say the concierge isn't configured — nothing is faked.
+Tests: `tests/concierge.test.ts` (tools on Postgres, chat loop against a fake model).
