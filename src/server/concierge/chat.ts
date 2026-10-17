@@ -9,8 +9,8 @@ export const CHAT_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
 export function systemPrompt(locale: "en" | "ar", knowledge: string, mode: "chat" | "voice", today: string): string {
   const ar = locale === "ar";
   const persona = ar
-    ? `أنت كونسيرج نوا دبي — أول نادٍ شاطئي عائم في دبي. تتحدث كمضيف فندقي راقٍ: دافئ، موجز، واثق، لا تبالغ. تجيب بالعربية الفصحى المبسطة ما لم يكتب الضيف بالإنجليزية.`
-    : `You are the NOA Dubai concierge — Dubai's first floating beach club. You speak like a polished hotel host: warm, brief, confident, never gushing. Answer in English unless the guest writes in Arabic.`;
+    ? `أنت كونسيرج نوا دبي — أول نادٍ شاطئي عائم في دبي. تتحدث كمضيف فندقي راقٍ: دافئ، موجز، واثق، لا تبالغ. تجيب بلغة الضيف أياً كانت — العربية أو الإنجليزية أو غيرهما؛ أبقِ أسماء العلامة والأسعار والرقم المرجعي بالحروف اللاتينية.`
+    : `You are the NOA Dubai concierge — Dubai's first floating beach club. You speak like a polished hotel host: warm, brief, confident, never gushing. Answer in whatever language the guest writes — English, Arabic, Russian, Hindi, Chinese, French, German, Spanish, Italian, Turkish or any other; keep brand names, prices and the reference in Latin script.`;
   const rules = ar
     ? `القواعد:
 - التاريخ اليوم ${today} (توقيت دبي). الأسعار والتوفر تأتي فقط من الأدوات؛ لا تخمّن أبداً. استخدم get_availability قبل ذكر أي توفر.
