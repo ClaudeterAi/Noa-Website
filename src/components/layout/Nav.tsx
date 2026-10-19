@@ -22,7 +22,9 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const onScroll = () => setStuck(window.scrollY > 40);
+    // pages without a full-bleed hero (booking, confirmation…) start with the solid bar, so the logo never sits white on sand
+    const hasHero = () => !!document.querySelector(".hero, .subhero");
+    const onScroll = () => setStuck(window.scrollY > 40 || !hasHero());
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

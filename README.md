@@ -174,6 +174,24 @@ Email → Cognito emails a one-time code (native `USER_AUTH` + `EMAIL_OTP`, no L
 at checkout. Routes: `/api/guest/start`, `/verify`, `/me`, `/signout`. Code: `src/server/guest-auth.ts`, `src/components/booking/GuestSignIn.tsx`.
 Cognito's default sender is capped at 50 emails/day; before launch point the pools at SES on NOA's domain.
 
+## Editorial home (design pass 2)
+
+Home page rebuilt on the grammar of the reference study (yonabeach.com): photography framed by white margins, text beside images
+never on them (hero excepted), 35/65 asymmetry mirrored section to section, framed carousels with thin arrows outside the frame,
+centred headings, warm neutrals, 96–160px between sections. New section types in `src/content/types.ts`: editorialIntro,
+tileCarousels, packageEditorial, galleryCarousel, textPortrait, posterCarousel (upcoming 2:3 / highlights 1:1 from the database),
+newsletter (`POST /api/newsletter` → marketing consent on the guest record). Carousel: `src/components/ui/Carousel.tsx` (scroll-snap,
+no library). Placeholder photography is curated Unsplash, every slot replaceable from `/admin/media`. The old section types remain
+for the inner pages until those get the same treatment.
+
+## Palette (19 Oct 2026)
+
+Three colours, values from Pantone's published chips (web simulations; swatch cards remain the print reference):
+sand — page/frames (11-0701 Whisper White #EDE6DA, tint #F6F2EA, band 13-1106 Sandshell #DFCDBE); sea green — header/footer
+#187A80 (lighter, bluer shade near 16-5421 Sea Green, white text 5.1:1), accent #27A0A1 for rules, dots, hovers (never small text);
+sea blue — text (#156A89 headings/links 4.9:1 on sand, ink #10384A body 10:1), lightened/bluer from 19-4535 Deep Sea on 19 Oct. Tokens at the end of `globals.css`
+(`--c-*`, `--bg`, `--ink`, `--head`, `--accent`, `--bar`). Palette sheet with contrast checks: `noa-palette.png` in the PR.
+
 ## The boat (final layout, 19 Oct 2026)
 
 Seat map and inventory follow the Atelier EPJ detailed-design set (EPJ-NA-DXB-01, NA-ID-1000 main deck, NA-ID-1100 upper deck,
