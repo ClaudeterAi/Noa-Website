@@ -17,7 +17,9 @@ const img = (id: string, url: string, altEn: string, altAr: string): MediaSlot =
 });
 
 export const media: Record<string, MediaSlot> = {
-  "hero-video": { id: "hero-video", kind: "video", url: null, source: "placeholder" },
+  // Placeholder film: "Aerial panorama of a tourist port at sunset" (Mixkit License, free for commercial use). Replaced by NOA's own edit via the media manager.
+  "hero-video": { id: "hero-video", kind: "video", url: "/media/hero-placeholder.mp4", source: "placeholder" },
+  "hero-poster": { id: "hero-poster", kind: "image", url: "/media/hero-placeholder.jpg", source: "placeholder" },
   "hero-still": img("hero-still", u("photo-1540541338287-41700207dee6", 1800), "Infinity pool over the Gulf", "مسبح لا متناهٍ يطل على الخليج"),
   "split-dj": img("split-dj", u("photo-1470229722913-7c0e2dbbafd3", 900), "DJ stage", "منصة الدي جيه"),
   "split-club": img("split-club", u("photo-1566073771259-6a8506099945", 900), "Beach club deck", "سطح النادي الشاطئي"),

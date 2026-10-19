@@ -1,10 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { AnthropicBedrock } from "@anthropic-ai/bedrock-sdk";
 import type { MessageParam, Tool, ToolUseBlock } from "@anthropic-ai/sdk/resources/messages";
 import { buildKnowledge } from "./knowledge";
 import { runTool, toolDefinitions, type AgentContext, type ToolName } from "./tools";
 
-/** Model per the estimate (Sonnet 5.5 for the chatbot); overridable. IDs verified against docs.claude.com on 17 Oct 2026. */
-export const CHAT_MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
+/**
+ * Claude runs through Amazon Bedrock in NOA's AWS account (19 Oct 2026: "Anthropic we can take from Bedrock only").
+ * Model IDs are Bedrock inference-profile IDs, e.g. eu.anthropic.claude-sonnet-5-5; set per environment.
+ * A direct Anthropic key is used only if ANTHROPIC_API_KEY is set and BEDROCK_REGION is not.
+ */
+export const CHAT_MODEL = process.env.ANTHROPIC_MODEL ?? (process.env.BEDROCK_REGION ? "eu.anthropic.claude-sonnet-5-5" : "claude-sonnet-5-5");
+export const onBedrock = () => !!process.env.BEDROCK_REGION;
 
 export function systemPrompt(locale: "en" | "ar", knowledge: string, mode: "chat" | "voice", today: string): string {
   const ar = locale === "ar";
@@ -36,6 +42,12 @@ export type ChatEvent = { type: "text"; text: string } | { type: "tool"; name: s
 type Client = Pick<Anthropic, "messages">;
 let defaultClient: Client | null = null;
 export function anthropicClient(): Client | null {
+  if (defaultClient) return defaultClient;
+  if (process.env.BEDROCK_REGION) {
+    // credentials: AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY of the least-privilege app user (bedrock:InvokeModel*)
+    defaultClient = new AnthropicBedrock({ awsRegion: process.env.BEDROCK_REGION }) as unknown as Client;
+    return defaultClient;
+  }
   if (!process.env.ANTHROPIC_API_KEY) return null;
   return (defaultClient ??= new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }));
 }

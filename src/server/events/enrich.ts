@@ -1,6 +1,6 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import type { EventAgentGuidance, EventArtist } from "@/db/schema";
-import { anthropicClient, CHAT_MODEL } from "@/server/concierge/chat";
+import { anthropicClient, CHAT_MODEL, onBedrock } from "@/server/concierge/chat";
 
 /**
  * "Auto-fill with AI": the admin types what they have (often just a title, a date and an artist name);
@@ -52,7 +52,8 @@ export async function enrichEvent(draft: EventDraft, client: Client | null = ant
   if (!missing.length) return { draft, aiFilled: {}, notes: ["Nothing to fill."] };
 
   const tools: Anthropic.Tool[] = [FILL_TOOL as unknown as Anthropic.Tool];
-  const serverTools = opts.webSearch !== false ? [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }] : [];
+  // The hosted web_search tool exists only on the direct Anthropic API; on Bedrock artist facts come from model knowledge, flagged with lower confidence
+  const serverTools = opts.webSearch !== false && !onBedrock() ? [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }] : [];
   const res = await client.messages.create({
     model: CHAT_MODEL, max_tokens: 2500, system: SYSTEM,
     tools: [...tools, ...(serverTools as unknown as Anthropic.Tool[])],

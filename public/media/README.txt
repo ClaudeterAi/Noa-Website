@@ -1,0 +1,1 @@
+Mixkit License (https://mixkit.co/license/): free for commercial use, no attribution required. Clip: 'Aerial panorama of a tourist port at sunset' #40080, trimmed to 14 s, silent. Placeholder until NOA's own film.

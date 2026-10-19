@@ -31,11 +31,15 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
   switch (s.type) {
     case "hero": {
       const video = registry.media[s.media];
+      const poster = registry.media["hero-poster"] ?? registry.media["hero-still"];
       const still = registry.media["hero-still"];
       return (
         <section className="hero" id={s.id}>
           {video?.url ? (
-            <video className="hero-bg" autoPlay muted loop playsInline poster={still?.url ?? undefined} src={video.url} style={{ objectFit: "cover", width: "100%", height: "100%" }} />
+            <video className="hero-bg hero-video" autoPlay muted loop playsInline preload="metadata" poster={poster?.url ?? undefined} aria-hidden="true">
+              <source src={video.url.replace(/\.mp4$/, ".webm")} type="video/webm" />
+              <source src={video.url} type="video/mp4" />
+            </video>
           ) : (
             <div className="hero-bg" style={still?.url ? bg("hero-still") : undefined} data-placeholder="hero-video" />
           )}
