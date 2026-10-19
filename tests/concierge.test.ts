@@ -24,7 +24,7 @@ describe("knowledge", () => {
     expect(en).toContain("Cabana: morning AED 6500, afternoon AED 8500");
     expect(en).toContain("held for 7 minutes");
     expect(en).toContain("→ /en/location");
-    expect(en).toContain("Q: What is the cancellation policy?");
+    expect(en).toContain("Q: Can I cancel or change my reservation?");
     expect(ar).toContain("كابانا: الصباح AED 6500");
     expect(ar).toContain("→ /ar/location");
     expect(en.length).toBeGreaterThan(8000);
