@@ -35,7 +35,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
   const media = await getMediaMap();   // admin uploads overlay the registry placeholders
   const mUrl = (id: string | undefined) => (id ? media[id]?.url ?? null : null);
   const bg = bgFrom(mUrl);
-  const live = s.type === "eventsGrid" || s.type === "eventStrip" || s.type === "posterCarousel" ? await publishedEvents() : null;
+  const live = s.type === "eventsGrid" || s.type === "eventStrip" || s.type === "posterCarousel" || s.type === "eventsProgramme" ? await publishedEvents() : null;
   const liveList = (ids: string[], take?: number): EventItem[] => {
     const fromDb = live?.upcoming ?? [];
     if (fromDb.length) return take ? fromDb.slice(0, take) : fromDb;
@@ -184,6 +184,34 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
             <div className="ed-actions"><CtaA link={p.more} locale={locale} className="ed-link" /><CtaButton link={p.book} locale={locale} /></div>
           </div>
           <div className="ed-pkg-media rv"><div className="ed-frame ed-frame-bleed" style={bg(p.media)} role="img" aria-label={media[p.media]?.alt?.[locale] ?? ""} /></div>
+        </section>
+      );
+    }
+    case "eventsProgramme": {
+      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
+      const items = (live?.upcoming ?? []).filter((e) => e.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+      const months = new Map<string, typeof items>();
+      for (const e of items) { const k = e.date.slice(0, 7); months.set(k, [...(months.get(k) ?? []), e]); }
+      const monthLabel = (k: string) => new Intl.DateTimeFormat(locale === "ar" ? "ar-AE-u-nu-latn" : "en-GB", { month: "long", year: "numeric", timeZone: "Asia/Dubai" }).format(new Date(`${k}-01T12:00:00+04:00`));
+      const bookHref = (e: (typeof items)[number]) => `${hrefPath({ page: "booking" })}?date=${e.date}&slot=${e.session ?? "night"}`;
+      const sessionName = (e: (typeof items)[number]) => { const t = e.startsAt ? `${e.startsAt}${e.endsAt ? ` – ${e.endsAt}` : ""}` : ""; const n = { morning: ["Morning", "الصباح"], afternoon: ["Afternoon", "بعد الظهر"], night: ["Night", "الليل"], full: ["Full day", "يوم كامل"] }[e.session ?? "night"]; return `${locale === "ar" ? n[1] : n[0]}${t ? ` · ${t}` : ""}`; };
+      return (
+        <section className="ed-programme" id={s.id}>
+          <div className="ed-center rv"><div className="ed-kicker">{pick(s.kicker, locale)}</div><h2 className="ed-h"><Rich l={s.heading} locale={locale} /></h2><div className="ed-sub">{pick(s.sub, locale)}</div></div>
+          {months.size === 0 && <div className="ed-center rv ed-programme-empty">{pick(s.empty, locale)}</div>}
+          {[...months.entries()].map(([k, list]) => (
+            <div key={k} className="ed-month rv">
+              <h3 className="ed-month-h">{monthLabel(k).toUpperCase()}</h3>
+              {list.map((e) => (
+                <Link key={e.id} href={bookHref(e)} className="event-row" prefetch={false}>
+                  <span className="event-date">{pick(e.shortDate, locale).toUpperCase()}</span>
+                  <span className="event-name">{pick(e.name, locale).replace("\n", " ").toUpperCase()}</span>
+                  <span className="event-who">{pick(e.artist, locale)}<span className="event-session"> · {sessionName(e)}</span></span>
+                  <span className="event-cta">{locale === "ar" ? "احجز مقعداً ←" : "Reserve a seat →"}</span>
+                </Link>
+              ))}
+            </div>
+          ))}
         </section>
       );
     }

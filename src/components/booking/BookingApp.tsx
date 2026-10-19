@@ -54,6 +54,12 @@ export default function BookingApp() {
 
   /* body class drives the opaque nav (legacy body.booking-page) */
   useEffect(() => { document.body.classList.add("booking-page"); return () => document.body.classList.remove("booking-page"); }, []);
+  // deep link from an event or a concierge card: /booking?date=YYYY-MM-DD&slot=night opens the deck plan for that session
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search); const d = q.get("date"); const sl = q.get("slot") as Slot | null;
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= today && sl && ["morning", "afternoon", "night", "full"].includes(sl)) { setDate(d); setSlot(sl); setStep(2); }
+  }, []);
 
   /* cart = the server's live holds for this browser (chat and voice fill the same cart); sessionStorage only keeps guest count / arrival choices */
   useEffect(() => {
