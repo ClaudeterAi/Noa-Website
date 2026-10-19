@@ -77,7 +77,8 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
   const amen = BOAT_AMENITIES.filter((a) => a.deck === deck);
   const hull = `M${R},0 H${W - R} a${R},${R} 0 0 1 ${R},${R} V${H - R} a${R},${R} 0 0 1 -${R},${R} H${R} a${R},${R} 0 0 1 -${R},-${R} V${R} a${R},${R} 0 0 1 ${R},-${R} Z`;
   const slabX = sx(31400);
-  const slab = `M${slabX},0 H${W - R} a${R},${R} 0 0 1 ${R},${R} V${H - R} a${R},${R} 0 0 1 -${R},${R} H${slabX} Z`;
+  const Rs = sx(400);
+  const slab = `M${slabX},0 H${W - Rs} a${Rs},${Rs} 0 0 1 ${Rs},${Rs} V${H - Rs} a${Rs},${Rs} 0 0 1 -${Rs},${Rs} H${slabX} Z`;
   
   return (
     <svg className="yacht-map" onClick={onClick} onMouseMove={onMove} onMouseLeave={() => onSeatLeave?.()} viewBox={`${-PAD} ${-PAD} ${W + PAD * 2} ${H + PAD * 2}`} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={deck === "main" ? labels.main : labels.upper}>
