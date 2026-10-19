@@ -5,6 +5,8 @@ import { getPage, pick } from "@/content/registry";
 import { Link } from "@/i18n/navigation";
 import BookingApp from "@/components/booking/BookingApp";
 
+export const dynamic = "force-dynamic"; // the "open soon" / live decision is made per request, not baked at build
+
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const page = getPage("booking");
