@@ -107,6 +107,6 @@ async function loadContext(bookingId: string, conn: DbOrTx = db): Promise<Bookin
   return {
     ref: b.booking.ref, guestName: b.guest.name ?? "Guest", email: b.guest.email, phone: b.guest.phone, locale, total: b.booking.total,
     items: items.map((i) => ({ unitName: locale === "ar" ? i.nameAr : i.nameEn, date: i.date, slot: i.slot, guests: i.guests, arrivalTime: i.arrivalTime })),
-    manageUrl: `${base}/${locale}/booking/confirmation?ref=${b.booking.ref}`,
+    manageUrl: `${base}/${locale}/booking/manage?ref=${b.booking.ref}`,
   };
 }

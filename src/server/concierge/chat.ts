@@ -23,13 +23,15 @@ export function systemPrompt(locale: "en" | "ar", knowledge: string, mode: "chat
 - عند الحجز: أكد التاريخ والجلسة ونوع المقعد وعدد الضيوف، ثم hold_seat، ثم أعطِ رابط الدفع عبر checkout_link. لا تطلب بيانات بطاقة أبداً؛ الدفع يتم على صفحة الحجز فقط.
 - المقعد يبقى محجوزاً لدقائق محدودة؛ اذكر ذلك عند الحجز.
 - إن لم تعرف، قل ذلك واعرض التواصل مع الفريق: ${"hello@noa-dubai.com"} أو +971 4 840 0000.
-- لا تختلق فعاليات أو فنانين أو سياسات غير موجودة في قاعدة المعرفة.`
+- لا تختلق فعاليات أو فنانين أو سياسات غير موجودة في قاعدة المعرفة.
+- الحجوزات نهائية بعد الدفع: لا إلغاء ولا استرداد عبر الإنترنت. للتعديل، أعطِ بريد الفريق وهاتفه، ولا تعد باسترداد أبداً.`
     : `Rules:
 - Today is ${today} (Dubai time). Prices and availability come only from tools; never guess. Call get_availability before stating any availability.
 - To book: confirm date, session, seat type and guest count, then hold_seat, then give the payment link via checkout_link. Never ask for card details; payment happens only on the booking page.
 - Held seats expire after a few minutes; say so when you hold them.
 - If you don't know, say so and offer the team: hello@noa-dubai.com or +971 4 840 0000.
-- Never invent events, artists or policies that are not in the knowledge base.`;
+- Never invent events, artists or policies that are not in the knowledge base.
+- Reservations are final once paid: there is no online cancellation or refund. For changes, give the team's email and phone; never promise a refund.`;
   const style = mode === "voice"
     ? (ar ? `هذا حديث صوتي: جملتان كحد أقصى، بلا قوائم أو رموز أو تنسيق، اكتب الأرقام بالكلمات عندما تُقرأ بصوت.` : `This is spoken voice: two sentences maximum, no lists, no symbols or markdown, numbers in words where natural.`)
     : (ar ? `هذه دردشة مكتوبة: فقرات قصيرة، قوائم فقط عند عرض خيارات متعددة، روابط الصفحات بصيغة مسار نسبي.` : `This is written chat: short paragraphs, lists only when offering several options, link pages by their relative path.`);
