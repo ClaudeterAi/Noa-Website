@@ -1452,3 +1452,33 @@ footer a:hover{color:#fff;}
 @media(max-width:680px){.ed-night-grid{grid-template-columns:1fr 1fr;gap:14px;}.ed-night-name{font-size:.86rem;}.ed-night-who{font-size:.84rem;}}
 /* Safari refused autoplay (Low Power Mode): show the still instead of a paused frame with a play glyph */
 .hero-video.hero-video-blocked{opacity:0;}
+
+/* ---------- motion: masked word reveals, directional image wipes with drift, staggered fades ---------- */
+:root{--ease-out:cubic-bezier(.2,.7,.2,1);}
+.motion [data-m="up"]{opacity:0;transform:translate3d(0,26px,0);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out);transition-delay:calc(var(--i,0)*.07s);}
+.motion [data-m="up"].in{opacity:1;transform:none;}
+.motion [data-m="img"]{position:relative;overflow:hidden;transform:translate3d(var(--rx,0px),var(--ry,0px),0);transition:transform 1.25s var(--ease-out);background-position:50% calc(50% + var(--par,0px));}
+.motion [data-m="img"]::after{content:"";position:absolute;inset:-1px;background:var(--bg,#EDE6DA);z-index:3;pointer-events:none;transform-origin:var(--origin,left center);transition:transform 1.15s var(--ease-out);}
+.motion [data-m="img"][data-dir="left"]{--rx:-56px;--origin:right center;}
+.motion [data-m="img"][data-dir="right"]{--rx:56px;--origin:left center;}
+.motion [data-m="img"][data-dir="up"]{--ry:48px;--origin:center top;}
+.motion [data-m="img"].in{transform:none;}
+.motion [data-m="img"][data-dir="left"].in::after,.motion [data-m="img"][data-dir="right"].in::after{transform:scaleX(0);}
+.motion [data-m="img"][data-dir="up"].in::after{transform:scaleY(0);}
+.motion [data-m="img"] img,.motion [data-m="img"] video{transform:scale(1.06);transition:transform 1.4s var(--ease-out);}
+.motion [data-m="img"].in img,.motion [data-m="img"].in video{transform:none;}
+.motion .subhero-bg[data-m="img"]::after{background:#0d1a1e;}
+.motion .mw{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em;margin-bottom:-.08em;}
+.motion .mwi{display:inline-block;transform:translate3d(0,112%,0);transition:transform .85s var(--ease-out);transition-delay:calc(var(--i,0)*.045s);will-change:transform;}
+.motion [data-m="words"].in .mwi{transform:none;}
+/* hero: the film breathes in slowly, the nav settles */
+.motion .hero-video,.motion .hero-bg{animation:heroBreath 24s var(--ease-out) both;}
+@keyframes heroBreath{from{transform:scale(1.08);}to{transform:scale(1);}}
+.motion .nav-links a,.motion .nav-book,.motion .logo{animation:navIn 1.1s var(--ease-out) both;}
+.motion .nav-links a:nth-child(2){animation-delay:.08s}.motion .nav-links a:nth-child(3){animation-delay:.16s}.motion .nav-links a:nth-child(4){animation-delay:.24s}.motion .nav-links a:nth-child(5){animation-delay:.32s}.motion .nav-links a:nth-child(6){animation-delay:.4s}.motion .nav-book{animation-delay:.5s}
+@keyframes navIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+/* legacy .rv keeps working but no longer hides content on its own when motion is on (the new layer handles it) */
+.motion .rv{opacity:1;transform:none;}
+.no-motion [data-m]{opacity:1!important;transform:none!important;}
+.no-motion [data-m="img"]::after{display:none;}
+@media(prefers-reduced-motion:reduce){[data-m],.mwi{transition:none!important;animation:none!important;opacity:1!important;transform:none!important;}[data-m="img"]::after{display:none!important;}}

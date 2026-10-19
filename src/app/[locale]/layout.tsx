@@ -7,6 +7,7 @@ import { hrefPath, getPage, pick, registry } from "@/content/registry";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import Effects from "@/components/layout/Effects";
+import Motion from "@/components/layout/Motion";
 import ChatConcierge from "@/components/concierge/ChatConcierge";
 import VoiceConcierge from "@/components/concierge/VoiceConcierge";
 import { barlow, naskh, plexArabic } from "@/fonts";
@@ -46,6 +47,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
       <body>
         <NextIntlClientProvider messages={messages}>
           <Effects />
+          <Motion />
           <Nav
             main={registry.nav.main.map((id) => toLink(id))}
             mobile={registry.nav.mobile.map((id) => toLink(id, true))}
