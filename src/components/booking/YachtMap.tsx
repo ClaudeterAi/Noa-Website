@@ -22,6 +22,7 @@ interface Props {
 }
 
 const sx = (mm: number) => mm / SCALE;
+const isCircle = (bw: number, bh: number) => bw >= 4.5 && bw < 24 && Math.abs(bw - bh) < Math.max(bw, bh) * 0.12;
 const sy = (mm: number) => (mm - HULL.top) / SCALE;
 const INK = "#5a4a36", INK_SOFT = "#8a7a63";
 const F = { fontFamily: "var(--font-sans)" } as const;
@@ -51,6 +52,16 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         <linearGradient id="hullGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#f3ede1" /><stop offset="1" stopColor="#ebe2d0" /></linearGradient>
         <pattern id="planks" patternUnits="userSpaceOnUse" width="160" height="3.2"><line x1="0" y1="0" x2="160" y2="0" stroke="#d8ccb6" strokeWidth=".25" /></pattern>
         <pattern id="hatch" patternUnits="userSpaceOnUse" width="5" height="5" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#b9ad99" strokeWidth=".6" /></pattern>
+        <radialGradient id="disc" cx="38%" cy="32%" r="75%"><stop offset="0" stopColor="#fffdf8" /><stop offset=".55" stopColor="#f1e9d8" /><stop offset="1" stopColor="#d9cbb1" /></radialGradient>
+        <radialGradient id="pouf" cx="40%" cy="35%" r="70%"><stop offset="0" stopColor="#fffdf9" /><stop offset=".6" stopColor="#f3ecdd" /><stop offset="1" stopColor="#d7c8ad" /></radialGradient>
+        <linearGradient id="sofaBody" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#fffcf6" /><stop offset="1" stopColor="#e6dbc6" /></linearGradient>
+        <filter id="bevel" x="-20%" y="-20%" width="140%" height="150%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation=".6" result="b" />
+          <feSpecularLighting in="b" surfaceScale="2.2" specularConstant=".55" specularExponent="18" lightingColor="#fff" result="spec"><fePointLight x="-40" y="-80" z="120" /></feSpecularLighting>
+          <feComposite in="spec" in2="SourceAlpha" operator="in" result="spec2" />
+          <feComposite in="SourceGraphic" in2="spec2" operator="arithmetic" k1="0" k2="1" k3=".9" k4="0" result="lit" />
+          <feDropShadow in="lit" dx="0" dy="1" stdDeviation=".8" floodColor="#4a3a24" floodOpacity=".42" />
+        </filter>
         <filter id="hullShadow" x="-5%" y="-5%" width="110%" height="120%"><feDropShadow dx="0" dy="2" stdDeviation="2.2" floodColor="#4a3a24" floodOpacity=".22" /></filter>
         <clipPath id="hullClip"><path d={deck === "main" ? hull : slab} /></clipPath>
         {units.map((u) => { const w = sx(u.w), h = sx(u.h); return <clipPath key={u.id} id={`clip-${u.id}`}>{u.r && u.r >= u.w / 2 ? <circle cx={w / 2} cy={h / 2} r={w / 2 + 2} /> : <rect x="-4" y="-4" width={w + 8} height={h + 8} rx={u.r ? sx(u.r) : 1.5} />}</clipPath>; })}
@@ -111,20 +122,37 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         const lines = FURN[u.id]?.p ?? [], pieces = FURN[u.id]?.f ?? [];
         return (
           <g key={`f-${u.id}`} transform={`translate(${x} ${y})`} pointerEvents="none" filter={lifted ? "url(#lift)" : undefined}>
-            {round ? <circle cx={w / 2} cy={h / 2} r={w / 2} fill={u.type === "table" ? "url(#cushion)" : fill} stroke={u.type === "table" ? "#9c8a6c" : "none"} strokeWidth=".45" /> : <rect x="0" y="0" width={w} height={h} rx={u.r ? sx(u.r) : 1.5} fill={fill} />}
-            {u.type === "table" && <circle cx={w / 2} cy={h / 2} r={w / 2 * 0.62} fill="none" stroke="#9c8a6c" strokeWidth=".3" opacity=".7" />}
+            {round ? <g filter="url(#bevel)"><circle cx={w / 2} cy={h / 2} r={w / 2} fill="url(#disc)" /></g> : <rect x="0" y="0" width={w} height={h} rx={u.r ? sx(u.r) : 1.5} fill={fill} />}
+            {u.type === "table" && <><circle cx={w / 2} cy={h / 2} r={w / 2} fill="none" stroke="#9c8a6c" strokeWidth=".4" /><circle cx={w / 2} cy={h / 2} r={w / 2 * 0.55} fill="none" stroke="#b2a286" strokeWidth=".3" /></>}
             {round ? <circle cx={w / 2} cy={h / 2} r={w / 2} fill="url(#edgeLight)" /> : <rect x="0" y="0" width={w} height={h} rx={u.r ? sx(u.r) : 1.5} fill="url(#edgeLight)" />}
-            {(u.type === "daybed" || u.type === "sunbed") && <rect x="1.4" y="1.4" width={w - 2.8} height={h - 2.8} rx="1.8" fill="url(#cushion)" filter="url(#piece)" />}
+            {(u.type === "daybed" || u.type === "sunbed") && <g filter="url(#bevel)"><rect x="1.4" y="1.4" width={w - 2.8} height={h - 2.8} rx="2" fill="url(#sofaBody)" /></g>}
             <g clipPath={`url(#clip-${u.id})`}>
-              {/* soft fills under the pieces: closed shapes by outline, cushion-like polylines by their box */}
-              <g filter="url(#piece)">
-                {pieces.map(([px, py, pw, ph], i) => <rect key={`p${i}`} x={px} y={py} width={pw} height={ph} rx="1.6" fill="url(#cushion)" />)}
-                {lines.map(([d, kind, bx, by, bw, bh], i) => kind === 1
-                  ? <path key={i} d={d} fill="url(#cushion)" stroke="none" />
-                  : kind === 2 ? <rect key={i} x={bx + 0.3} y={by + 0.3} width={bw - 0.6} height={bh - 0.6} rx="1.3" fill="url(#cushion)" /> : null)}
+              {/* 3-D bodies: every closed shape and every rectilinear piece gets a lit, shadowed body; circles become discs/poufs */}
+              <g filter="url(#bevel)">
+                {lines.map(([, kind, bx, by, bw, bh], i) => (kind !== 1 && isCircle(bw, bh) ? <circle key={`o${i}`} cx={bx + bw / 2} cy={by + bh / 2} r={bw / 2} fill={bw > 10 ? "url(#disc)" : "url(#pouf)"} /> : null))}
+                {u.type === "lounge" && pieces.map(([px, py, pw, ph], i) => (pw >= 5 && pw <= 14 && ph >= 5 && ph <= 14 ? <rect key={`q${i}`} x={px} y={py} width={pw} height={ph} rx={Math.min(pw, ph) * 0.42} fill="url(#pouf)" /> : null))}
+                {(u.type === "cabana" || u.type === "upper-cabana" || u.type === "alfresco" || u.type === "vip-booth") && pieces.map(([px, py, pw, ph], i) => <rect key={`p${i}`} x={px} y={py} width={pw} height={ph} rx="1.6" fill="url(#sofaBody)" />)}
+                {lines.map(([d, kind, bx, by, bw, bh], i) => {
+                  if (kind !== 1) return null;
+                  const roundish = Math.abs(bw - bh) < Math.max(bw, bh) * 0.12;
+                  if (roundish && bw < 24) return <circle key={i} cx={bx + bw / 2} cy={by + bh / 2} r={bw / 2} fill={bw > 10 ? "url(#disc)" : "url(#pouf)"} />;
+                  return <path key={i} d={d} fill="url(#sofaBody)" stroke="none" />;
+                })}
+                {(u.type === "cabana" || u.type === "upper-cabana" || u.type === "alfresco" || u.type === "vip-booth") && lines.map(([d, kind, bx, by, bw, bh], i) => kind === 2 ? <rect key={`c${i}`} x={bx + 0.3} y={by + 0.3} width={bw - 0.6} height={bh - 0.6} rx="1.3" fill="url(#cushion)" /> : null)}
               </g>
+              {/* sofa curves (lounges, VIP): a raised ribbon — dark offset, cream body, ink edge */}
+              {(u.type === "lounge" || u.type === "vip-booth") && lines.map(([d, kind, , , bw, bh], i) => (kind === 1 || isCircle(bw, bh) || Math.max(bw, bh) < 12 || Math.min(bw, bh) < 0.6) ? null : (
+                <g key={`r${i}`}>
+                  <path d={d} fill="none" stroke="#5a4a36" strokeWidth="4.6" strokeOpacity=".2" strokeLinecap="round" strokeLinejoin="round" transform="translate(0 1.1)" />
+                  <path d={d} fill="none" stroke="url(#sofaBody)" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+                </g>
+              ))}
               {/* the architect's strokes */}
-              {lines.map(([d, kind], i) => <path key={i} d={d} fill="none" stroke={kind ? "#6b5a44" : "#7d6d56"} strokeWidth={kind ? ".42" : ".36"} strokeLinecap="round" strokeLinejoin="round" opacity={kind ? 1 : 0.85} />)}
+              {lines.map(([d, kind], i) => {
+                const roundish = isCircle(lines[i][4], lines[i][5]);
+                if (roundish) return <circle key={i} cx={lines[i][2] + lines[i][4] / 2} cy={lines[i][3] + lines[i][5] / 2} r={lines[i][4] / 2} fill="none" stroke="#8a7a63" strokeWidth=".32" />;
+                return <path key={i} d={d} fill="none" stroke={kind ? "#6b5a44" : "#7d6d56"} strokeWidth={kind ? ".4" : ".34"} strokeLinecap="round" strokeLinejoin="round" opacity={kind ? 1 : 0.8} />;
+              })}
             </g>
           </g>
         );
