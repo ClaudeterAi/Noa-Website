@@ -1,6 +1,7 @@
 import { ApiGatewayManagementApiClient, PostToConnectionCommand, GoneException } from "@aws-sdk/client-apigatewaymanagementapi";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand, DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { after } from "next/server";
 
 /**
  * Live seat map: browsers watching a session hold a WebSocket (API Gateway); the engine pushes
@@ -29,7 +30,12 @@ export async function broadcastSeatChanges(date: string, slot: string, changes: 
   return sent;
 }
 
-/** Never let a realtime failure affect the booking path. */
+/**
+ * Never let a realtime failure affect the booking path. On Vercel a function is frozen as soon as the
+ * response is sent, so the push is scheduled with next/server's after() (runs after the response,
+ * kept alive by the platform); outside a request scope (tests, scripts) it simply runs in the background.
+ */
 export function broadcastSafely(date: string, slot: string, changes: SeatChange[]) {
-  broadcastSeatChanges(date, slot, changes).catch((e) => console.warn("[realtime] broadcast failed:", e instanceof Error ? e.message : e));
+  const run = () => broadcastSeatChanges(date, slot, changes).catch((e) => console.warn("[realtime] broadcast failed:", e instanceof Error ? e.message : e));
+  try { after(run); } catch { void run(); }
 }
