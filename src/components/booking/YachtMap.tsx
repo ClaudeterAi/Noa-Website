@@ -127,7 +127,8 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         : <><path d={hull} fill="none" stroke={INK_SOFT} strokeWidth=".7" strokeDasharray="3 3" opacity=".6" /><path d={slab} fill="url(#hullGrad)" stroke={INK} strokeWidth="1.1" filter="url(#hullShadow)" /></>}
       <path d={deck === "main" ? hull : slab} fill="url(#planks)" pointerEvents="none" />
 
-      {/* 2 · amenities: raised panels with icons and readable captions */}
+      {/* 2 · amenities: raised panels with icons and readable captions — everything inside the deck outline */}
+      <g clipPath="url(#hullClip)">
       {amen.map((a) => {
         const x = sx(a.x), y = sy(a.y), w = sx(a.w), h = sx(a.h), cx = x + w / 2, cy = y + h / 2, nm = a.name[L]?.toUpperCase() ?? "";
         const badges: string[] = a.kind === "restroom" ? [a.id.includes("-w-") ? "women" : "men"] : a.id === "spa" ? ["hand", "stones"] : a.id === "salon" ? ["scissors", "tattoo"] : a.id === "reception" ? ["reception"] : a.id === "boh" ? ["kitchen"] : a.id === "boh-2" ? ["staff"] : [];
@@ -169,6 +170,8 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
           default: return null;
         }
       })}
+
+      </g>
 
       {/* 3 · seats: tinted base with a lift shadow, then the architect's own furniture lines for that unit */}
       {units.map((u) => {
