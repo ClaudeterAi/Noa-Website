@@ -26,3 +26,9 @@
 .ad .note{color:#777;font-size:.78rem;}
 .ad pre{font-size:.72rem;background:#f4f1ec;padding:10px;overflow:auto;}
 .ad-signin{min-height:100vh;display:grid;place-items:center;}
+
+/* The public site hides the native cursor and draws its own; admin uses the normal cursor */
+body.ad, body.ad *{cursor:auto;}
+body.ad a, body.ad button:not(:disabled), body.ad select, body.ad [role="button"], body.ad input[type="checkbox"], body.ad label:has(input[type="checkbox"]){cursor:pointer;}
+body.ad input:not([type="checkbox"]), body.ad textarea{cursor:text;}
+body.ad button:disabled{cursor:not-allowed;}
