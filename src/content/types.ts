@@ -33,6 +33,7 @@ export type PageId =
   | "home"
   | "morning-package"
   | "afternoon-package"
+  | "night-package"
   | "cabana"
   | "events"
   | "about"
