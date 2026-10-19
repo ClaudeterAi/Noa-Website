@@ -65,17 +65,22 @@
     "guestsCount": "{count, plural, one {ضيف واحد} two {ضيفان} few {# ضيوف} many {# ضيفاً} other {# ضيف}}",
     "viewMore": "عرض المزيد",
     "legend": {
-      "cabana": "كابانا",
+      "cabana": "كابانا المسبح",
       "frontCabana": "كابانا أمامية",
-      "daybed": "سرير نهاري",
-      "sunbed": "سرير شمسي",
+      "daybed": "سرير نهاري عند المسبح",
+      "sunbed": "كرسي استلقاء",
       "jacuzzi": "جاكوزي",
       "vip": "صالة VIP",
       "balcony": "أريكة الشرفة",
       "dj": "صالة الدي جيه",
       "entry": "دخول عام",
-      "sold": "مباع",
-      "reserved": "أولوية الأعضاء"
+      "sold": "مباع / محجوز",
+      "reserved": "أولوية الأعضاء",
+      "vipBooth": "مقصورة VIP",
+      "upperCabana": "كابانا السطح العلوي",
+      "lounge": "كابانا الصالة",
+      "alfresco": "طاولة في الهواء الطلق",
+      "table": "طاولة كوكتيل"
     },
     "confirmed": {
       "title": "تم تأكيد الحجز",

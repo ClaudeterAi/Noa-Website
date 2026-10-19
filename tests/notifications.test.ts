@@ -65,19 +65,19 @@ describe("templates", () => {
 
 describe("outbox", () => {
   it("confirmation queues email + WhatsApp exactly once, worker sends both", async () => {
-    const id = await confirmedBooking("daybed-t-1", "en");
+    const id = await confirmedBooking("daybed-1", "en");
     expect(await enqueueBookingMessages(id, "booking_confirmed")).toBe(2);
     expect(await enqueueBookingMessages(id, "booking_confirmed")).toBe(0);   // replay → nothing new
     const r = await processOutbox(fakes);
     expect(r.sent).toBe(2);
-    expect(sentEmails.at(-1)?.to).toBe("daybed-t-1@example.com");
+    expect(sentEmails.at(-1)?.to).toBe("daybed-1@example.com");
     expect(sentEmails.at(-1)?.ics).toContain("BEGIN:VCALENDAR");
     expect(sentWa.at(-1)).toMatchObject({ to: "+971501234567", sid: "HXen" });
     const rows = await db.select().from(notificationLog).where(eq(notificationLog.bookingId, id));
     expect(rows.every((x) => x.status === "sent" && x.providerId)).toBe(true);
   });
   it("a failed send is retried with backoff, then succeeds", async () => {
-    const id = await confirmedBooking("daybed-t-2", "ar", "0501112222");
+    const id = await confirmedBooking("daybed-2", "ar", "0501112222");
     await enqueueBookingMessages(id, "booking_confirmed");
     failNext = 1;
     const r1 = await processOutbox(fakes);

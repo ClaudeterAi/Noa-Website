@@ -21,11 +21,11 @@ afterAll(async () => { await pool.end(); });
 describe("knowledge", () => {
   it("renders prices from the database, booking rules from settings, and every page path, in EN and AR", async () => {
     const en = await buildKnowledge("en"); const ar = await buildKnowledge("ar");
-    expect(en).toContain("Cabana: morning AED 6500, afternoon AED 8500");
+    expect(en).toContain("Pool Cabana: morning AED 6500, afternoon AED 8500");
     expect(en).toContain("held for 7 minutes");
     expect(en).toContain("→ /en/location");
     expect(en).toContain("Q: Can I cancel or change my reservation?");
-    expect(ar).toContain("كابانا: الصباح AED 6500");
+    expect(ar).toContain("كابانا المسبح: الصباح AED 6500");
     expect(ar).toContain("→ /ar/location");
     expect(en.length).toBeGreaterThan(8000);
   });
@@ -39,8 +39,8 @@ describe("knowledge", () => {
 describe("tools", () => {
   it("availability summary groups by seat type with live counts", async () => {
     const s = await availabilitySummary(D, "afternoon", ctx) as { seat_types: { type: string; free: number; price_aed: number; reserved_for_members: number }[] };
-    const cab = s.seat_types.find((t) => t.type === "cabana")!; expect(cab.free).toBe(6); expect(cab.price_aed).toBe(8500);
-    expect(s.seat_types.find((t) => t.type === "front-cabana")!.reserved_for_members).toBe(2); // far-future date → members priority
+    const cab = s.seat_types.find((t) => t.type === "cabana")!; expect(cab.free).toBe(8); expect(cab.price_aed).toBe(8500);
+    expect(s.seat_types.find((t) => t.type === "vip-booth")!.reserved_for_members).toBe(1); // far-future date → members priority
   });
   it("hold_seat picks free seats of the type, respects quantity, lands in the shared cart", async () => {
     const r = await holdSeat(D, "afternoon", "daybed", 2, ctx) as { held: { unit_id: string }[] };
@@ -49,9 +49,9 @@ describe("tools", () => {
     const av = await getAvailability(D, "afternoon", ctx.cartToken); expect(av.filter((u) => u.state === "yours")).toHaveLength(2);
   });
   it("reserved seats explain the members rule instead of holding", async () => {
-    const r = await holdSeat(D, "afternoon", "front-cabana", 1, ctx) as { held: unknown[]; error: string };
+    const r = await holdSeat(D, "afternoon", "vip-booth", 1, ctx) as { held: unknown[]; error: string };
     expect(r.held).toHaveLength(0); expect(r.error).toMatch(/reserved for returning members/);
-    const vip = await holdSeat(D, "afternoon", "front-cabana", 1, { ...ctx, cartToken: "22222222-2222-4222-8222-222222222222", tier: "vip" }) as { held: unknown[] };
+    const vip = await holdSeat(D, "afternoon", "vip-booth", 1, { ...ctx, cartToken: "22222222-2222-4222-8222-222222222222", tier: "vip" }) as { held: unknown[] };
     expect(vip.held).toHaveLength(1);
   });
   it("find_page resolves navigation phrases to paths", () => {

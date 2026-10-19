@@ -191,3 +191,23 @@ sand — page/frames (11-0701 Whisper White #EDE6DA, tint #F6F2EA, band 13-1106 
 #187A80 (lighter, bluer shade near 16-5421 Sea Green, white text 5.1:1), accent #27A0A1 for rules, dots, hovers (never small text);
 sea blue — text (#156A89 headings/links 4.9:1 on sand, ink #10384A body 10:1), lightened/bluer from 19-4535 Deep Sea on 19 Oct. Tokens at the end of `globals.css`
 (`--c-*`, `--bg`, `--ink`, `--head`, `--accent`, `--bar`). Palette sheet with contrast checks: `noa-palette.png` in the PR.
+
+## The boat (final layout, 19 Oct 2026)
+
+Seat map and inventory follow the Atelier EPJ detailed-design set (EPJ-NA-DXB-01, NA-ID-1000 main deck, NA-ID-1100 upper deck,
+rev 00 · 17.07.2026). Geometry in `src/components/booking/boat.ts` (mm from the bow and the port rail, hull 52 000 × 15 000, drawn at
+1:50); `YachtMap.tsx` renders one deck at a time. Sellable units: 10 sun loungers, 14 pool daybeds, 8 pool cabanas, 10 cocktail
+tables, 4 lounge cabanas (main deck); 8 upper-deck cabanas, 1 VIP booth (VIP-priority), 12 alfresco tables (upper deck); 40 general
+entry. Shown but not bookable: infinity pool, stage/dance floor, DJ, both bars, reception, restrooms, salon/tattoo, manicure/
+pedicure/massage, stairs, arrival points, canopies. Not drawn: kitchen, prep/store, store, A/V room, artists' room, service stations,
+stowage, dumbwaiter (one hatched "Kitchen & service" block), captain's deck (by others). `npx tsx src/db/sync-units.ts` reconciles the
+database to the geometry; pass an SVG path to use a designer drawing instead.
+
+### Seat-map furniture is the architect's drawing
+
+`src/components/booking/furniture.json` holds, per sellable unit, the furniture strokes from the EPJ PDF vectors (sheets NA-ID-1000 /
+NA-ID-1100), calibrated from the cabana outlines (1:70 on A1 → 1 mm = 0.0405 pt), clipped to the unit and exported at 1:50 in
+unit-local units; closed shapes are flagged so the renderer fills them (cushions, tables, poufs). Everything else on the map (deck,
+pool, stairs, bars, rooms) is drawn clean by `YachtMap.tsx` at positions measured from the same vectors (`boat.ts`). Regenerate with
+`scripts/map/extract-epj-furniture.py` after `pdftocairo -svg` on a new drawing issue (`extract-epj-linework.py` exports the full
+cleaned sheet if a reference overlay is ever needed).

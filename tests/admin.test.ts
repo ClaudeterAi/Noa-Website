@@ -39,7 +39,7 @@ describe("bookings", () => {
     const list = await listBookings({ q: "case@" });
     expect(list[0]?.ref).toBe(p.ref); expect(list[0]?.firstDate).toBe(D);
     const detail = await getBooking(p.bookingId);
-    expect(detail?.items[0].unitName).toBe("Cabana"); expect(detail?.items[0].label).toBe("C1");
+    expect(detail?.items[0].unitName).toBe("Pool Cabana"); expect(detail?.items[0].label).toBe("C1");
     await cancelBookingAdmin(actor, p.bookingId);
     expect((await getBooking(p.bookingId))?.booking.status).toBe("cancelled");
     expect((await getAvailability(D, "afternoon")).find((u) => u.unitId === "cabana-1")?.state).toBe("free");
@@ -75,10 +75,10 @@ describe("inventory, sessions, settings", () => {
   });
   it("closing a session blocks new holds; reopening restores", async () => {
     await setSessionStatus(actor, D, "morning", "closed");
-    await expect(createHold({ date: D, slot: "morning", unitId: "daybed-t-1", cartToken: "a2" })).rejects.toThrow();
+    await expect(createHold({ date: D, slot: "morning", unitId: "daybed-1", cartToken: "a2" })).rejects.toThrow();
     const s = await listSessions(D, D); expect(s.find((x) => x.slot === "morning")?.status).toBe("closed");
     await setSessionStatus(actor, D, "morning", "open");
-    expect((await createHold({ date: D, slot: "morning", unitId: "daybed-t-1", cartToken: "a2" })).holdId).toBeTruthy();
+    expect((await createHold({ date: D, slot: "morning", unitId: "daybed-1", cartToken: "a2" })).holdId).toBeTruthy();
   });
   it("settings are validated and audited", async () => {
     await updateSetting(actor, "hold_minutes", 7);

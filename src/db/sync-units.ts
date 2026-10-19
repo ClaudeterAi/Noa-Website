@@ -14,8 +14,11 @@ import { eq, sql } from "drizzle-orm";
 import { db, pool } from "./client";
 import { inventoryUnits, unitTypes } from "./schema";
 import { units as typeMap } from "@/components/booking/inventory";
+import { BOAT_UNITS } from "@/components/booking/boat";
 
-export function seatIdsFromSvg(source: string): string[] {
+/** Seat ids: from a designer SVG (data-seat="…") when one is given, otherwise from the drawing geometry in boat.ts. */
+export function seatIdsFromSvg(source?: string): string[] {
+  if (!source) return BOAT_UNITS.map((u) => u.id);
   const ids = [...source.matchAll(/data-seat="([^"]+)"/g)].map((m) => m[1]);
   return [...new Set(ids)];
 }
@@ -24,30 +27,28 @@ export function seatIdsFromSvg(source: string): string[] {
 export function typeForSeat(id: string, known: Set<string>): string | null {
   if (typeMap[id]) return typeMap[id];
   const prefixes: [RegExp, string][] = [
-    [/^front-cabana-/, "front-cabana"], [/^lower-cabana-vip/, "front-cabana"], [/^(lower-)?cabana-/, "cabana"],
-    [/^daybed-b-/, "front-daybed"], [/^daybed(-t)?-/, "daybed"], [/^balcony-/, "balcony-sofa"], [/^sunbed-/, "sunbed"],
-    [/^jacuzzi-/, "jacuzzi"], [/^vip-lounge-/, "vip-lounge"], [/^dj-lounge-/, "dj-lounge"], [/^entry-/, "entry"],
+    [/^vip-booth-/, "vip-booth"], [/^upper-cabana-/, "upper-cabana"], [/^lounge-/, "lounge"], [/^cabana-/, "cabana"], [/^alfresco-/, "alfresco"],
+    [/^daybed-/, "daybed"], [/^table-/, "table"], [/^sunbed-/, "sunbed"], [/^entry-/, "entry"],
   ];
   for (const [re, type] of prefixes) if (re.test(id) && known.has(type)) return type;
   return null;
 }
 
-export async function syncUnits(source: string) {
+export async function syncUnits(source?: string) {
   const ids = seatIdsFromSvg(source);
   const known = new Set((await db.select({ id: unitTypes.id }).from(unitTypes)).map((t) => t.id));
   const existing = await db.select().from(inventoryUnits);
   const byId = new Map(existing.map((u) => [u.id, u]));
-  const upper = new Set(["sunbed", "jacuzzi", "vip-lounge", "balcony-sofa"]);
+  const upper = new Set(["upper-cabana", "vip-booth", "alfresco"]);   // decks per the EPJ drawings (boat.ts)
   const report = { added: [] as string[], reactivated: [] as string[], retyped: [] as string[], deactivated: [] as string[], unmapped: [] as string[], total: ids.length };
 
   for (const [i, id] of ids.entries()) {
     const cur = byId.get(id);
     const type = cur?.unitTypeId ?? typeForSeat(id, known);
     if (!type) { report.unmapped.push(id); continue; }
-    const label = id.replace(/^lower-cabana-vip$/, "LCV").replace(/^lower-cabana-(\d+)/, "LC$1").replace(/^daybed-t-(\d+)/, "D$1").replace(/^daybed-b-(\d+)/, "F$1")
-      .replace(/^([a-z])[a-z-]*?-(\d+)$/, (_m, c: string, n: string) => `${c.toUpperCase()}${n}`).toUpperCase();
+    const label = BOAT_UNITS.find((u) => u.id === id)?.label ?? id.toUpperCase();
     if (!cur) {
-      await db.insert(inventoryUnits).values({ id, unitTypeId: type, label, deck: upper.has(type) ? "upper" : "main", sort: i, vipPriority: type === "front-cabana" });
+      await db.insert(inventoryUnits).values({ id, unitTypeId: type, label, deck: BOAT_UNITS.find((u) => u.id === id)?.deck ?? (upper.has(type) ? "upper" : "main"), sort: i, vipPriority: type === "vip-booth" });
       report.added.push(id);
     } else {
       const patch: Partial<typeof inventoryUnits.$inferInsert> = { sort: i };
@@ -64,8 +65,8 @@ export async function syncUnits(source: string) {
 }
 
 if (require.main === module) {
-  const file = process.argv[2] ?? "src/components/booking/YachtMap.tsx";
-  syncUnits(readFileSync(file, "utf-8"))
+  const file = process.argv[2];
+  syncUnits(file ? readFileSync(file, "utf-8") : undefined)
     .then((r) => { console.log(JSON.stringify(r, null, 2)); return pool.end(); })
     .catch((e) => { console.error(e); process.exit(1); });
 }

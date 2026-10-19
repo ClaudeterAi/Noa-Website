@@ -973,13 +973,13 @@ input,select,textarea{font-size:16px;}
     overflow: visible;
     position: relative;
     width: var(--bkw);
-    height: calc(var(--bkw) * 1400 / 1000);
+    height: calc(var(--bkw) * 1092 / 352);
   }
   .yacht-map{
     position: absolute;
     top: 50%;
     left: 50%;
-    width: calc(var(--bkw) * 1400 / 1000);
+    width: calc(var(--bkw) * 1092 / 352);
     height: var(--bkw);
     min-width: 0;
     max-width: none;
@@ -1353,3 +1353,45 @@ footer a:hover{color:#fff;}
 /* labels that sit on photography stay white */
 .ed-tile-h,.ed-tile-sub,.ed-tile-cap,.split-h,.split-sub,.subhero-h,.subhero-sub,.hero-h,.hero-sub{color:#fff;}
 .ed-tile .car-dot,.ed-intro .car-dot,.ed-tile .car-arrow{border-color:#fff;color:#fff;} .ed-tile .car-dot.on,.ed-intro .car-dot.on{background:#fff;}
+
+/* deck switch above the seat map */
+.bk-decks{display:flex;gap:0;margin:0 0 14px;border:1px solid var(--head,#1a1a1a);width:max-content;}
+.bk-deck{padding:10px 22px;font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;background:transparent;border:0;color:var(--head,#1a1a1a);cursor:pointer;min-height:40px;}
+.bk-deck.on{background:var(--bar,#1a1a1a);color:#fff;}
+.yacht-map .seat{cursor:pointer;transition:filter .2s,opacity .2s;}
+.yacht-map .seat:hover{filter:brightness(.94);}
+.yacht-map .seat.taken{fill:#cfc8bb!important;opacity:.55;cursor:not-allowed;}
+.yacht-map .seat.reserved{fill:#e3dccd!important;stroke-dasharray:2 1.5;cursor:help;}
+.yacht-map .seat.closed{opacity:.18;cursor:not-allowed;}
+.yacht-map .seat.mine{stroke:var(--bar,#1a1a1a);stroke-width:1.6;}
+/* illustrated seat map states */
+.yacht-map .seat-g.taken .seat,.yacht-map .seat.taken{fill:#d9d4ca!important;}
+.yacht-map .seat-g.taken{opacity:.55;filter:none;}
+.yacht-map .seat-g.taken *{cursor:not-allowed;}
+.yacht-map .seat-g.reserved .seat{stroke-dasharray:2 1.5;fill:#eee7d9!important;}
+.yacht-map .seat-g.closed{opacity:.2;}
+.yacht-map .seat-g.mine .seat{stroke:var(--bar,#187A80);stroke-width:1.6;}
+.yacht-map .seat-g:not(.taken):not(.closed) .seat{cursor:pointer;}
+.yacht-map .seat-g:not(.taken):not(.closed):hover .seat{filter:brightness(.95);}
+/* bigger boat on desktop: full width of the step, scrolls sideways on narrower laptops instead of shrinking */
+@media(min-width:681px){
+  .bk-map-wrap{max-width:none;width:100%;overflow-x:auto;padding-bottom:10px;}
+  .yacht-map{width:100%;min-width:1500px;}
+}
+/* seat states over the EPJ linework */
+.yacht-map .seat{cursor:pointer;transition:fill .15s;}
+.yacht-map .seat-g:not(.taken):not(.closed):hover .seat{fill:rgba(24,122,128,.14);}
+.yacht-map .seat-g.taken .seat{fill:rgba(90,74,54,.28)!important;stroke:rgba(90,74,54,.5);cursor:not-allowed;}
+.yacht-map .seat-g.mine .seat{fill:rgba(24,122,128,.22)!important;stroke:var(--bar,#187A80);stroke-width:1.6;}
+.yacht-map .seat-g.reserved .seat{stroke-dasharray:2 1.5;fill:rgba(255,255,255,.35)!important;}
+.yacht-map .seat-g.closed .seat{fill:rgba(255,255,255,.6)!important;stroke-opacity:.3;cursor:not-allowed;}
+.yacht-map .seat-g.taken text,.yacht-map .seat-g.closed text{opacity:.5;}
+/* interactive layer stays invisible until a state applies — the illustration carries the look */
+.yacht-map .seat{stroke:none;fill:transparent;}
+.yacht-map .seat-g:not(.taken):not(.closed):hover .seat{fill:rgba(255,255,255,.18);stroke:rgba(24,122,128,.9);stroke-width:1.2;}
+.yacht-map .seat-g.mine .seat{fill:rgba(24,122,128,.16)!important;stroke:var(--bar,#187A80);stroke-width:1.6;}
+.yacht-map .seat-g.taken .seat{fill:rgba(90,74,54,.32)!important;stroke:none;}
+.yacht-map .seat-g.reserved .seat{stroke:rgba(90,74,54,.7);stroke-dasharray:2 1.5;stroke-width:.8;fill:rgba(255,255,255,.3)!important;}
+.yacht-map .seat-g.closed .seat{fill:rgba(255,255,255,.6)!important;}
+/* tiny SVG labels: exact advances, no pixel-snapped glyph gaps */
+.yacht-map text{text-rendering:geometricPrecision;}

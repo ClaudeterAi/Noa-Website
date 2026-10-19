@@ -25,7 +25,7 @@ describe("event night", () => {
     const s = await getOrCreateSession(D, "night"); expect(s.vipReleaseAt?.toISOString()).toBe("2027-08-13T17:30:00.000Z");  // 21:30 Dubai − 24 h
     const av = await getAvailability(D, "night");
     expect(av.find((u) => u.unitId === "cabana-1")?.price).toBe(12000);            // explicit event price
-    expect(av.find((u) => u.unitId === "daybed-t-1")?.price).toBe(2200 + 300);    // base afternoon + surcharge
+    expect(av.find((u) => u.unitId === "daybed-1")?.price).toBe(2200 + 300);    // base afternoon + surcharge
     expect(av.find((u) => u.unitId === "sunbed-1")?.state).toBe("closed");         // not on sale tonight
     await expect(createHold({ date: D, slot: "night", unitId: "sunbed-1", cartToken: "c1" })).rejects.toBeInstanceOf(TypeNotOnSaleError);
   });
