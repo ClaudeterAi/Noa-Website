@@ -187,12 +187,24 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
         </section>
       );
     }
+    case "map": {
+      return (
+        <section className="ed-map" id={s.id}>
+          <div className="ed-center rv"><div className="ed-kicker">{pick(s.kicker, locale)}</div><h2 className="ed-h"><Rich l={s.heading} locale={locale} /></h2></div>
+          <div className="ed-map-frame rv">
+            <iframe title={pick(s.heading, locale)} src={`https://www.google.com/maps?q=${encodeURIComponent(s.query)}&z=15&hl=${locale}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          </div>
+          <div className="ed-center rv ed-map-notes"><p>{pick(s.address, locale)}</p><p className="ed-map-note">{pick(s.note, locale)}</p>
+            <a className="ed-link ed-link-arrow" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.query)}`} target="_blank" rel="noopener noreferrer">{locale === "ar" ? "افتح في خرائط جوجل" : "Open in Google Maps"}</a></div>
+        </section>
+      );
+    }
     case "galleryCarousel": {
       return (
         <section className="ed-gallery" id={s.id}>
           <div className="ed-center rv"><h2 className="ed-h">{pick(s.heading, locale)}</h2><div className="ed-sub">{pick(s.sub, locale)}</div></div>
           <div className="rv">
-            <Carousel perView={2} arrows="outside" dots={false} ariaLabel={pick(s.heading, locale)}>
+            <Carousel perView={2} arrows="inside" dots={false} ariaLabel={pick(s.heading, locale)}>
               {s.media.map((m) => <div key={m} className="ed-frame ed-frame-tall" style={bg(m)} role="img" aria-label={media[m]?.alt?.[locale] ?? ""} />)}
             </Carousel>
           </div>
@@ -224,7 +236,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
         <section className={`ed-posters ed-posters-${s.aspect === "1/1" ? "sq" : "tall"}`} id={s.id}>
           <div className="ed-center rv"><h2 className="ed-h">{pick(s.heading, locale)}</h2>{s.sub && <div className="ed-sub">{pick(s.sub, locale)}</div>}</div>
           <div className="rv">
-            <Carousel perView={3} arrows="outside" dots={slides.length > 3} ariaLabel={pick(s.heading, locale)}>
+            <Carousel perView={3} arrows="inside" dots={slides.length > 3} ariaLabel={pick(s.heading, locale)}>
               {slides.map((sl) => (
                 <Link key={sl.key} href={hrefPath(s.href)} className="ed-poster">
                   <div className={`ed-frame ${s.aspect === "1/1" ? "ed-frame-square" : "ed-frame-poster"}`} style={{ backgroundImage: `url('${sl.img}')` }} />

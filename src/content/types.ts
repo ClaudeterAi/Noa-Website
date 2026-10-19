@@ -141,6 +141,7 @@ export type Section =
   | (Base & { type: "cta"; pre: L; heading: L; body: L; primary: CtaLink; secondary: CtaLink })
   | (Base & { type: "subhero"; media: string; kicker: L; heading: L; sub: L })
   | (Base & { type: "prose"; kicker: L; heading: L; paragraphs: L[] })
+  | (Base & { type: "map"; kicker: L; heading: L; query: string; address: L; note: L })
   | (Base & {
       type: "splitProse";
       media: string;
