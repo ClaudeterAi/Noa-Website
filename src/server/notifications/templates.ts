@@ -55,9 +55,15 @@ export function renderEmail(template: Template, ctx: BookingContext): RenderedEm
         : [`Dear ${ctx.guestName},`, "Your payment arrived after the seat hold had expired, and the seat was reserved by another guest in the meantime.", `${aed(ctx.total)} has been refunded automatically to the same payment method (3–10 business days).`, "We would love to help you pick another seat — reply to this email or book again on the site."];
       return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, lines) };
     }
+    case "staff_new_booking": case "staff_callback": {
+      throw new Error("staff templates are pre-rendered into payload");
+    }
     case "shuttle_alert": {
       const title = L === "ar" ? `قاربك إلى نوا — ${ctx.ref}` : `Your shuttle to NOA — ${ctx.ref}`;
-      const lines = L === "ar" ? [`مرحباً ${ctx.guestName}،`, `قاربك ينطلق من ${PIER.ar}.`, CHECKIN.ar] : [`Dear ${ctx.guestName},`, `Your shuttle departs from ${PIER.en}.`, CHECKIN.en];
+      const when = first ? (L === "ar" ? `الوصول ${first.arrivalTime}` : `arrival ${first.arrivalTime}`) : "";
+      const lines = L === "ar"
+        ? [`مرحباً ${ctx.guestName}،`, `قاربك إلى نوا اليوم — ${when}. ينطلق من ${PIER.ar}؛ القوارب كل 30 دقيقة.`, CHECKIN.ar, `الرقم المرجعي: ${ctx.ref}`]
+        : [`Dear ${ctx.guestName},`, `Your shuttle to NOA is today — ${when}. It leaves from ${PIER.en}; boats run every 30 minutes.`, CHECKIN.en, `Reference: ${ctx.ref}`];
       return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, lines) };
     }
   }

@@ -27,6 +27,14 @@ export async function enqueueBookingMessages(bookingId: string, template: Templa
 }
 
 export interface Providers { email: EmailProvider | null; whatsapp: WhatsAppProvider | null }
+
+/** Staff alert (ops inbox): rendered up front, stored in payload, sent by the same worker with the same retries. */
+export async function enqueueStaffEmail(to: string, template: "staff_new_booking" | "staff_callback", subject: string, text: string, conn: DbOrTx = db, bookingId?: string) {
+  const html = `<!doctype html><html><body style="font-family:Georgia,serif;color:#1a1a1a;padding:24px;max-width:600px"><div style="letter-spacing:.45em;font-size:18px;margin-bottom:18px">NOA · STAFF</div><h2 style="font-weight:300;margin:0 0 14px">${subject.replace(/</g, "&lt;")}</h2><pre style="font:inherit;white-space:pre-wrap;line-height:1.6">${text.replace(/</g, "&lt;")}</pre></body></html>`;
+  const inserted = await conn.insert(notificationLog).values({ bookingId: bookingId ?? null, channel: "email", template, to, locale: "en", status: "queued", payload: { subject, text, html } })
+    .onConflictDoNothing().returning({ id: notificationLog.id });
+  return inserted.length;
+}
 export const liveProviders = (): Providers => ({ email: resendProvider(), whatsapp: twilioWhatsAppProvider() });
 
 const BACKOFF_MINUTES = [1, 5, 30, 120, 720]; // then give up
@@ -46,10 +54,13 @@ export async function processOutbox(providers: Providers = liveProviders(), limi
   for (const id of due) {
     const [row] = await db.select().from(notificationLog).where(eq(notificationLog.id, id));
     if (!row) continue;
-    const ctx = row.bookingId ? await loadContext(row.bookingId) : null;
-    if (!ctx) { await db.update(notificationLog).set({ status: "failed", error: "booking context missing" }).where(eq(notificationLog.id, id)); result.failed++; continue; }
+    const pre = row.template.startsWith("staff_") ? (row.payload as { subject: string; text: string; html: string } | null) : null;
+    const ctx = pre ? null : row.bookingId ? await loadContext(row.bookingId) : null;
+    if (!pre && !ctx) { await db.update(notificationLog).set({ status: "failed", error: "booking context missing" }).where(eq(notificationLog.id, id)); result.failed++; continue; }
     try {
-      const sent = await sendOne(row.channel as Channel, row.template as Template, row.to, ctx, providers);
+      const sent = pre
+        ? (providers.email ? await providers.email.send(row.to, { subject: pre.subject, text: pre.text, html: pre.html }).then((r) => ({ id: r.id, payload: pre })) : "skipped" as const)
+        : await sendOne(row.channel as Channel, row.template as Template, row.to, ctx!, providers);
       if (sent === "skipped") {
         await db.update(notificationLog).set({ status: "skipped", error: "provider not configured", payload: { template: row.template } }).where(eq(notificationLog.id, id));
         result.skipped++;
@@ -93,6 +104,19 @@ export async function enqueueReminders(conn: DbOrTx = db): Promise<number> {
     WHERE b.status = 'confirmed' AND s.date = (now() AT TIME ZONE 'Asia/Dubai')::date + 1`);
   let n = 0;
   for (const r of rows.rows) n += await enqueueBookingMessages(r.booking_id, "booking_reminder_24h", conn);
+  return n;
+}
+
+/** Shuttle alert: confirmed bookings arriving within `shuttle_alert_hours` from now (Dubai time), exactly once per booking. */
+export async function enqueueShuttleAlerts(hours: number, conn: DbOrTx = db): Promise<number> {
+  const rows = await conn.execute<{ booking_id: string }>(sql`
+    SELECT DISTINCT b.id AS booking_id
+    FROM bookings b JOIN booking_items bi ON bi.booking_id = b.id AND bi.active JOIN sessions s ON s.id = bi.session_id
+    WHERE b.status = 'confirmed'
+      AND (s.date::text || ' ' || bi.arrival_time)::timestamp AT TIME ZONE 'Asia/Dubai'
+          BETWEEN now() AND now() + make_interval(hours => ${hours})`);
+  let n = 0;
+  for (const r of rows.rows) n += await enqueueBookingMessages(r.booking_id, "shuttle_alert", conn);
   return n;
 }
 

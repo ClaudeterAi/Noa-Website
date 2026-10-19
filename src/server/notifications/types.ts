@@ -1,5 +1,5 @@
 export type Channel = "email" | "whatsapp";
-export type Template = "booking_confirmed" | "booking_reminder_24h" | "booking_late_refunded" | "shuttle_alert";
+export type Template = "booking_confirmed" | "booking_reminder_24h" | "booking_late_refunded" | "shuttle_alert" | "staff_new_booking" | "staff_callback";
 export type Locale = "en" | "ar";
 
 /** Everything a template needs; assembled from the booking, its items and the guest. */
