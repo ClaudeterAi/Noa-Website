@@ -1,0 +1,16 @@
+# Gemini Code Assist (GitHub App) — review configuration for NOA Dubai
+have_fun: false
+code_review:
+  disable: false
+  comment_severity_threshold: MEDIUM     # LOW adds noise; MEDIUM+ are things worth a human look
+  max_review_comments: -1                # no cap
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+ignore_patterns:
+  - "legacy-static/**"                   # archived previous site
+  - "public/media/**"                    # binary placeholders
+  - "src/fonts/**"
+  - "drizzle/meta/**"
+  - "package-lock.json"
