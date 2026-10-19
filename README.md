@@ -185,10 +185,11 @@ pedicure/massage, stairs, arrival points, canopies. Not drawn: kitchen, prep/sto
 stowage, dumbwaiter (one hatched "Kitchen & service" block), captain's deck (by others). `npx tsx src/db/sync-units.ts` reconciles the
 database to the geometry; pass an SVG path to use a designer drawing instead.
 
-### Seat-map linework is the architect's drawing
+### Seat-map furniture is the architect's drawing
 
-`public/map/main-deck.svg` and `upper-deck.svg` are the EPJ PDF's own vectors (sheets NA-ID-1000 / NA-ID-1100), cleaned of
-dimensions, grid lines, annotations and glyphs, calibrated from the cabana outlines (1:70 on A1 → 1 mm = 0.0405 pt) and exported at
-1:50 into map units. Regenerate with `scripts/map/extract-epj-linework.py` after `pdftocairo -svg` on a new drawing issue.
-`YachtMap.tsx` paints colour under that linework and the interactive seat layer over it; `boat.ts` boxes are measured from the same
-vectors. Nothing about the layout is drawn by hand.
+`src/components/booking/furniture.json` holds, per sellable unit, the furniture strokes from the EPJ PDF vectors (sheets NA-ID-1000 /
+NA-ID-1100), calibrated from the cabana outlines (1:70 on A1 → 1 mm = 0.0405 pt), clipped to the unit and exported at 1:50 in
+unit-local units; closed shapes are flagged so the renderer fills them (cushions, tables, poufs). Everything else on the map (deck,
+pool, stairs, bars, rooms) is drawn clean by `YachtMap.tsx` at positions measured from the same vectors (`boat.ts`). Regenerate with
+`scripts/map/extract-epj-furniture.py` after `pdftocairo -svg` on a new drawing issue (`extract-epj-linework.py` exports the full
+cleaned sheet if a reference overlay is ever needed).
