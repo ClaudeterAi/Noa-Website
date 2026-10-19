@@ -27,24 +27,38 @@ const sy = (mm: number) => (mm - HULL.top) / SCALE;
 const INK = "#5a4a36", INK_SOFT = "#8a7a63";
 const F = { fontFamily: "var(--font-sans)" } as const;
 const ICON = "#5f5040";
-/** Clear pictograms, drawn at 1 unit = 50 mm, centred on (0,0), ~16 units tall */
-function Icon({ kind, x, y }: { kind: string; x: number; y: number }) {
-  const g = (children: ReactNode) => <g transform={`translate(${x} ${y})`} fill="none" stroke={ICON} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">{children}</g>;
+/** Pictograms centred on (0,0), about 16 units tall */
+function Icon({ kind, x, y, scale = 1 }: { kind: string; x: number; y: number; scale?: number }) {
+  const g = (children: ReactNode) => <g transform={`translate(${x} ${y}) scale(${scale})`} fill="none" stroke={ICON} strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round">{children}</g>;
   switch (kind) {
-    case "women": return g(<><circle cx="0" cy="-6.5" r="2.2" fill={ICON} stroke="none" /><path d="M-4.2,4 L-2.4,-2.6 h4.8 L4.2,4 Z" fill={ICON} stroke="none" /><path d="M-1.6,4 v4.5 M1.6,4 v4.5" /></>);
-    case "men": return g(<><circle cx="0" cy="-6.5" r="2.2" fill={ICON} stroke="none" /><rect x="-3" y="-3" width="6" height="7.5" rx="1" fill={ICON} stroke="none" /><path d="M-1.6,4.5 v4.5 M1.6,4.5 v4.5" /></>);
-    case "spa": return g(<><path d="M0,7 C-7,4 -8,-3 -4,-6 C-2,-3 -1,0 0,2 C1,0 2,-3 4,-6 C8,-3 7,4 0,7 Z" /><path d="M0,2 C-1,-2 -1,-5 0,-8 C1,-5 1,-2 0,2 Z" fill={ICON} stroke="none" /><path d="M-9,7 q9,4 18,0" /></>);
-    case "salon": return g(<><circle cx="-3.5" cy="4.5" r="2.4" /><circle cx="3.5" cy="4.5" r="2.4" /><path d="M-2,2.6 L5,-8 M2,2.6 L-5,-8" /></>);
-    case "reception": return g(<><path d="M-8,5 h16 M-6,5 a6,6 0 0 1 12,0 M0,-1 v-2.5" /><circle cx="0" cy="-4.5" r="1.1" fill={ICON} stroke="none" /></>);
-    case "kitchen": return g(<><path d="M-7,-7 v14 M-7,-7 q-3,0 -3,3 v4 q0,3 3,3 M-5,-7 q3,0 3,3 v4 q0,3 -3,3" /><path d="M3,-7 v14 M3,-7 q-2.5,0 -2.5,3 v2 q0,2 2.5,2 M3,-7 q2.5,0 2.5,3 v2 q0,2 -2.5,2 M6.5,-7 v14" /></>);
-    case "staff": return g(<><circle cx="0" cy="-5" r="2.6" /><path d="M-6,8 a6,6 0 0 1 12,0 Z" /></>);
-    case "stairs": return g(<path d="M-7,7 h3.5 v-3.5 h3.5 v-3.5 h3.5 v-3.5 h3.5" />);
+    case "women": return g(<><circle cx="0" cy="-6.6" r="2.3" fill={ICON} stroke="none" /><path d="M-4.6,4.2 L-2.3,-2.8 h4.6 L4.6,4.2 Z" fill={ICON} stroke="none" /><path d="M-1.7,4.2 v4.4 M1.7,4.2 v4.4" /></>);
+    case "men": return g(<><circle cx="0" cy="-6.6" r="2.3" fill={ICON} stroke="none" /><rect x="-3.2" y="-3.2" width="6.4" height="7.6" rx="1.2" fill={ICON} stroke="none" /><path d="M-1.7,4.4 v4.4 M1.7,4.4 v4.4" /><path d="M-2.2,-3.4 l2.2,1.4 l2.2,-1.4" strokeWidth=".9" /></>);
+    case "hand": return g(<><path d="M-5.5,2.5 v-7 a1.4,1.4 0 0 1 2.8,0 v5 v-8.5 a1.4,1.4 0 0 1 2.8,0 v8.5 v-9.5 a1.4,1.4 0 0 1 2.8,0 v9.5 v-7.5 a1.4,1.4 0 0 1 2.8,0 v9.5 c0,4.5 -3,7 -6.5,7 c-3.5,0 -5.5,-2 -6.8,-4.5 l-2.2,-4.2 a1.4,1.4 0 0 1 2.4,-1.3 z" /><path d="M-4.1,-5.3 a1.2,.8 0 0 0 0,.2 M-1.3,-8.8 a1.2,.8 0 0 0 0,.2" stroke="#b56a7a" strokeWidth="1.6" /></>);
+    case "stones": return g(<><ellipse cx="0" cy="5.5" rx="7.5" ry="3" fill="#e9dfcc" /><ellipse cx="0" cy="1" rx="6" ry="2.6" fill="#e9dfcc" /><ellipse cx="0" cy="-3.2" rx="4.4" ry="2.2" fill="#e9dfcc" /><path d="M-2,-8 q1,-2 0,-4 M2,-8 q1,-2 0,-4" strokeWidth=".8" /></>);
+    case "scissors": return g(<><circle cx="-3.6" cy="4.8" r="2.4" /><circle cx="3.6" cy="4.8" r="2.4" /><path d="M-2,2.8 L5.4,-8 M2,2.8 L-5.4,-8" /></>);
+    case "tattoo": return g(<><path d="M-1.8,-9 h3.6 v5 h-3.6 z" fill={ICON} stroke="none" /><rect x="-2.6" y="-4" width="5.2" height="7" rx="1" /><path d="M0,3 v4.5 M-.8,7.5 l.8,2.2 l.8,-2.2" /><path d="M2.6,-7 q4,-1 4,2.5 q0,2 -2,2" strokeWidth=".9" /></>);
+    case "reception": return g(<><path d="M-8,5 h16 M-6.2,5 a6.2,6.2 0 0 1 12.4,0 M0,-1.2 v-2.4" /><circle cx="0" cy="-4.6" r="1.2" fill={ICON} stroke="none" /></>);
+    case "kitchen": return g(<><path d="M-6.5,-8 v15 M-6.5,-8 q-2.6,0 -2.6,2.6 v3 q0,2.6 2.6,2.6 M-6.5,-8 q2.6,0 2.6,2.6 v3 q0,2.6 -2.6,2.6" /><path d="M4,-8 v15 M4,-8 q-2.4,0 -2.4,2.4 v2 q0,2 2.4,2 M4,-8 q2.4,0 2.4,2.4 v2 q0,2 -2.4,2 M7,-8 v15" /></>);
+    case "staff": return g(<><circle cx="0" cy="-5" r="2.7" /><path d="M-6.2,8 a6.2,6.2 0 0 1 12.4,0 Z" /></>);
+    case "cocktail": return g(<><path d="M-7,-8 h14 L0,0 Z" /><path d="M0,0 v7 M-4,7 h8" /><path d="M-5,-5.5 h10" strokeWidth=".8" /><circle cx="3.5" cy="-9.5" r="1.3" fill="#c0392b" stroke="none" /><path d="M-7,-8 l-2,-3" strokeWidth=".8" /></>);
+    case "dj": return g(<><circle cx="-4.5" cy="0" r="4.2" /><circle cx="4.5" cy="0" r="4.2" /><circle cx="-4.5" cy="0" r="1" fill={ICON} stroke="none" /><circle cx="4.5" cy="0" r="1" fill={ICON} stroke="none" /><path d="M-9,-5.5 h18" strokeWidth=".9" /></>);
     default: return null;
   }
 }
-const Caption = ({ x, y, text, dark = false }: { x: number; y: number; text: string; dark?: boolean }) => {
-  const w = Math.max(14, text.length * 3.1 + 6);
-  return <g pointerEvents="none"><rect x={x - w / 2} y={y - 4.3} width={w} height="6.4" rx="3.2" fill={dark ? "#5f5040" : "#fff"} fillOpacity={dark ? 1 : 0.92} /><text x={x} y={y + 0.4} fontSize="4.2" letterSpacing=".9" fill={dark ? "#fff" : "#5f5040"} style={F} textAnchor="middle" fontWeight="600">{text}</text></g>;
+/** A lit, shadowed disc with a pictogram on it */
+const Badge = ({ kind, x, y, r = 9 }: { kind: string; x: number; y: number; r?: number }) => (
+  <g pointerEvents="none"><g filter="url(#bevel)"><circle cx={x} cy={y} r={r} fill="url(#disc)" /></g><circle cx={x} cy={y} r={r} fill="none" stroke="#b9a98d" strokeWidth=".4" opacity=".8" /><Icon kind={kind} x={x} y={y} scale={r / 11} /></g>
+);
+/** Caption pill: one line per " · " segment, text forced to fit its line */
+const Caption = ({ x, y, text, dark = false, max = 40 }: { x: number; y: number; text: string; dark?: boolean; max?: number }) => {
+  const parts = text.split(" · ").flatMap((t) => (t.length * 2.7 > max ? t.split(" ").reduce<string[]>((acc, wd) => { const last = acc[acc.length - 1]; if (last !== undefined && (last + " " + wd).length * 2.7 <= max) acc[acc.length - 1] = last + " " + wd; else acc.push(wd); return acc; }, []) : [t]));
+  const lh = 5.6, fs = 4.3, pw = Math.min(max, Math.max(...parts.map((t) => t.length * 2.7)) + 6), ph = parts.length * lh + 1.6;
+  return (
+    <g pointerEvents="none">
+      <rect x={x - pw / 2} y={y - ph / 2} width={pw} height={ph} rx="3.2" fill={dark ? "#5f5040" : "#fff"} fillOpacity={dark ? 1 : 0.94} />
+      {parts.map((t, i) => <text key={i} x={x} y={y - ph / 2 + 0.8 + lh * (i + 1) - 1.3} fontSize={fs} fill={dark ? "#fff" : "#5f5040"} style={{ ...F, fontKerning: "none" }} textAnchor="middle" fontWeight="600">{t}</text>)}
+    </g>
+  );
 };
 
 /**
@@ -115,7 +129,8 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
       {/* 2 · amenities: raised panels with icons and readable captions */}
       {amen.map((a) => {
         const x = sx(a.x), y = sy(a.y), w = sx(a.w), h = sx(a.h), cx = x + w / 2, cy = y + h / 2, nm = a.name[L]?.toUpperCase() ?? "";
-        const icon = a.kind === "restroom" ? (a.id.includes("-w-") ? "women" : "men") : a.id === "spa" ? "spa" : a.id === "salon" ? "salon" : a.id === "reception" ? "reception" : a.id === "boh" ? "kitchen" : a.id === "boh-2" ? "staff" : "";
+        const badges: string[] = a.kind === "restroom" ? [a.id.includes("-w-") ? "women" : "men"] : a.id === "spa" ? ["hand", "stones"] : a.id === "salon" ? ["scissors", "tattoo"] : a.id === "reception" ? ["reception"] : a.id === "boh" ? ["kitchen"] : a.id === "boh-2" ? ["staff"] : [];
+        const Badges = ({ cy2 }: { cy2: number }) => <>{badges.map((b, i) => <Badge key={b} kind={b} x={cx + (i - (badges.length - 1) / 2) * 22} y={cy2} />)}</>;
         switch (a.kind) {
           case "pool": return <g key={a.id} pointerEvents="none">
             <rect x={x} y={y} width={w} height={h} rx="1.2" fill="url(#poolDepth)" />
@@ -125,15 +140,30 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
             {nm && <text x={cx} y={cy + 2.4} fontSize="6.5" letterSpacing="2.4" fill="#1f4f57" style={F} textAnchor="middle" fontWeight="600">{nm}</text>}
           </g>;
           case "stairs": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx="1.2" fill="url(#panel)" />{Array.from({ length: 8 }).map((_, i) => { const yy = y + 1.5 + (i * (h - 3)) / 7; return <g key={i}><line x1={x + 1.5} y1={yy} x2={x + w - 1.5} y2={yy} stroke="#fff" strokeOpacity=".8" strokeWidth=".5" /><line x1={x + 1.5} y1={yy + 0.7} x2={x + w - 1.5} y2={yy + 0.7} stroke="#8d7c64" strokeOpacity=".35" strokeWidth=".6" /></g>; })}</g>;
-          case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} />}</g>;
-          case "dj": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" /><rect x={x + 6} y={y + 6} width={w - 12} height={h - 12} rx="1.5" fill="url(#panel)" />{[0.3, 0.5, 0.7].map((k) => <circle key={k} cx={x + w * k} cy={cy} r="2" fill="#f6efe2" stroke="#8d7c64" strokeWidth=".4" />)}{nm && <Caption x={cx} y={cy + 7} text={nm} />}</g>;
-          case "bar": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx={sx(a.r ?? 500)} fill="url(#barGrad)" /><rect x={x + 6} y={y + 6} width={w - 12} height={h - 12} rx={Math.max(1.5, sx(a.r ?? 500) - 6)} fill="url(#panel)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx={Math.max(1, sx(a.r ?? 500) - 1)} fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth=".7" />{nm && <Caption x={cx} y={cy} text={nm} dark />}</g>;
-          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="1.6" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Icon kind={icon} x={cx} y={cy - 5} />{nm && <Caption x={cx} y={y + h - 6} text={nm} />}</g>;
-          case "boh": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panelDark)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="1.6" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth=".7" />{icon && <Icon kind={icon} x={cx} y={cy - (nm ? 6 : 0)} />}{nm && <Caption x={cx} y={cy + 8} text={nm} />}</g>;
+          case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} max={60} />}</g>;
+          case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" filter="url(#lift)" /><Badge kind="dj" x={cx} y={cy - 7} r={8} />{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
+          case "bar": {
+            const vertical = h > w, rr = sx(a.r ?? 500), n = vertical ? 4 : 5, stools: [number, number][] = [];
+            for (let i = 0; i < n; i++) { const t = (i + 0.5) / n; if (vertical) { stools.push([x - 4.2, y + h * t], [x + w + 4.2, y + h * t]); } else { stools.push([x + w * t, y - 4.2], [x + w * t, y + h + 4.2]); } }
+            return <g key={a.id} pointerEvents="none">
+              <g filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx={rr} fill="url(#barGrad)" /></g>
+              <rect x={x + 5} y={y + 5} width={w - 10} height={h - 10} rx={Math.max(1.5, rr - 5)} fill="url(#panel)" />
+              {/* back bar: a shelf of bottles along the service side */}
+              {vertical
+                ? <g><rect x={x + 7} y={y + 8} width="4" height={h - 16} rx="1" fill="#d9cdb6" />{Array.from({ length: 7 }).map((_, i) => <rect key={i} x={x + 7.8} y={y + 10 + (i * (h - 20)) / 6} width="2.4" height="3.2" rx=".8" fill={["#7a9a6b", "#b56a3a", "#5f7f9a", "#c9a24a"][i % 4]} />)}</g>
+                : <g><rect x={x + 8} y={y + 7} width={w - 16} height="4" rx="1" fill="#d9cdb6" />{Array.from({ length: 9 }).map((_, i) => <rect key={i} x={x + 10 + (i * (w - 20)) / 8} y={y + 7.4} width="2.4" height="3.2" rx=".8" fill={["#7a9a6b", "#b56a3a", "#5f7f9a", "#c9a24a"][i % 4]} />)}</g>}
+              {/* bar stools on the guest sides */}
+              <g filter="url(#bevel)">{stools.map(([sxx, syy], i) => <circle key={i} cx={sxx} cy={syy} r="2.3" fill="url(#pouf)" />)}</g>
+              <Badge kind="cocktail" x={cx} y={cy - 6} r={8} />
+              {nm && <Caption x={cx} y={cy + 8} text={nm} dark max={w - 2} />}
+            </g>;
+          }
+          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="1.6" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Badges cy2={cy - 8} />{nm && <Caption x={cx} y={y + h - 9} text={nm} max={w - 4} />}</g>;
+          case "boh": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panelDark)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="1.6" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth=".7" />{badges.length > 0 && <Badges cy2={cy - (nm ? 8 : 0)} />}{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
           case "label": return <g key={a.id} pointerEvents="none">
             {a.id === "void" && <rect x={x} y={y} width={w} height={h} rx="4" fill="#e7dfcf" stroke="#c9bda6" strokeWidth=".6" />}
-            {a.id === "reception" && <><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panel)" filter="url(#lift)" /><Icon kind="reception" x={cx} y={cy - 5} /></>}
-            {nm && <Caption x={cx} y={a.id === "reception" ? y + h - 6 : cy} text={nm} />}
+            {a.id === "reception" && <><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panel)" filter="url(#lift)" /><Badge kind="reception" x={cx} y={cy - 8} /></>}
+            {nm && <Caption x={cx} y={a.id === "reception" ? y + h - 9 : cy} text={nm} max={a.id === "reception" ? w - 4 : 120} />}
           </g>;
           default: return null;
         }

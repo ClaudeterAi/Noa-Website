@@ -1160,3 +1160,5 @@ body{font-weight:300;}
 .yacht-map .seat-g.taken .seat{fill:rgba(90,74,54,.32)!important;stroke:none;}
 .yacht-map .seat-g.reserved .seat{stroke:rgba(90,74,54,.7);stroke-dasharray:2 1.5;stroke-width:.8;fill:rgba(255,255,255,.3)!important;}
 .yacht-map .seat-g.closed .seat{fill:rgba(255,255,255,.6)!important;}
+/* tiny SVG labels: exact advances, no pixel-snapped glyph gaps */
+.yacht-map text{text-rendering:geometricPrecision;}
