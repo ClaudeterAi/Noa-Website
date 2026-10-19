@@ -1121,3 +1121,70 @@ body{font-weight:300;}
 .pkg-desc,.evt-who,.amen-d,.loc-val,.faq-ans p,.cta-body,.ft-about,.ft-col a,.subhero-sub,.subhero-h em,.prose p,.split-prose-p,.incl-sub,.incl-val,.tariff-sub,.tariff-desc,.specs-sub,.form-sub,.form-meta,.contact-cell,.event-row-who,.bk-pkg-time,.bk-time .bot{font-style:normal;font-weight:300;}
 .subhero-h em{font-weight:600;}
 .tariff-price,.spec-n,.bk-tt-price,.bk-price-val,.bk-total-val{font-weight:600;font-style:normal;}
+
+/* =====================================================================================
+   DESIGN PASS 1 — cleaner, classier. Reference: Nammos (framed imagery, air, restraint).
+   • one gutter token; on phones every media block sits inside it (white frame both edges)
+   • event cards are portrait (4:5) and swipe horizontally on phones with a peek of the next
+   • events page rows get taller 3:4 thumbnails and more breathing room
+   • hairlines lightened; section rhythm evened
+   ===================================================================================== */
+:root{--gutter:clamp(20px,5vw,56px);--hair:rgba(26,26,26,.08);}
+
+/* events grid → portrait cards */
+.events-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;padding:0 var(--gutter) 8px;border-top:0;}
+.events-grid > a,.events-grid .evt-card{border:0!important;}
+.evt-img{aspect-ratio:4/5;height:auto;}
+.evt-body{padding:22px 0 26px;}
+.evt-name{font-weight:600;letter-spacing:.12em;font-size:clamp(.9rem,1.4vw,1.05rem);}
+.evt-who{margin-bottom:12px;}
+.events-top{padding:88px var(--gutter) 36px;}
+
+/* events page rows */
+.event-strip{padding:72px var(--gutter) 96px;border-top:1px solid var(--hair);}
+.event-row{grid-template-columns:96px 1fr 1fr 140px;gap:28px;padding:22px 0;border-bottom:1px solid var(--hair);}
+.event-row-img{width:96px;aspect-ratio:3/4;height:auto;object-fit:cover;}
+.event-row-name{font-weight:600;letter-spacing:.12em;}
+
+/* lighter structure everywhere */
+.pkg,.rest,.amen,.loc,.faq-wrap,.cta,footer,.split-prose,.incl,.tariff,.specs,.form-block,.contact-strip{border-color:var(--hair);}
+.split-h,.pkg-h,.rest-h,.events-h,.amen-h,.loc-h,.faq-h,.cta-h,.subhero-h,.prose-h,.split-prose-h,.event-strip-h{letter-spacing:.12em;}
+
+@media(max-width:680px){
+  :root{--gutter:20px;}
+  /* framed media: white gap on both edges */
+  .split{padding:0 var(--gutter);gap:12px;}
+  .split-img,.split-cell{aspect-ratio:4/5;min-height:0;height:auto;}
+  .pkg{padding:0 var(--gutter);}
+  .pkg-img{aspect-ratio:4/5;height:auto;min-height:0;}
+  .pkg-copy{padding:36px 0 56px;}
+  .rest{padding:64px var(--gutter);}
+  .amen{padding:64px var(--gutter);}
+  .loc-info{padding:44px 0;}
+  .loc{padding:0 var(--gutter);}
+  .cta{padding:80px var(--gutter);}
+  footer{padding:48px var(--gutter) 28px;}
+  .subhero-text,.hero-text,.hero-inner{padding-left:var(--gutter);padding-right:var(--gutter);}
+  /* event cards: swipe row, portrait, peek of the next card */
+  .events-grid{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 var(--gutter) 8px;scrollbar-width:none;}
+  .events-grid::-webkit-scrollbar{display:none;}
+  .events-grid > a,.events-grid .evt-card{flex:0 0 78%;scroll-snap-align:start;}
+  .evt-body{padding:18px 0 22px;}
+  .events-top{padding:64px var(--gutter) 28px;}
+  /* events page rows stack: thumb left, text right */
+  .event-strip{padding:56px var(--gutter) 72px;}
+  .event-row{grid-template-columns:84px 1fr;gap:16px 18px;padding:20px 0;}
+  .event-row-img{width:84px;}
+  .event-row-date{grid-column:2;}
+  .event-row-name{grid-column:2;}
+  .event-row-who{grid-column:2;}
+  .event-row-cta{grid-column:2;text-align:left;}
+  .event-row > :first-child{grid-row:1 / span 4;}
+}
+.event-row-img{background-size:cover;background-position:center;background-color:#eee9e1;}
+.event-row{grid-template-columns:96px 100px 1fr 1fr 140px;}
+@media(max-width:680px){.event-row{grid-template-columns:84px 1fr;}}
+@media(max-width:680px){
+  .split-cell,.split-img{width:100%;height:auto!important;max-height:none!important;min-height:0!important;aspect-ratio:4/5;}
+  .rest-img{height:auto!important;aspect-ratio:4/5;}
+}

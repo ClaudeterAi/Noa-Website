@@ -10,6 +10,13 @@ import { publishedEvents } from "@/server/events/public";
 import { getMediaMap } from "@/server/media";
 import type { EventItem } from "@/content/types";
 
+/** Event art: an uploaded poster URL, a registry slot id, or the DJ placeholder. */
+const eventImage = (media: string | undefined, lookup: (id: string | undefined) => string | null) => {
+  if (!media) return lookup("split-dj") ?? "";
+  if (media.startsWith("/") || media.startsWith("http")) return media;
+  return lookup(media) ?? lookup("split-dj") ?? "";
+};
+
 const bgFrom = (lookup: (id: string | undefined) => string | null) => (mediaId: string): CSSProperties => {
   const url = lookup(mediaId) ?? mediaUrl(mediaId);
   return url ? { backgroundImage: `url('${url}')` } : {};
@@ -158,6 +165,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
             const id = e.id;
             return (
               <Link key={id} href={hrefPath(s.href)} className="event-row rv" data-placeholder={e.isPlaceholder ? "event" : undefined}>
+                <div className="event-row-img" style={{ backgroundImage: `url('${eventImage(e.media, mUrl)}')` }} aria-hidden="true" />
                 <div className="event-row-date">{pick(e.shortDate, locale)}</div>
                 <div className="event-row-name">{pick(e.name, locale).replace("\n", " ")}</div>
                 <div className="event-row-who">{pick(e.artist, locale)}</div>
