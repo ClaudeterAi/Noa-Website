@@ -48,7 +48,7 @@ export async function syncUnits(source?: string) {
     if (!type) { report.unmapped.push(id); continue; }
     const label = BOAT_UNITS.find((u) => u.id === id)?.label ?? id.toUpperCase();
     if (!cur) {
-      await db.insert(inventoryUnits).values({ id, unitTypeId: type, label, deck: upper.has(type) ? "upper" : "main", sort: i, vipPriority: type === "vip-booth" });
+      await db.insert(inventoryUnits).values({ id, unitTypeId: type, label, deck: BOAT_UNITS.find((u) => u.id === id)?.deck ?? (upper.has(type) ? "upper" : "main"), sort: i, vipPriority: type === "vip-booth" });
       report.added.push(id);
     } else {
       const patch: Partial<typeof inventoryUnits.$inferInsert> = { sort: i };

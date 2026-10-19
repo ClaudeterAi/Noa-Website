@@ -10,7 +10,7 @@ import { BOAT_UNITS } from "@/components/booking/boat";
 import { attachPaymentIntent, confirmBookingByPaymentIntent, createHold, createPendingBooking, getAvailability } from "@/server/booking";
 
 const svgOf = (ids: string[]) => ids.map((id) => `<rect data-seat="${id}"/>`).join(" ");
-const TOTAL = BOAT_UNITS.length;   // 10 sunbeds + 14 daybeds + 8 cabanas + 10 tables + 4 lounges + 8 upper cabanas + 1 VIP + 12 alfresco + 40 entry
+const TOTAL = BOAT_UNITS.length;   // 10 sunbeds + 14 daybeds + 8 cabanas + 18 tables + 4 lounges + 8 upper cabanas + 1 VIP + 6 alfresco + 40 entry
 
 beforeAll(async () => {
   await migrate(db, { migrationsFolder: "./drizzle" }); await seed();
@@ -21,7 +21,7 @@ afterAll(async () => { await pool.end(); });
 
 describe("layout sync", () => {
   it("the geometry yields every seat of the EPJ drawing set and a second pass is a no-op", async () => {
-    expect(TOTAL).toBe(107);
+    expect(TOTAL).toBe(109);
     expect(seatIdsFromSvg()).toHaveLength(TOTAL);
     const r = await syncUnits();
     expect(r).toMatchObject({ total: TOTAL, added: [], deactivated: [], unmapped: [] });
@@ -35,12 +35,12 @@ describe("layout sync", () => {
     await attachPaymentIntent(p.bookingId, "pi_layout"); expect(await confirmBookingByPaymentIntent("pi_layout")).toBe("confirmed");
 
     // designer SVG: two more sunbeds, two more cocktail tables, no lounge cabanas 1–2, one unknown kind
-    const ids = BOAT_UNITS.map((u) => u.id).filter((id) => id !== "lounge-1" && id !== "lounge-2").concat(["sunbed-11", "sunbed-12", "table-11", "table-12", "helipad-1"]);
+    const ids = BOAT_UNITS.map((u) => u.id).filter((id) => id !== "lounge-1" && id !== "lounge-2").concat(["sunbed-11", "sunbed-12", "table-21", "table-22", "helipad-1"]);
     const r = await syncUnits(svgOf(ids));
-    expect([...r.added, ...r.reactivated].sort()).toEqual(["sunbed-11", "sunbed-12", "table-11", "table-12"]);
+    expect([...r.added, ...r.reactivated].sort()).toEqual(["sunbed-11", "sunbed-12", "table-21", "table-22"]);
     expect(r.deactivated.sort()).toEqual(["lounge-1", "lounge-2"]);
     expect(r.unmapped).toEqual(["helipad-1"]);
-    expect((await db.select().from(inventoryUnits).where(eq(inventoryUnits.id, "table-12")))[0]).toMatchObject({ unitTypeId: "table", deck: "main" });
+    expect((await db.select().from(inventoryUnits).where(eq(inventoryUnits.id, "table-22")))[0]).toMatchObject({ unitTypeId: "table", deck: "main" });
     expect((await db.select().from(inventoryUnits).where(eq(inventoryUnits.id, "lounge-1")))[0].active).toBe(false);
 
     const av = await getAvailability("2027-06-01", "morning");
@@ -52,6 +52,6 @@ describe("layout sync", () => {
     // the drawing set comes back → lounges reactivate, extras deactivate
     const back = await syncUnits();
     expect(back.reactivated.sort()).toEqual(["lounge-1", "lounge-2"]);
-    expect(back.deactivated.sort()).toEqual(["sunbed-11", "sunbed-12", "table-11", "table-12"]);
+    expect(back.deactivated.sort()).toEqual(["sunbed-11", "sunbed-12", "table-21", "table-22"]);
   });
 });

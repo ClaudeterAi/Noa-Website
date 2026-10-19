@@ -13,7 +13,7 @@ export type Deck = "main" | "upper";
 export interface BoatUnit { id: string; type: string; deck: Deck; x: number; y: number; w: number; h: number; label: string; r?: number }
 export interface Amenity { id: string; deck: Deck; kind: "pool" | "stage" | "bar" | "label" | "restroom" | "stairs" | "arrival" | "boh" | "salon" | "canopy" | "dj"; x: number; y: number; w: number; h: number; name: { en: string; ar: string }; r?: number }
 
-export const HULL = { length: 52000, beam: 15000 };
+export const HULL = { length: 52000, beam: 15000, corner: 1400 };
 export const SCALE = 50;
 
 const units: BoatUnit[] = [];
@@ -23,9 +23,11 @@ const A = (id: string, deck: Deck, kind: Amenity["kind"], x: number, y: number, 
 
 /* ------------------------------------------------------------------ MAIN DECK (FFL +1800) */
 // Extended sun deck at the bow (FFL +1200): ten loungers in five pairs along the rail, two parasol tables
-for (let i = 0; i < 10; i++) { const pair = Math.floor(i / 2), inPair = i % 2; U(`sunbed-${i + 1}`, "sunbed", "main", 1000, 2500 + pair * 1900 + inPair * 800, 1800, 650, `S${i + 1}`); }
-A("arr-bow-p", "main", "arrival", 600, 300, 1400, 1200, "Arrival / departure", "الوصول / المغادرة");
-A("arr-bow-s", "main", "arrival", 600, 13500, 1400, 1200, "Arrival / departure", "الوصول / المغادرة");
+for (let i = 0; i < 10; i++) { const pair = Math.floor(i / 2), inPair = i % 2; U(`sunbed-${i + 1}`, "sunbed", "main", 1350, 2650 + pair * 1900 + inPair * 800, 1150, 650, `S${i + 1}`); }
+A("parasol-p", "main", "label", 1250, 1500, 1300, 800, "", "");
+A("parasol-s", "main", "label", 1250, 12700, 1300, 800, "", "");
+A("arr-bow-p", "main", "arrival", 1300, 350, 1300, 1000, "Arrival / departure", "الوصول / المغادرة");
+A("arr-bow-s", "main", "arrival", 1300, 13650, 1300, 1000, "Arrival / departure", "الوصول / المغادرة");
 
 // Infinity pool (FFL +0600): wide bay at the bow, long channel to the pool steps
 A("pool-bay", "main", "pool", 3000, 1900, 4300, 11200, "Infinity pool", "المسبح اللامتناهي");
@@ -48,23 +50,24 @@ A("wc-w-mid", "main", "restroom", 26000, 0, 3300, 3240, "Women's restroom", "د�
 A("wc-m-mid", "main", "restroom", 26000, 11760, 3300, 3240, "Men's restroom", "دورة مياه الرجال");
 
 // Stage / dance area (FFL +1650) with the mobile DJ station; ten cocktail tables around it
-A("stage", "main", "stage", 24000, 4200, 16800, 6600, "Stage · dance floor", "المسرح · حلبة الرقص");
-A("dj", "main", "dj", 31000, 6400, 3500, 2200, "DJ", "دي جي");
-for (let i = 0; i < 5; i++) { U(`table-${i + 1}`, "table", "main", 30200 + i * 1800, 3500, 900, 900, `T${i + 1}`, 450); U(`table-${i + 6}`, "table", "main", 30200 + i * 1800, 10600, 900, 900, `T${i + 6}`, 450); }
+A("stage", "main", "stage", 25200, 4100, 15400, 6800, "Stage · dance area", "المسرح · منطقة الرقص");
+A("dj", "main", "dj", 32300, 6300, 3000, 2400, "Mobile DJ station", "منصة دي جي متنقلة");
+for (let i = 0; i < 5; i++) { const x = 31900 + i * 2650; U(`table-${i + 1}`, "table", "main", x, 3400, 700, 700, `T${i + 1}`, 350); U(`table-${i + 6}`, "table", "main", x, 10900, 700, 700, `T${i + 6}`, 350); }
 
 // Lounge cabanas by the dance floor (FFL +1950): two curved sofa booths per side, 5480 wide
 for (let i = 0; i < 2; i++) { const x = 32200 + i * 5720; U(`lounge-${i + 1}`, "lounge", "main", x, 0, 5480, 3600, `L${i + 1}`, 900); U(`lounge-${i + 3}`, "lounge", "main", x, 11400, 5480, 3600, `L${i + 3}`, 900); }
 
 // Main bar island, stairs to the upper deck, reception, arrival points at the stern
-A("bar-main", "main", "bar", 41300, 5600, 3000, 3800, "Bar", "البار", 1100);
+A("bar-main", "main", "bar", 41500, 5350, 2950, 4300, "Bar", "البار", 500);
 A("stairs-p", "main", "stairs", 43400, 300, 2200, 2800, "Stairs to upper deck", "درج إلى السطح العلوي");
 A("stairs-s", "main", "stairs", 43400, 11900, 2200, 2800, "Stairs to upper deck", "درج إلى السطح العلوي");
 A("reception", "main", "label", 45600, 300, 3400, 3200, "Reception · foyer", "الاستقبال · البهو");
-A("arr-stern-p", "main", "arrival", 50400, 300, 1400, 1200, "Arrival / departure", "الوصول / المغادرة");
-A("arr-stern-s", "main", "arrival", 50400, 13500, 1400, 1200, "Arrival / departure", "الوصول / المغادرة");
+A("arr-stern-p", "main", "arrival", 49600, 350, 1300, 1000, "Arrival / departure", "الوصول / المغادرة");
+A("arr-stern-s", "main", "arrival", 49600, 13650, 1300, 1000, "Arrival / departure", "الوصول / المغادرة");
 A("wc-w-stern", "main", "restroom", 49200, 1600, 2600, 2600, "Women's restroom", "دورة مياه السيدات");
 A("wc-m-stern", "main", "restroom", 49200, 10800, 2600, 2600, "Men's restroom", "دورة مياه الرجال");
 A("boh", "main", "boh", 45600, 4200, 6400, 6600, "Kitchen & service", "المطبخ والخدمات");
+A("boh-upper", "upper", "boh", 50700, 4300, 1000, 6400, "", "");
 
 /* ------------------------------------------------------------------ UPPER DECK (FFL +4500) */
 // The bow half of the upper deck is canopy over the pool cabanas and the pool — not accessible
@@ -75,18 +78,21 @@ A("canopy-s2", "upper", "canopy", 22050, 11760, 7250, 3240, "Canopy", "مظلة"
 A("void", "upper", "label", 29600, 4200, 11200, 6600, "Open to the dance floor below", "مفتوح على حلبة الرقص بالأسفل");
 
 // Upper cabanas (FFL +4500): four per side over the lounge cabanas, 2650 wide
-for (let i = 0; i < 4; i++) { const x = 32200 + i * 2770; U(`upper-cabana-${i + 1}`, "upper-cabana", "upper", x, 0, 2650, 3400, `U${i + 1}`); U(`upper-cabana-${i + 5}`, "upper-cabana", "upper", x, 11600, 2650, 3400, `U${i + 5}`); }
+for (let i = 0; i < 4; i++) { const x = 32300 + i * 2770; U(`upper-cabana-${i + 1}`, "upper-cabana", "upper", x, 0, 2650, 3000, `U${i + 1}`); U(`upper-cabana-${i + 5}`, "upper-cabana", "upper", x, 12000, 2650, 3000, `U${i + 5}`); }
 
 // VIP booth (FFL +4650): the curved booth looking down onto the stage
-U("vip-booth-1", "vip-booth", "upper", 43600, 5500, 2600, 4000, "VIP", 1300);
+U("vip-booth-1", "vip-booth", "upper", 43900, 5200, 2510, 4600, "VIP", 400);
+A("vip-rail", "upper", "label", 42600, 4300, 1300, 6400, "", "");
 
 // Upper bar and the two alfresco lounges at the stern (FFL +4650): six dining tables each
-A("bar-upper", "upper", "bar", 47400, 6000, 3200, 3000, "Bar", "البار", 900);
+A("bar-upper", "upper", "bar", 47000, 6000, 4300, 2950, "Bar · sushi bar", "البار · بار السوشي", 500);
 A("stairs-up-p", "upper", "stairs", 43400, 300, 2200, 2800, "Stairs to main deck", "درج إلى السطح الرئيسي");
 A("stairs-up-s", "upper", "stairs", 43400, 11900, 2200, 2800, "Stairs to main deck", "درج إلى السطح الرئيسي");
-for (let i = 0; i < 6; i++) { const col = i % 3, row = Math.floor(i / 3); U(`alfresco-${i + 1}`, "alfresco", "upper", 46000 + col * 1900, 500 + row * 1700, 1300, 1300, `A${i + 1}`, 650); U(`alfresco-${i + 7}`, "alfresco", "upper", 46000 + col * 1900, 11500 + row * 1700, 1300, 1300, `A${i + 7}`, 650); }
-A("alfresco-p", "upper", "label", 45600, 0, 6400, 4200, "Alfresco lounge", "صالة في الهواء الطلق");
-A("alfresco-s", "upper", "label", 45600, 10800, 6400, 4200, "Alfresco lounge", "صالة في الهواء الطلق");
+for (let i = 0; i < 3; i++) { const x = 45700 + i * 2150; U(`alfresco-${i + 1}`, "alfresco", "upper", x, 350, 1850, 3100, `A${i + 1}`); U(`alfresco-${i + 4}`, "alfresco", "upper", x, 11550, 1850, 3100, `A${i + 4}`); }
+// high tables on the upper deck between the lounges and the bar, four per side
+for (let i = 0; i < 4; i++) { const x = 45900 + i * 1200; U(`table-${i + 11}`, "table", "upper", x, 4300, 700, 700, `T${i + 11}`, 350); U(`table-${i + 15}`, "table", "upper", x, 10000, 700, 700, `T${i + 15}`, 350); }
+A("alfresco-p", "upper", "label", 45500, 3550, 6700, 500, "Alfresco lounge", "صالة في الهواء الطلق");
+A("alfresco-s", "upper", "label", 45500, 10950, 6700, 500, "Alfresco lounge", "صالة في الهواء الطلق");
 
 // General entry: dance-floor capacity sold per person (not drawn as seats)
 for (let i = 0; i < 40; i++) U(`entry-${i + 1}`, "entry", "main", 0, 0, 0, 0, `E${i + 1}`);

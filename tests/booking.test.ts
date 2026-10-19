@@ -78,7 +78,7 @@ describe("bookings", () => {
       { holdId: h1.holdId, guests: 6, arrivalTime: "15:00" },
       { holdId: h2.holdId, guests: 3, arrivalTime: "15:00" },   // general entry unit holds 1 person → clamped to pax (1 × 900)
     ], { name: "Test Guest", email: "Guest@Example.com", phone: "+971500000000" });
-    expect(pending.subtotal).toBe(2400 + 900);   // alfresco table (afternoon) + one general entry
+    expect(pending.subtotal).toBe(3500 + 900);   // alfresco lounge (afternoon) + one general entry
     expect(pending.vat).toBe(Math.round(pending.subtotal * 0.05));
     expect(pending.total).toBe(pending.subtotal + pending.vat);
     const ext = new Date(pending.holdsExtendedUntil).getTime() - Date.now();

@@ -17,7 +17,7 @@ export async function seed(opts: { onlyIfEmpty?: boolean } = {}) {
 
   const upper = new Set(["upper-cabana", "vip-booth", "alfresco"]);   // decks per the EPJ drawings (boat.ts)
   const rows = Object.entries(units).map(([id, typeId], i) => ({
-    id, unitTypeId: typeId, label: labelFor(id), deck: upper.has(typeId) ? "upper" : "main", sort: i,
+    id, unitTypeId: typeId, label: labelFor(id), deck: BOAT_UNITS.find((u) => u.id === id)?.deck ?? (upper.has(typeId) ? "upper" : "main"), sort: i,
     vipPriority: typeId === "vip-booth",   // default VIP-priority unit; NOA changes in admin
   }));
   await db.insert(inventoryUnits).values(rows).onConflictDoUpdate({ target: inventoryUnits.id, set: { unitTypeId: sql`excluded.unit_type_id`, label: sql`excluded.label`, deck: sql`excluded.deck`, sort: sql`excluded.sort` } });
