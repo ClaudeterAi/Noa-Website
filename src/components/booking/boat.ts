@@ -38,12 +38,12 @@ U("daybed-13", "daybed", "main", 7240, 1903, 1662, 1399, "D13"); U("daybed-14", 
 [8840, 12132, 15422, 18711].forEach((x, i) => { U(`cabana-${i + 1}`, "cabana", "main", x, 0, 2890, 3240, `C${i + 1}`); U(`cabana-${i + 5}`, "cabana", "main", x, 10840, 2890, 3240, `C${i + 5}`); });
 
 // Wellness, restrooms (service stations behind them are masked)
-A("spa", "main", "salon", 22050, 0, 3500, 3240, "Manicure · pedicure · massage", "مانيكير · باديكير · مساج");
-A("salon", "main", "salon", 22050, 10840, 3500, 3240, "Hair salon · tattoo station", "صالون شعر · محطة وشم");
-A("wc-w-mid", "main", "restroom", 25600, 0, 3250, 3240, "Women's restroom", "دورة مياه السيدات");
-A("wc-m-mid", "main", "restroom", 25600, 10840, 3250, 3240, "Men's restroom", "دورة مياه الرجال");
-A("svc-p", "main", "boh", 28850, 0, 2950, 3240, "", "");
-A("svc-s", "main", "boh", 28850, 10840, 2950, 3240, "", "");
+A("spa", "main", "salon", 22100, 100, 3400, 3100, "Manicure · pedicure · massage", "مانيكير · باديكير · مساج");
+A("salon", "main", "salon", 22100, 10980, 3400, 3100, "Hair salon · tattoo station", "صالون شعر · محطة وشم");
+A("wc-w-mid", "main", "restroom", 25650, 100, 3150, 3100, "Women's restroom", "دورة مياه السيدات");
+A("wc-m-mid", "main", "restroom", 25650, 10980, 3150, 3100, "Men's restroom", "دورة مياه الرجال");
+A("svc-p", "main", "boh", 28900, 100, 2850, 3100, "", "");
+A("svc-s", "main", "boh", 28900, 10980, 2850, 3100, "", "");
 
 // Stage / dance area under the roof line, mobile DJ station, five high tables per side
 A("stage", "main", "stage", 30700, 4030, 9300, 6100, "Stage · dance area", "المسرح · منطقة الرقص");
@@ -57,11 +57,11 @@ for (let i = 0; i < 5; i++) { const cx = 33300 + i * 1340; U(`table-${i + 1}`, "
 A("bar-main", "main", "bar", 40700, 5030, 2600, 4100, "Bar", "البار", 500);
 A("stairs-p", "main", "stairs", 43100, 930, 1000, 2000, "Stairs up", "درج للأعلى");
 A("stairs-s", "main", "stairs", 43100, 11810, 1000, 2000, "Stairs up", "درج للأعلى");
-A("reception", "main", "label", 45200, 0, 3000, 3300, "Reception · foyer", "الاستقبال · البهو");
-A("wc-w-stern", "main", "restroom", 48250, 0, 3450, 3300, "Women's restroom", "دورة مياه السيدات");
-A("wc-m-stern", "main", "restroom", 48250, 10850, 3450, 3230, "Men's restroom", "دورة مياه الرجال");
-A("boh", "main", "boh", 45200, 3350, 6500, 7500, "Kitchen & service", "المطبخ والخدمات");
-A("boh-2", "main", "boh", 45200, 10850, 3050, 3230, "Staff only", "للموظفين فقط");
+A("reception", "main", "label", 45250, 150, 2950, 3050, "Reception · foyer", "الاستقبال · البهو");
+A("wc-w-stern", "main", "restroom", 48350, 150, 3050, 3050, "Women's restroom", "دورة مياه السيدات");
+A("wc-m-stern", "main", "restroom", 48350, 10950, 3050, 3050, "Men's restroom", "دورة مياه الرجال");
+A("boh", "main", "boh", 45250, 3400, 6150, 7350, "Kitchen & service", "المطبخ والخدمات");
+A("boh-2", "main", "boh", 45250, 10950, 2950, 3050, "Staff only", "للموظفين فقط");
 
 /* ------------------------------------------------------------------ UPPER DECK — from NA-ID-1100 vectors */
 A("void", "upper", "label", 30700, 4030, 10800, 6100, "Open to the dance floor below", "مفتوح على حلبة الرقص بالأسفل");

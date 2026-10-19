@@ -141,7 +141,7 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
             {[0.28, 0.5, 0.72].map((q) => <path key={q} d={`M${x + 5},${y + h * q} q${w / 10},-1.2 ${w / 5},0 t${w / 5},0 t${w / 5},0 t${w / 5},0`} fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth=".7" strokeLinecap="round" />)}
             {nm && <text x={cx} y={cy + 2.4} fontSize="6.5" letterSpacing="2.4" fill="#1f4f57" style={F} textAnchor="middle" fontWeight="600">{nm}</text>}
           </g>;
-          case "stairs": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx="1.2" fill="url(#panel)" />{Array.from({ length: 8 }).map((_, i) => { const yy = y + 1.5 + (i * (h - 3)) / 7; return <g key={i}><line x1={x + 1.5} y1={yy} x2={x + w - 1.5} y2={yy} stroke="#fff" strokeOpacity=".8" strokeWidth=".5" /><line x1={x + 1.5} y1={yy + 0.7} x2={x + w - 1.5} y2={yy + 0.7} stroke="#8d7c64" strokeOpacity=".35" strokeWidth=".6" /></g>; })}</g>;
+          case "stairs": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panel)" />{Array.from({ length: 8 }).map((_, i) => { const yy = y + 1.5 + (i * (h - 3)) / 7; return <g key={i}><line x1={x + 1.5} y1={yy} x2={x + w - 1.5} y2={yy} stroke="#fff" strokeOpacity=".8" strokeWidth=".5" /><line x1={x + 1.5} y1={yy + 0.7} x2={x + w - 1.5} y2={yy + 0.7} stroke="#8d7c64" strokeOpacity=".35" strokeWidth=".6" /></g>; })}</g>;
           case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} max={60} />}</g>;
           case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" filter="url(#lift)" /><Badge kind="dj" x={cx} y={cy - 7} r={8} />{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
           case "bar": {
@@ -160,11 +160,11 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
               {nm && <Caption x={cx} y={cy + 8} text={nm} dark max={w - 2} />}
             </g>;
           }
-          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="1.6" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Badges cy2={cy - 8} />{nm && <Caption x={cx} y={y + h - 9} text={nm} max={w - 4} />}</g>;
-          case "boh": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panelDark)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="1.6" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth=".7" />{badges.length > 0 && <Badges cy2={cy - (nm ? 8 : 0)} />}{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
+          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Badges cy2={cy - 8} />{nm && <Caption x={cx} y={y + h - 9} text={nm} max={w - 4} />}</g>;
+          case "boh": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panelDark)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth=".7" />{badges.length > 0 && <Badges cy2={cy - (nm ? 8 : 0)} />}{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
           case "label": return <g key={a.id} pointerEvents="none">
             {a.id === "void" && <rect x={x} y={y} width={w} height={h} rx="4" fill="#e7dfcf" stroke="#c9bda6" strokeWidth=".6" />}
-            {a.id === "reception" && <><rect x={x} y={y} width={w} height={h} rx="2" fill="url(#panel)" filter="url(#lift)" /><Badge kind="reception" x={cx} y={cy - 8} /></>}
+            {a.id === "reception" && <><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><Badge kind="reception" x={cx} y={cy - 8} /></>}
             {nm && <Caption x={cx} y={a.id === "reception" ? y + h - 9 : cy} text={nm} max={a.id === "reception" ? w - 4 : 120} />}
           </g>;
           default: return null;
