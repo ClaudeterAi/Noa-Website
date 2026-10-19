@@ -1,3 +1,4 @@
+import HeroVideo from "@/components/media/HeroVideo";
 import type { CSSProperties } from "react";
 import type { CtaLink, L, Locale, Section } from "@/content/types";
 import { hrefPath, mediaUrl, pick, registry } from "@/content/registry";
@@ -50,10 +51,10 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
       return (
         <section className={`hero${s.quiet ? " hero-quiet" : ""}`} id={s.id}>
           {video?.url ? (
-            <video className="hero-bg hero-video" autoPlay muted loop playsInline preload="metadata" poster={poster?.url ?? undefined} aria-hidden="true">
-              {isPlaceholderFilm && <source src={video.url.replace(/\.mp4$/, ".webm")} type="video/webm" />}
-              <source src={video.url} type={video.url.endsWith(".webm") ? "video/webm" : "video/mp4"} />
-            </video>
+            <HeroVideo className="hero-bg hero-video" poster={poster?.url ?? undefined} sources={[
+              ...(isPlaceholderFilm ? [{ src: video.url.replace(/\.mp4$/, ".webm"), type: "video/webm" }] : []),
+              { src: video.url, type: video.url.endsWith(".webm") ? "video/webm" : "video/mp4" },
+            ]} />
           ) : (
             <div className="hero-bg" style={still?.url ? bg("hero-still") : undefined} data-placeholder="hero-video" />
           )}
