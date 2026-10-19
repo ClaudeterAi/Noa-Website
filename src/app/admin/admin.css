@@ -32,3 +32,32 @@ body.ad, body.ad *{cursor:auto;}
 body.ad a, body.ad button:not(:disabled), body.ad select, body.ad [role="button"], body.ad input[type="checkbox"], body.ad label:has(input[type="checkbox"]){cursor:pointer;}
 body.ad input:not([type="checkbox"]), body.ad textarea{cursor:text;}
 body.ad button:disabled{cursor:not-allowed;}
+
+/* ---------- mobile (≤ 760px) ---------- */
+@media (max-width: 760px){
+  .ad-nav{flex-wrap:wrap;gap:10px 14px;padding:12px 14px;}
+  .ad-nav .logo{width:100%;font-size:1rem;}
+  .ad-nav a{font-size:.62rem;}
+  .ad-nav .who{margin-inline-start:0;width:100%;font-size:.62rem;}
+  .ad-main{padding:16px 14px;}
+  .ad h1{font-size:1.5rem;margin-bottom:12px;}
+  .ad h2{font-size:1.15rem;margin:20px 0 10px;}
+  .ad .cards{grid-template-columns:1fr;gap:10px;}
+  .ad .card .n{font-size:1.6rem;}
+  /* tables scroll sideways instead of squashing; first column stays visible */
+  .ad table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;max-width:100%;}
+  .ad th,.ad td{padding:9px 10px;font-size:.78rem;}
+  .ad td:first-child,.ad th:first-child{position:sticky;left:0;background:#fff;z-index:1;}
+  .ad input,.ad select,.ad textarea,.ad button{font-size:16px;}            /* stops iOS zoom-on-focus */
+  .ad input:not([type=checkbox]),.ad select,.ad textarea{width:100%;max-width:100%;}
+  .ad button{min-height:44px;padding:10px 14px;}
+  .ad .row{gap:8px;}
+  .ad .row > *{flex:1 1 auto;}
+  .ad form.row input,.ad form.row select{flex:1 1 100%;}
+  .ad pre{font-size:.66rem;}
+  .ad-signin .card{width:calc(100vw - 32px)!important;}
+}
+@media (max-width: 760px){
+  /* event editor line-up rows stack */
+  .ad .cards[style*="grid-template-columns: 2fr"]{grid-template-columns:1fr!important;}
+}
