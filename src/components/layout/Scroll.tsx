@@ -87,7 +87,7 @@ export default function Scroll() {
       const intro = main.querySelector<HTMLElement>(".ed-intro");
       if (intro) {
         mark([intro]);
-        gsap.fromTo(intro.querySelector(".ed-intro-copy"), { yPercent: 14, opacity: 0 }, { yPercent: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: intro, start: "top 85%", end: "top 30%", scrub: true } });
+        gsap.fromTo(intro.querySelector(".ed-intro-copy"), { yPercent: 10, y: 0, opacity: 0 }, { yPercent: 0, y: 0, opacity: 1, duration: 1, ease: "power3.out", scrollTrigger: { trigger: intro, start: "top 85%", toggleActions: "play none none reverse", fastScrollEnd: true } });
         intro.querySelectorAll<HTMLElement>(".ed-frame").forEach((f, i) => gsap.fromTo(f, { yPercent: 10 + i * 8 }, { yPercent: -10 - i * 8, ease: "none", scrollTrigger: { trigger: intro, start: "top bottom", end: "bottom top", scrub: true } }));
       }
 
@@ -95,7 +95,7 @@ export default function Scroll() {
       const tiles = main.querySelector<HTMLElement>(".ed-tiles");
       if (tiles) {
         mark([tiles]);
-        tiles.querySelectorAll<HTMLElement>(".ed-tile").forEach((t, i) => gsap.fromTo(t, { yPercent: i % 2 ? 14 : -4, opacity: 0.35 }, { yPercent: i % 2 ? -10 : 6, opacity: 1, ease: "none", scrollTrigger: { trigger: tiles, start: "top 90%", end: "bottom 30%", scrub: true } }));
+        tiles.querySelectorAll<HTMLElement>(".ed-tile").forEach((t, i) => gsap.fromTo(t, { yPercent: i % 2 ? 10 : -3, y: 0, opacity: 1 }, { yPercent: i % 2 ? -8 : 4, y: 0, ease: "none", scrollTrigger: { trigger: tiles, start: "top bottom", end: "bottom top", scrub: true } }));
       }
 
       /* ---------- packages: a pinned stack, each slides up over the last; the Night brings the night ---------- */
@@ -110,12 +110,12 @@ export default function Scroll() {
         const nightIdx = pkgs.findIndex((p) => p.id === "pkg-night");
         if (desktop) {
           wrap.classList.add("pinned");
-          pkgs.forEach((p, i) => { p.classList.add("stacked"); gsap.set(p, { yPercent: i === 0 ? 0 : 100, zIndex: i + 1 }); });
+          pkgs.forEach((p, i) => { p.classList.add("stacked"); gsap.set(p, { yPercent: i === 0 ? 0 : 100, y: 0, zIndex: i + 1 }); gsap.set(p.querySelectorAll(".ed-pkg-copy, .ed-pkg-media"), { y: 0, opacity: 1 }); });
           const tl = gsap.timeline({ scrollTrigger: { trigger: wrap, start: "top top", end: `+=${(pkgs.length - 1) * 100}%`, scrub: true, pin: true, anticipatePin: 1, invalidateOnRefresh: true } });
           pkgs.forEach((p, i) => {
             if (i === 0) return;
             tl.to(p, { yPercent: 0, ease: "power2.inOut", duration: 1 }, i - 1)
-              .to(pkgs[i - 1].querySelector(".ed-pkg-media"), { filter: "brightness(0.35)", scale: 0.96, ease: "power2.inOut", duration: 1 }, i - 1)
+              .to(pkgs[i - 1].querySelector(".ed-pkg-media"), { opacity: 0.35, scale: 0.96, ease: "power2.inOut", duration: 1 }, i - 1)
               .to(pkgs[i - 1].querySelector(".ed-pkg-copy"), { opacity: 0.15, yPercent: -6, ease: "power2.inOut", duration: 1 }, i - 1);
             if (i === nightIdx) tl.to(root, { ...NIGHT, ease: "none", duration: 1 }, i - 1);
           });
@@ -139,17 +139,17 @@ export default function Scroll() {
         mark([sec]);
         const media = sec.querySelector(".ed-portrait-media"); const copy = sec.querySelector(".ed-portrait-copy");
         if (media) gsap.fromTo(media, { yPercent: 12 }, { yPercent: -12, ease: "none", scrollTrigger: { trigger: sec, start: "top bottom", end: "bottom top", scrub: true } });
-        if (copy) gsap.fromTo(copy, { yPercent: 18, opacity: 0 }, { yPercent: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: sec, start: "top 80%", end: "top 35%", scrub: true } });
+        if (copy) gsap.fromTo(copy, { yPercent: 12, y: 0, opacity: 0 }, { yPercent: 0, y: 0, opacity: 1, duration: 1, ease: "power3.out", scrollTrigger: { trigger: sec, start: "top 80%", toggleActions: "play none none reverse", fastScrollEnd: true } });
       });
 
       /* ---------- posters: rise and straighten one after another ---------- */
       q(".ed-posters").forEach((sec) => {
         mark([sec]);
-        sec.querySelectorAll<HTMLElement>(".ed-poster").forEach((p, i) => gsap.fromTo(p, { yPercent: 24, rotation: i % 2 ? 2.5 : -2.5, opacity: 0 }, { yPercent: 0, rotation: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: sec, start: "top 90%", end: "top 35%", scrub: true }, delay: 0 }));
+        sec.querySelectorAll<HTMLElement>(".ed-poster").forEach((p, i) => gsap.fromTo(p, { yPercent: 18, rotation: i % 2 ? 2 : -2, opacity: 0 }, { yPercent: 0, rotation: 0, opacity: 1, duration: 1, delay: i * 0.08, ease: "power3.out", scrollTrigger: { trigger: sec, start: "top 85%", toggleActions: "play none none reverse", fastScrollEnd: true } }));
       });
 
       /* ---------- programme (events page): cards rise in a wave ---------- */
-      q(".ed-night").forEach((card, i) => gsap.fromTo(card, { yPercent: 18, opacity: 0 }, { yPercent: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: card, start: "top 95%", end: "top 55%", scrub: true } }));
+      q(".ed-night").forEach((card, i) => gsap.fromTo(card, { yPercent: 14, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, delay: (i % 3) * 0.08, ease: "power3.out", scrollTrigger: { trigger: card, start: "top 95%", toggleActions: "play none none reverse", fastScrollEnd: true } }));
 
       /* ---------- inner page heroes: the photograph settles, the heading writes in ---------- */
       q(".subhero").forEach((sh) => {
@@ -162,7 +162,7 @@ export default function Scroll() {
 
       /* ---------- split sections: images at depth, headings write in ---------- */
       q(".split-img, .split-media").forEach((m) => gsap.fromTo(m, { yPercent: 8, scale: 1.06 }, { yPercent: -8, scale: 1, ease: "none", scrollTrigger: { trigger: m, start: "top bottom", end: "bottom top", scrub: true } }));
-      q("h2").forEach((h) => { if (h.closest("[data-scrub]")) return; mark([h]); const cs = chars(h); gsap.fromTo(cs, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.012, ease: "none", scrollTrigger: { trigger: h, start: "top 92%", end: "top 55%", scrub: true } }); });
+      q("h2").forEach((h) => { if (h.closest("[data-scrub]")) return; mark([h]); const cs = chars(h); gsap.fromTo(cs, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.012, duration: 0.8, ease: "power3.out", scrollTrigger: { trigger: h, start: "top 92%", toggleActions: "play none none reverse", fastScrollEnd: true } }); });
 
       /* ---------- ticker: moves on its own, faster and in the direction of your scroll ---------- */
       const firstPosters = main.querySelector<HTMLElement>(".ed-posters");

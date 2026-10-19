@@ -15,7 +15,7 @@ export default function HeroVideo({ className, poster, sources }: { className: s
     if (!v) return;
     v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
     let stopped = false;
-    const tryPlay = () => { if (stopped) return; const p = v.play(); if (p) p.then(() => { v.classList.remove("hero-video-blocked"); v.classList.add("hero-video-playing"); }).catch(() => v.classList.add("hero-video-blocked")); };
+    const tryPlay = () => { if (stopped || !v.paused) return; const p = v.play(); if (p) p.then(() => { v.classList.remove("hero-video-blocked"); v.classList.add("hero-video-playing"); }).catch(() => v.classList.add("hero-video-blocked")); };
     const show = () => { v.classList.remove("hero-video-blocked"); v.classList.add("hero-video-playing"); };
     v.addEventListener("playing", show); v.addEventListener("timeupdate", show, { once: true });
     const check = window.setInterval(() => { if (!v.paused && v.currentTime > 0) { show(); window.clearInterval(check); } }, 250);
@@ -23,9 +23,21 @@ export default function HeroVideo({ className, poster, sources }: { className: s
     tryPlay();
     const onVis = () => { if (document.visibilityState === "visible") tryPlay(); };
     document.addEventListener("visibilitychange", onVis);
-    window.addEventListener("touchstart", tryPlay, { once: true, passive: true });
-    window.addEventListener("pointerdown", tryPlay, { once: true, passive: true });
-    return () => { stopped = true; document.removeEventListener("visibilitychange", onVis); window.removeEventListener("touchstart", tryPlay); window.removeEventListener("pointerdown", tryPlay); };
+    const gestures: (keyof WindowEventMap)[] = ["touchstart", "pointerdown", "keydown", "wheel", "touchend", "click"];
+    gestures.forEach((g) => window.addEventListener(g, tryPlay, { passive: true }));
+    const hero = v.closest(".hero");
+    let btn: HTMLButtonElement | null = null;
+    if (hero && !hero.querySelector(".hero-play")) {
+      btn = document.createElement("button"); btn.type = "button"; btn.className = "hero-play"; btn.setAttribute("aria-label", "Play film");
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+      btn.addEventListener("click", (e) => { e.stopPropagation(); v.muted = true; v.play().then(() => hero.classList.remove("film-blocked")).catch(() => undefined); });
+      hero.appendChild(btn);
+    }
+    const blocked = () => hero?.classList.add("film-blocked");
+    const unblocked = () => hero?.classList.remove("film-blocked");
+    v.addEventListener("playing", unblocked);
+    const watch = window.setTimeout(() => { if (v.paused) blocked(); }, 2500);
+    return () => { stopped = true; window.clearTimeout(watch); document.removeEventListener("visibilitychange", onVis); gestures.forEach((g) => window.removeEventListener(g, tryPlay)); btn?.remove(); };
   }, []);
   return (
     <video ref={ref} className={className} autoPlay muted loop playsInline preload="metadata" poster={poster} aria-hidden="true" disablePictureInPicture disableRemotePlayback>

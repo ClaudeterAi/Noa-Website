@@ -25,6 +25,10 @@ export const media: Record<string, MediaSlot> = {
   "split-club": img("split-club", u("photo-1566073771259-6a8506099945", 900), "Beach club deck", "سطح النادي الشاطئي"),
   "pkg-morning": img("pkg-morning", u("photo-1520250497591-112f2f40a3f4", 2000), "Morning by the lagoon pool", "الصباح عند مسبح البحيرة"),
   "pkg-afternoon": img("pkg-afternoon", u("photo-1566073771259-6a8506099945", 2000), "Golden hour on the deck", "الساعة الذهبية على السطح"),
+  "evt-demo-1": img("evt-demo-1", "/media/events/demo-1.jpg", "Techno night poster", "ملصق ليلة التكنو"),
+  "evt-demo-2": img("evt-demo-2", "/media/events/demo-2.jpg", "Thursday night poster", "ملصق ليلة الخميس"),
+  "evt-demo-3": img("evt-demo-3", "/media/events/demo-3.jpg", "Jungle night poster", "ملصق ليلة الغابة"),
+  "evt-demo-4": img("evt-demo-4", "/media/events/demo-4.jpg", "Sunset session", "جلسة الغروب"),
   "pkg-night": img("pkg-night", u("photo-1514525253161-7a46d19cd819"), "Night session", "جلسة الليل"),
   "pkg-cabana": img("pkg-cabana", u("photo-1445019980597-93fa8acb246c"), "Private cabana", "كابانا خاصة"),
   "rest-1": img("rest-1", u("photo-1565299624946-b28f40a0ae38", 900), "Restaurant plate", "طبق من المطعم"),
@@ -162,6 +166,10 @@ const ev = (
 });
 
 export const events: Record<string, EventItem> = {
+  "demo-techno": { ...ev("demo-techno", "2026-10-24", ["Sat 24 October 2026 · Night", "السبت 24 October 2026 · الليل"], ["Sat 24 Oct", "السبت 24"], ["Techno\nNight", "ليلة\nالتكنو"], ["Ada Stawiarz · El'Mirka (vinyl set)", "Ada Stawiarz · El'Mirka"], "evt-demo-1"), session: "night", startsAt: "21:30", endsAt: "02:00" },
+  "demo-thursday": { ...ev("demo-thursday", "2026-10-29", ["Thu 29 October 2026 · Night", "الخميس 29 October 2026 · الليل"], ["Thu 29 Oct", "الخميس 29"], ["Thursday\nResidents", "خميس\nالمقيمين"], ["NOA Residents · Hernan B", "مقيمو نوا · Hernan B"], "evt-demo-2"), session: "night", startsAt: "21:30", endsAt: "02:00" },
+  "demo-jungle": { ...ev("demo-jungle", "2026-10-30", ["Fri 30 October 2026 · Night", "الجمعة 30 October 2026 · الليل"], ["Fri 30 Oct", "الجمعة 30"], ["Jungle\nVibes", "أجواء\nالغابة"], ["Guest DJ, to be announced", "دي جيه ضيف، يُعلن لاحقاً"], "evt-demo-3"), session: "night", startsAt: "21:30", endsAt: "02:00" },
+  "demo-sunset": { ...ev("demo-sunset", "2026-11-07", ["Sat 07 November 2026 · Afternoon", "السبت 7 November 2026 · بعد الظهر"], ["Sat 07 Nov", "السبت 7"], ["Sunset\nSession", "جلسة\nالغروب"], ["Afternoon residents", "مقيمو بعد الظهر"], "evt-demo-4"), session: "afternoon", startsAt: "14:00", endsAt: "21:30" },
   "golden-hour": ev("golden-hour", "2026-03-14", ["Fri 14 March 2026 · Afternoon", "الجمعة 14 مارس 2026 · بعد الظهر"], ["Fri 14 Mar", "الجمعة 14 مارس"], ["Golden Hour\nOpening Night", "الساعة الذهبية\nليلة الافتتاح"], ["DJ Claptone · Berlin", "دي جيه كلابتون · برلين"], "evt-1"),
   "desert-moon": ev("desert-moon", "2026-03-21", ["Fri 21 March 2026 · Full Moon", "الجمعة 21 مارس 2026 · اكتمال القمر"], ["Fri 21 Mar", "الجمعة 21 مارس"], ["Desert Moon\nNight", "ليلة قمر\nالصحراء"], ["Peggy Gou · Seoul / Berlin", "بيغي غو · سيول / برلين"], "evt-2"),
   "white-edition": ev("white-edition", "2026-03-28", ["Fri 28 March 2026 · All White", "الجمعة 28 مارس 2026 · الأبيض بالكامل"], ["Fri 28 Mar", "الجمعة 28 مارس"], ["NOA\nWhite Edition", "نوا\nالإصدار الأبيض"], ["Black Coffee · Johannesburg", "بلاك كوفي · جوهانسبرغ"], "evt-3"),
