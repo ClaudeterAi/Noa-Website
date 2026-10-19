@@ -29,6 +29,13 @@
       "when": 1792249246113,
       "tag": "0003_day4_events_kb_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792398333208,
+      "tag": "0004_day5_media",
+      "breakpoints": true
     }
   ]
 }

@@ -287,3 +287,25 @@ export const kbDocuments = pgTable("kb_documents", {
   contentHash: text("content_hash").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [primaryKey({ columns: [t.entity, t.entityId, t.provider] })]);
+
+/* ---------------- media (uploads to S3, served through /api/media) ---------------- */
+
+export const mediaAssets = pgTable("media_assets", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: text("key").notNull(),                   // S3 object key: media/<sha256-prefix>/<filename>
+  kind: text("kind").notNull(),                 // image | video
+  mime: text("mime").notNull(),
+  bytes: integer("bytes").notNull(),
+  width: integer("width"), height: integer("height"), durationSec: integer("duration_sec"),
+  altEn: text("alt_en"), altAr: text("alt_ar"),
+  uploadedBy: text("uploaded_by"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [uniqueIndex("media_assets_key_uq").on(t.key)]);
+
+/** Which uploaded asset fills which site slot (hero-video, pkg-morning, cabana-1 …). Absent → registry placeholder. */
+export const mediaSlots = pgTable("media_slots", {
+  slotId: text("slot_id").primaryKey(),
+  assetId: uuid("asset_id").notNull().references(() => mediaAssets.id),
+  updatedBy: text("updated_by"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});

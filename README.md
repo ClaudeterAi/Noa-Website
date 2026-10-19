@@ -158,3 +158,11 @@ browser: applies {unitId, state} instantly; polls every 30 s as a safety net (4 
 ```
 Correctness never depends on the socket — the database is the truth. Infra lives in AWS (eu-central-1 until the UAE move):
 DynamoDB `noa-ws-connections`, Lambda `noa-ws-connect`, API `noa-seatmap-ws` stage `prod`. Env: `NEXT_PUBLIC_WS_URL`, `WS_MANAGEMENT_ENDPOINT`, `WS_TABLE`.
+
+## Media manager
+
+`/admin/media` (editor+): every image and film on the site is a *slot* from the registry. Upload → presigned PUT straight to NOA's
+private S3 bucket (`S3_MEDIA_BUCKET`, region `S3_REGION`) → register (size/type verified with HEAD) → assign to a slot.
+The public site serves uploads through `/api/media/<key>` (immutable, edge-cached, Range for video) so the bucket stays private.
+Reset returns a slot to its placeholder. Tables: `media_assets`, `media_slots` (migration 0004). Tests: `tests/media.test.ts`
+(real S3 round-trip when AWS env is present).
