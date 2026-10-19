@@ -1108,3 +1108,5 @@ html[dir="rtl"] .cc-msg.assistant{align-self:flex-end;} html[dir="rtl"] .cc-msg.
 .bk-day-badge{position:absolute;top:6px;inset-inline-start:6px;background:#1a1a1a;color:#fff;font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;padding:3px 7px;z-index:2;}
 .bk-day{position:relative;}
 .yacht-map .seat.closed{opacity:.18;cursor:not-allowed;}
+/* guest sign-in block inside checkout */
+.bk-signin{border:1px solid #e6e2db;padding:16px;margin-bottom:18px;background:#faf9f7;}

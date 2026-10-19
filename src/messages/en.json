@@ -106,6 +106,10 @@
     "fullTime": "9:30AM – 9:30PM",
     "seatClosed": "This seat type is not on sale for this event.",
     "salesNotOpen": "Sales for this event open on {time}. Members can book early.",
-    "salesClosed": "Sales for this event have closed."
+    "salesClosed": "Sales for this event have closed.",
+    "welcomeBack": "Welcome back, {name}",
+    "tierVip": "VIP member",
+    "tierPreferred": "Preferred member",
+    "lastTime": "last time: {seat}"
   }
 }

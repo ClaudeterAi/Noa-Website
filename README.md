@@ -166,3 +166,10 @@ private S3 bucket (`S3_MEDIA_BUCKET`, region `S3_REGION`) → register (size/typ
 The public site serves uploads through `/api/media/<key>` (immutable, edge-cached, Range for video) so the bucket stays private.
 Reset returns a slot to its placeholder. Tables: `media_assets`, `media_slots` (migration 0004). Tests: `tests/media.test.ts`
 (real S3 round-trip when AWS env is present).
+
+## Guest sign-in (passwordless)
+
+Email → Cognito emails a one-time code (native `USER_AUTH` + `EMAIL_OTP`, no Lambdas) → `/api/guest/verify` issues the signed
+`noa_guest` cookie the engine already honours: VIP/preferred priority seats, "welcome back" with the last seat, details pre-filled
+at checkout. Routes: `/api/guest/start`, `/verify`, `/me`, `/signout`. Code: `src/server/guest-auth.ts`, `src/components/booking/GuestSignIn.tsx`.
+Cognito's default sender is capped at 50 emails/day; before launch point the pools at SES on NOA's domain.

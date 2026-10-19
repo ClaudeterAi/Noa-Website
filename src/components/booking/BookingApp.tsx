@@ -8,6 +8,7 @@ import YachtMap from "./YachtMap";
 import PaymentPanel, { paymentsConfigured } from "./PaymentPanel";
 import { api, isApiError, type CalendarEvent, type UnitAvailability, type UnitTypeInfo } from "./api";
 import { useLiveSeats } from "./useLiveSeats";
+import GuestSignIn, { useMe, type Me } from "./GuestSignIn";
 import { ARRIVALS, DAY_IMG, unitTypes as placeholderTypes, type Slot } from "./inventory";
 
 /* ---------- helpers ---------- */
@@ -40,6 +41,9 @@ export default function BookingApp() {
   const [tip, setTip] = useState<{ id: string; x: number; y: number } | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [details, setDetails] = useState({ name: "", email: "", phone: "" });
+  const [me, setMe] = useMe();
+  useEffect(() => { if (me?.signedIn && me.guest) setDetails((d) => ({ name: d.name || me.guest!.name || "", email: d.email || me.guest!.email, phone: d.phone || me.guest!.phone || "" })); }, [me]);
+  const welcome = (m: Me) => { setMe(m); void refresh(); };   // tier may unlock members-priority seats → re-read availability
   const [payment, setPayment] = useState<{ clientSecret: string; total: number; ref: string; until: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -350,6 +354,9 @@ export default function BookingApp() {
               </div>
             ) : (
               <form className="bk-pay-form" onSubmit={checkout}>
+                {me?.signedIn && me.guest ? (
+                  <p className="bk-cart-meta" style={{ marginBottom: 10 }}>{t("welcomeBack", { name: me.guest.name || me.guest.email })}{me.guest.tier !== "guest" ? ` · ${t(me.guest.tier === "vip" ? "tierVip" : "tierPreferred")}` : ""}{me.lastBooking ? ` · ${t("lastTime", { seat: locale === "ar" ? me.lastBooking.unitNameAr : me.lastBooking.unitName })}` : ""}</p>
+                ) : me && !me.signedIn ? <GuestSignIn compact onSignedIn={welcome} /> : null}
                 <h4 className="bk-section-h">{t("yourDetails")}</h4>
                 <input type="text" name="name" placeholder={t("fullName")} required minLength={2} value={details.name} onChange={(e) => setDetails({ ...details, name: e.target.value })} />
                 <input type="email" name="email" placeholder={t("email")} required value={details.email} onChange={(e) => setDetails({ ...details, email: e.target.value })} />
