@@ -1,6 +1,6 @@
 import type { Slot } from "./inventory";
 
-export interface UnitAvailability { unitId: string; unitTypeId: string; price: number; pax: number; state: "free" | "held" | "booked" | "yours" | "reserved"; heldUntil?: string; releaseAt?: string; vipPriority: boolean }
+export interface UnitAvailability { unitId: string; unitTypeId: string; price: number; pax: number; state: "free" | "held" | "booked" | "yours" | "reserved" | "closed"; heldUntil?: string; releaseAt?: string; vipPriority: boolean }
 export interface UnitTypeInfo { id: string; nameEn: string; nameAr: string; descEn: string; descAr: string; pax: number; perPerson: boolean; tier: number; imageSlot: string | null; priceMorning: number; priceAfternoon: number }
 export interface ApiError { code: string; message: string; details?: unknown }
 
@@ -11,7 +11,9 @@ async function req<T>(input: string, init?: RequestInit): Promise<T> {
   return body;
 }
 
+export interface CalendarEvent { id: string; date: string; session: "morning" | "afternoon" | "night" | "full"; titleEn: string; titleAr: string | null; kind: string; startsAt: string | null; endsAt: string | null; poster: string | null }
 export const api = {
+  calendar: (month: string) => req<{ month: string; events: CalendarEvent[] }>(`/api/calendar?month=${month}`),
   availability: (date: string, slot: Slot) => req<{ units: UnitAvailability[]; serverTime: string; tier: "guest" | "preferred" | "vip"; holdMinutes: number; types: Record<string, UnitTypeInfo> }>(`/api/availability?date=${date}&slot=${slot}`),
   hold: (date: string, slot: Slot, unitId: string) => req<{ holdId: string; expiresAt: string; serverTime: string }>("/api/holds", { method: "POST", body: JSON.stringify({ date, slot, unitId }) }),
   release: (holdId: string) => req<{ released: boolean }>(`/api/holds/${holdId}`, { method: "DELETE" }),

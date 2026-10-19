@@ -6,7 +6,7 @@ import { t } from "@/content/entities";
  * Prices in AED, placeholder values carried over from the live mock; NOA confirms before launch.
  * `tier` is the ranking VIP logic reads on Day 3 (higher = better seat).
  */
-export type Slot = "morning" | "afternoon";
+export type Slot = "morning" | "afternoon" | "night" | "full";
 
 export interface UnitType {
   id: string;
@@ -67,6 +67,8 @@ export const priceFor = (type: UnitType, slot: Slot) => (slot === "morning" ? ty
 export const ARRIVALS: Record<Slot, string[]> = {
   morning: ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00"],
   afternoon: ["14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "19:00", "20:00"],
+  night: ["21:30", "22:00", "22:30", "23:00", "23:30", "00:00"],
+  full: ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00"],
 };
 
 /* Weekday imagery for the calendar (placeholders) */

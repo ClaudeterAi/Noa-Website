@@ -8,7 +8,7 @@ import { after } from "next/server";
  * state changes here after each hold / release / booking / sweep. Correctness never depends on
  * this — the database is the truth and the map still polls as a fallback. Fire-and-forget.
  */
-export type SeatChange = { unitId: string; state: "free" | "held" | "booked" | "reserved"; heldUntil?: string };
+export type SeatChange = { unitId: string; state: "free" | "held" | "booked" | "reserved" | "closed"; heldUntil?: string };
 
 const configured = () => !!(process.env.WS_MANAGEMENT_ENDPOINT && process.env.WS_TABLE);
 let mgmt: ApiGatewayManagementApiClient | null = null, ddb: DynamoDBDocumentClient | null = null;

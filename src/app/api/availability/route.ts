@@ -7,7 +7,7 @@ import { error, handle, json } from "@/server/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const Query = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), slot: z.enum(["morning", "afternoon"]) });
+const Query = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), slot: z.enum(["morning", "afternoon", "night", "full"]) });
 
 export async function GET(req: Request) {
   try {

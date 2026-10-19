@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export type SeatPush = { type: "availability"; date: string; slot: string; serverTime: string; changes: { unitId: string; state: "free" | "held" | "booked" | "reserved"; heldUntil?: string }[] };
+export type SeatPush = { type: "availability"; date: string; slot: string; serverTime: string; changes: { unitId: string; state: "free" | "held" | "booked" | "reserved" | "closed"; heldUntil?: string }[] };
 
 /**
  * Live seat updates over the API Gateway WebSocket. Reconnects with backoff; reports whether it is

@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 const Body = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  slot: z.enum(["morning", "afternoon"]),
+  slot: z.enum(["morning", "afternoon", "night", "full"]),
   unitId: z.string().min(1).max(64),
 });
 
