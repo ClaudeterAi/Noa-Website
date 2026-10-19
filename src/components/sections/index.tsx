@@ -36,7 +36,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
   const media = await getMediaMap();   // admin uploads overlay the registry placeholders
   const mUrl = (id: string | undefined) => (id ? media[id]?.url ?? null : null);
   const bg = bgFrom(mUrl);
-  const live = s.type === "eventsGrid" || s.type === "eventStrip" || s.type === "posterCarousel" ? await publishedEvents() : null;
+  const live = s.type === "eventsGrid" || s.type === "eventStrip" || s.type === "posterCarousel" || s.type === "eventsProgramme" ? await publishedEvents() : null;
   const liveList = (ids: string[], take?: number): EventItem[] => {
     const fromDb = live?.upcoming ?? [];
     if (fromDb.length) return take ? fromDb.slice(0, take) : fromDb;
@@ -188,12 +188,71 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
         </section>
       );
     }
+    case "eventsProgramme": {
+      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
+      const items = (live?.upcoming ?? []).filter((e) => e.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+      const months = new Map<string, typeof items>();
+      for (const e of items) { const k = e.date.slice(0, 7); months.set(k, [...(months.get(k) ?? []), e]); }
+      const monthLabel = (k: string) => new Intl.DateTimeFormat(locale === "ar" ? "ar-AE-u-nu-latn" : "en-GB", { month: "long", year: "numeric", timeZone: "Asia/Dubai" }).format(new Date(`${k}-01T12:00:00+04:00`));
+      const bookHref = (e: (typeof items)[number]) => `${hrefPath({ page: "booking" })}?date=${e.date}&slot=${e.session ?? "night"}`;
+      const sessionName = (e: (typeof items)[number]) => { const t = e.startsAt ? `${e.startsAt}${e.endsAt ? ` – ${e.endsAt}` : ""}` : ""; const n = { morning: ["Morning", "الصباح"], afternoon: ["Afternoon", "بعد الظهر"], night: ["Night", "الليل"], full: ["Full day", "يوم كامل"] }[e.session ?? "night"]; return `${locale === "ar" ? n[1] : n[0]}${t ? ` · ${t}` : ""}`; };
+      const next = items[0];
+      const reserve = locale === "ar" ? "احجز مقعداً" : "Reserve a seat";
+      return (
+        <section className="ed-programme" id={s.id}>
+          <div className="ed-center rv"><div className="ed-kicker">{pick(s.kicker, locale)}</div><h2 className="ed-h"><Rich l={s.heading} locale={locale} /></h2><div className="ed-sub">{pick(s.sub, locale)}</div></div>
+          {months.size === 0 && <div className="ed-center rv ed-programme-empty">{pick(s.empty, locale)}</div>}
+          {next && (
+            <Link href={bookHref(next)} className="ed-next rv" prefetch={false}>
+              <div className="ed-next-img ed-frame" style={{ backgroundImage: `url('${eventImage(next.media, mUrl)}')` }} />
+              <div className="ed-next-body">
+                <div className="ed-kicker">{locale === "ar" ? "الليلة القادمة" : "Next night"}</div>
+                <div className="ed-next-date">{pick(next.dateLabel, locale).toUpperCase()} · {sessionName(next).toUpperCase()}</div>
+                <h3 className="ed-next-name">{pick(next.name, locale).replace("\n", " ")}</h3>
+                <div className="ed-next-who">{pick(next.artist, locale)}</div>
+                <span className="ed-link ed-link-arrow">{reserve}</span>
+              </div>
+            </Link>
+          )}
+          {[...months.entries()].map(([k, list]) => (
+            <div key={k} className="ed-month rv">
+              <h3 className="ed-month-h">{monthLabel(k).toUpperCase()}</h3>
+              <div className="ed-night-grid">
+                {list.map((e) => (
+                  <Link key={e.id} href={bookHref(e)} className="ed-night" prefetch={false}>
+                    <div className="ed-night-img ed-frame" style={{ backgroundImage: `url('${eventImage(e.media, mUrl)}')` }}>
+                      <span className="ed-night-pill">{pick(e.shortDate, locale).toUpperCase()}</span>
+                    </div>
+                    <div className="ed-night-session">{sessionName(e).toUpperCase()}</div>
+                    <div className="ed-night-name">{pick(e.name, locale).replace("\n", " ")}</div>
+                    <div className="ed-night-who">{pick(e.artist, locale)}</div>
+                    <span className="ed-night-cta">{reserve} →</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      );
+    }
+    case "map": {
+      return (
+        <section className="ed-map" id={s.id}>
+          <div className="ed-center rv"><div className="ed-kicker">{pick(s.kicker, locale)}</div><h2 className="ed-h"><Rich l={s.heading} locale={locale} /></h2></div>
+          <div className="ed-map-frame rv">
+            <iframe title={pick(s.heading, locale)} src={`https://www.google.com/maps?q=${encodeURIComponent(s.query)}&z=15&hl=${locale}&output=embed`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+          </div>
+          <div className="ed-center rv ed-map-notes"><p>{pick(s.address, locale)}</p><p className="ed-map-note">{pick(s.note, locale)}</p>
+            <a className="ed-link ed-link-arrow" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.query)}`} target="_blank" rel="noopener noreferrer">{locale === "ar" ? "افتح في خرائط جوجل" : "Open in Google Maps"}</a></div>
+        </section>
+      );
+    }
     case "galleryCarousel": {
       return (
         <section className="ed-gallery" id={s.id}>
           <div className="ed-center rv"><h2 className="ed-h">{pick(s.heading, locale)}</h2><div className="ed-sub">{pick(s.sub, locale)}</div></div>
           <div className="rv">
-            <Carousel perView={2} arrows="outside" dots={false} ariaLabel={pick(s.heading, locale)}>
+            <Carousel perView={2} arrows="inside" dots={false} ariaLabel={pick(s.heading, locale)}>
               {s.media.map((m) => <div key={m} className="ed-frame ed-frame-tall" style={bg(m)} role="img" aria-label={media[m]?.alt?.[locale] ?? ""} />)}
             </Carousel>
           </div>
@@ -225,7 +284,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
         <section className={`ed-posters ed-posters-${s.aspect === "1/1" ? "sq" : "tall"}`} id={s.id}>
           <div className="ed-center rv"><h2 className="ed-h">{pick(s.heading, locale)}</h2>{s.sub && <div className="ed-sub">{pick(s.sub, locale)}</div>}</div>
           <div className="rv">
-            <Carousel perView={3} arrows="outside" dots={slides.length > 3} ariaLabel={pick(s.heading, locale)}>
+            <Carousel perView={3} arrows="inside" dots={slides.length > 3} ariaLabel={pick(s.heading, locale)}>
               {slides.map((sl) => (
                 <Link key={sl.key} href={hrefPath(s.href)} className="ed-poster">
                   <div className={`ed-frame ${s.aspect === "1/1" ? "ed-frame-square" : "ed-frame-poster"}`} style={{ backgroundImage: `url('${sl.img}')` }} />

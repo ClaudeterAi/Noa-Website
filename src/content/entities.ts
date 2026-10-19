@@ -25,6 +25,7 @@ export const media: Record<string, MediaSlot> = {
   "split-club": img("split-club", u("photo-1566073771259-6a8506099945", 900), "Beach club deck", "سطح النادي الشاطئي"),
   "pkg-morning": img("pkg-morning", u("photo-1520250497591-112f2f40a3f4", 2000), "Morning by the lagoon pool", "الصباح عند مسبح البحيرة"),
   "pkg-afternoon": img("pkg-afternoon", u("photo-1566073771259-6a8506099945", 2000), "Golden hour on the deck", "الساعة الذهبية على السطح"),
+  "pkg-night": img("pkg-night", u("photo-1514525253161-7a46d19cd819"), "Night session", "جلسة الليل"),
   "pkg-cabana": img("pkg-cabana", u("photo-1445019980597-93fa8acb246c"), "Private cabana", "كابانا خاصة"),
   "rest-1": img("rest-1", u("photo-1565299624946-b28f40a0ae38", 900), "Restaurant plate", "طبق من المطعم"),
   "rest-2": img("rest-2", u("photo-1553621042-f6e147245754", 900), "Dining on the water", "تناول الطعام على الماء"),
@@ -65,11 +66,11 @@ export const media: Record<string, MediaSlot> = {
 export const settings: Settings = {
   brand: "NOA",
   tagline: t(
-    "Dubai's first floating beach club. Anchored in the Arabian Gulf. Opening 2026.",
+    "Dubai's first floating beach club. Days on the water, nights on the Gulf. Opening 2026.",
     "أول نادٍ شاطئي عائم في دبي. راسٍ في الخليج العربي. الافتتاح 2026."
   ),
   contact: { phoneDisplay: "+971 4 840 0000", phoneHref: "tel:+97148400000", email: "hello@noa-dubai.com" },
-  hours: t("Daily — 9:30 AM to 9:30 PM", "يومياً — 9:30 صباحاً إلى 9:30 مساءً"),
+  hours: t("Daily, 9:30 AM to 2:00 AM", "يومياً — 9:30 صباحاً إلى 9:30 مساءً"),
   departure: t("Dubai Marina Pier, Berth 7", "رصيف مرسى دبي، المرسى 7"),
   socials: [
     { label: "IG", href: "#" },
@@ -84,40 +85,54 @@ export const packages: Record<string, Package> = {
   morning: {
     id: "morning",
     number: "01",
-    name: t("Morning\nPackage", "باقة\nالصباح"),
-    vibe: t("Chill Vibe", "أجواء هادئة"),
-    time: t("9:30 AM — 2:00 PM", "9:30 صباحاً — 2:00 ظهراً"),
+    name: t("The\nMorning", "جلسة\nالصباح"),
+    vibe: t("The Water", "الماء"),
+    time: t("9:30 AM to 2:00 PM", "9:30 صباحاً إلى 2:00 ظهراً"),
     desc: t(
-      "Start your day with our exclusive morning experience, designed for those seeking a relaxed, laid-back atmosphere before the vibrant party begins. Unwind on our lounge areas, bask in the warm Gulf sun on spacious daybeds, and bathe in our 22-metre infinity pool with the Burj Al Arab on the horizon.",
-      "ابدأ يومك مع تجربتنا الصباحية الحصرية، المصممة لمن يبحث عن أجواء هادئة ومسترخية قبل أن تبدأ الحفلة النابضة بالحياة. استرخِ في مناطق الجلوس، واستمتع بشمس الخليج الدافئة على أسرّة نهارية فسيحة، واسبح في مسبحنا اللامتناهي بطول 22 متراً وبرج العرب في الأفق."
+      "The first boat leaves the pier at nine. By half past the pool is still, breakfast is on the bow and the music is low. This is the session for a long swim, a late breakfast and a daybed on the edge of the water with the Burj Al Arab on the horizon.",
+      "ينطلق أول قارب من الرصيف في التاسعة. وبحلول التاسعة والنصف يكون المسبح ساكناً والفطور على مقدمة السفينة والموسيقى خافتة. هذه جلسة السباحة الطويلة والفطور المتأخر وسرير نهاري على حافة الماء وبرج العرب في الأفق."
     ),
     media: "pkg-morning",
-    more: { label: t("See More", "اعرف المزيد"), href: { page: "morning-package" } },
+    more: { label: t("See the Morning", "اطّلع على الصباح"), href: { page: "morning-package" } },
     book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
   },
   afternoon: {
     id: "afternoon",
     number: "02",
-    name: t("Afternoon\nPackage", "باقة\nبعد الظهر"),
-    vibe: t("Party Vibe", "أجواء الحفلة"),
-    time: t("12:00 PM — 9:30 PM", "12:00 ظهراً — 9:30 مساءً"),
+    name: t("The\nAfternoon", "جلسة\nبعد الظهر"),
+    vibe: t("The Sun", "الشمس"),
+    time: t("2:00 PM to 9:30 PM", "2:00 ظهراً إلى 9:30 مساءً"),
     desc: t(
-      "Dive into the vibrant afternoon session — full pool access, Dubai's hottest DJs spinning on the open-air deck, and a curated dining experience. Whether you want to dance, float, or simply watch the city skyline turn gold at dusk, this is NOA at its most electric.",
-      "انغمس في جلسة بعد الظهر النابضة بالحياة — دخول كامل إلى المسبح، وأشهر الدي جيه في دبي على السطح المفتوح، وتجربة طعام مختارة بعناية. سواء أردت الرقص أو الطفو أو مجرد مشاهدة أفق المدينة وهو يتحول إلى اللون الذهبي عند الغسق، هذه نوا في أبهى حالاتها."
+      "The DJ comes on at two and the pool fills. Lunch runs into dinner, the sky behind the skyline goes pink, and from two kilometres out the sun sets twice, once behind the towers and once on the water. At half past nine the lights come up on the stage and the deck changes shift.",
+      "يبدأ الدي جيه في الثانية ويمتلئ المسبح. يمتد الغداء إلى العشاء، وتتورّد السماء خلف الأفق، ومن على بُعد كيلومترين تغرب الشمس مرتين، مرة خلف الأبراج ومرة على الماء. في التاسعة والنصف تضاء المنصة ويبدّل السطح نوبته."
     ),
     media: "pkg-afternoon",
-    more: { label: t("See More", "اعرف المزيد"), href: { page: "afternoon-package" } },
+    more: { label: t("See the Afternoon", "اطّلع على بعد الظهر"), href: { page: "afternoon-package" } },
+    book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
+  },
+  night: {
+    id: "night",
+    number: "03",
+    name: t("The\nNight", "جلسة\nالليل"),
+    vibe: t("The Floor", "الحلبة"),
+    time: t("9:30 PM to 2:00 AM", "9:30 مساءً إلى 2:00 فجراً"),
+    desc: t(
+      "This is why NOA floats. Residents and guest DJs on the stage, fifteen metres of dance floor under the roof, the lounge cabanas lit low and the skyline across the water. Upstairs is quieter: the sushi bar, the alfresco lounge and the booth above the floor.",
+      "لهذا تطفو نوا. المقيمون والدي جيه الضيوف على المنصة، وخمسة عشر متراً من حلبة الرقص تحت السقف، وكبائن الصالة بإضاءة خافتة، وأفق المدينة عبر الماء. الطابق العلوي أهدأ: بار السوشي وصالة الهواء الطلق والمقصورة فوق الحلبة."
+    ),
+    media: "pkg-night",
+    more: { label: t("See the Night", "اطّلع على الليل"), href: { page: "night-package" } },
     book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
   },
   cabana: {
     id: "cabana",
-    number: "03",
-    name: t("Private\nCabana", "كابانا\nخاصة"),
-    vibe: t("Exclusive · All Day", "حصرية · طوال اليوم"),
-    time: t("9:30 AM — 9:30 PM", "9:30 صباحاً — 9:30 مساءً"),
+    number: "04",
+    name: t("The\nCabanas", "الكبائن"),
+    vibe: t("Yours by the Session", "لك طوال الجلسة"),
+    time: t("Morning, afternoon or night", "صباحاً أو بعد الظهر أو ليلاً"),
     desc: t(
-      "Your own poolside sanctuary — a dedicated cabana with personal butler, unlimited F&B credit, and front-row views of the Arabian Gulf. Ideal for groups seeking total privacy, effortless comfort, and the highest tier of service on the water. From AED 8,500 per cabana.",
-      "ملاذك الخاص بجانب المسبح — كابانا مخصصة مع خادم شخصي، ورصيد غير محدود للطعام والمشروبات، وإطلالة في الصف الأول على الخليج العربي. مثالية للمجموعات التي تبحث عن الخصوصية التامة والراحة وأعلى مستوى من الخدمة على الماء. ابتداءً من 8,500 درهم للكابانا."
+      "Twenty cabanas across two decks. Eight line the pool, four face the stage, eight sit on the upper deck above the floor. Each has two sofas, a low table, curtains you can draw and a host who stays with you. Six guests, booked by the session.",
+      "عشرون كابينة على سطحين. ثمانٍ على حافة المسبح، وأربع تواجه المنصة، وثمانٍ على السطح العلوي فوق الحلبة. في كل منها أريكتان وطاولة منخفضة وستائر تُسدل ومضيف يبقى معك. ستة ضيوف، وتُحجز بالجلسة."
     ),
     media: "pkg-cabana",
     more: { label: t("Enquire", "استفسر"), href: { page: "cabana" } },
@@ -165,6 +180,15 @@ export const events: Record<string, EventItem> = {
 const faq = (id: string, q: [string, string], a: [string, string]): Faq => ({ id, q: t(...q), a: t(...a) });
 
 export const faqs: Record<string, Faq> = {
+  "last-shuttle": faq("last-shuttle", ["What time is the last shuttle back?", "متى يعود آخر قارب مكوكي؟"], ["Boats leave the pier every 30 minutes. The last boat back is 2:30 PM after the morning session, 10:00 PM after the afternoon and 2:30 AM after the night. Your wristband is your ticket on board.", "تنطلق القوارب من الرصيف كل 30 دقيقة. آخر قارب للعودة في 2:30 ظهراً بعد جلسة الصباح، و10:00 مساءً بعد جلسة بعد الظهر، و2:30 فجراً بعد جلسة الليل. سوارك هو تذكرتك على المتن."]),
+  "stay-night": faq("stay-night", ["Can I stay on from the afternoon into the night?", "هل يمكنني البقاء من جلسة بعد الظهر إلى الليل؟"], ["Yes, if the night is not sold out. Ask your host before 8:30 PM and they will move your seat over at the desk. On event nights you need a ticket for the night, and your host can sort that too.", "نعم، إن لم تكن الليلة مكتملة. اطلب من مضيفك قبل 8:30 مساءً وسينقل مقعدك عند المكتب. في ليالي الفعاليات تحتاج إلى تذكرة لليل، ويمكن لمضيفك ترتيب ذلك أيضاً."]),
+  "night-ticket": faq("night-ticket", ["Is the night session ticketed?", "هل جلسة الليل بتذكرة؟"], ["Every night has general entry sold per person, plus seats you can book on the deck plan: lounge cabanas, high tables, the alfresco lounge, the upper cabanas and the booth. A seat includes entry for everyone at it. On guest DJ nights, tickets go on sale two weeks ahead and members see them first.", "لكل ليلة دخول عام يُباع للشخص، إضافة إلى مقاعد تحجزها على مخطط السطح: كبائن الصالة، والطاولات العالية، وصالة الهواء الطلق، والكبائن العلوية، والمقصورة. المقعد يشمل الدخول لكل من فيه. في ليالي الدي جيه الضيف تُطرح التذاكر قبل أسبوعين ويراها الأعضاء أولاً."]),
+  "pool-night": faq("pool-night", ["Is the pool open at night?", "هل المسبح مفتوح ليلاً؟"], ["No. The pool closes at dusk and the daybeds around it become lounge seating. The night is for the floor, the bars and the upper deck.", "لا. يُغلق المسبح عند الغسق وتتحول الأسرّة النهارية حوله إلى جلسات. الليل لحلبة الرقص والبارات والسطح العلوي."]),
+  "treatments": faq("treatments", ["Can I book a massage, a manicure or the salon?", "هل يمكنني حجز مساج أو مانيكير أو الصالون؟"], ["Yes. There is a treatment room for manicures, pedicures and massage, and a hair salon with a tattoo station, both on the main deck. Book a slot with your seat at checkout or at reception when you arrive. Treatments are charged to your wristband.", "نعم. توجد غرفة علاج للمانيكير والباديكير والمساج، وصالون شعر مع محطة وشم، كلاهما على السطح الرئيسي. احجز موعداً مع مقعدك عند الدفع أو في الاستقبال عند وصولك. تُحتسب الخدمات على سوارك."]),
+  "changing": faq("changing", ["Are there changing rooms and showers?", "هل توجد غرف تبديل ودُش؟"], ["Restrooms with showers and changing space are on the main deck, midships and at the stern, for women and for men. Towels are at reception and at the pool.", "توجد دورات مياه مع دُش ومساحة تبديل على السطح الرئيسي، في المنتصف وعند المؤخرة، للنساء وللرجال. المناشف في الاستقبال وعند المسبح."]),
+  "sushi-hours": faq("sushi-hours", ["When is the sushi bar open?", "متى يفتح بار السوشي؟"], ["The sushi bar on the upper deck opens at 7:00 PM and serves until 1:00 AM. The main restaurant serves breakfast from 9:30 AM, lunch from noon and dinner until 11:00 PM.", "يفتح بار السوشي على السطح العلوي في 7:00 مساءً ويقدم حتى 1:00 فجراً. المطعم الرئيسي يقدم الفطور من 9:30 صباحاً، والغداء من الظهر، والعشاء حتى 11:00 مساءً."]),
+  "stairs": faq("stairs", ["How do I get to the upper deck?", "كيف أصل إلى السطح العلوي؟"], ["Stairs on both sides of the main deck, sixteen steps each. Tell us when you book if steps are a problem and we will seat you on the main deck with the same view of the stage.", "درج على جانبي السطح الرئيسي، ستة عشر درجة لكل منهما. أخبرنا عند الحجز إن كانت الدرجات مشكلة وسنجلسك على السطح الرئيسي بإطلالة مماثلة على المسرح."]),
+
   "book-advance": faq("book-advance", ["Do I need to book in advance?", "هل أحتاج إلى الحجز مسبقاً؟"], ["Walk-ins are welcome, but advance booking is strongly recommended. NOA has limited daily capacity and reserved daybeds sell out quickly, especially on weekends and event nights.", "نرحب بالزوار دون حجز، لكننا ننصح بشدة بالحجز المسبق. سعة نوا اليومية محدودة، والأسرّة النهارية المحجوزة تنفد بسرعة، خاصة في عطلات نهاية الأسبوع وليالي الفعاليات."]),
   "dress-code": faq("dress-code", ["What is the dress code?", "ما هو قواعد اللباس؟"], ["Smart beach casual is required. We welcome linen shirts, tailored shorts, resort wear and chic cover-ups. Tank tops, ripped clothing, sports jerseys, and flip-flops are not permitted. NOA reserves the right to deny entry.", "اللباس الشاطئي الأنيق مطلوب. نرحب بقمصان الكتان والشورتات المفصلة وملابس المنتجعات وأغطية السباحة الأنيقة. لا يُسمح بالقمصان بلا أكمام أو الملابس الممزقة أو القمصان الرياضية أو الشباشب. تحتفظ نوا بحق رفض الدخول."]),
   "dress-code-rest": faq("dress-code-rest", ["What is the dress code?", "ما هو قواعد اللباس؟"], ["Smart beach casual is required. We welcome linen shirts, tailored shorts, resort wear and chic cover-ups. Tank tops, ripped clothing, sports jerseys, and flip-flops are not permitted in the restaurant. NOA reserves the right to deny entry.", "اللباس الشاطئي الأنيق مطلوب. نرحب بقمصان الكتان والشورتات المفصلة وملابس المنتجعات وأغطية السباحة الأنيقة. لا يُسمح بالقمصان بلا أكمام أو الملابس الممزقة أو القمصان الرياضية أو الشباشب داخل المطعم. تحتفظ نوا بحق رفض الدخول."]),

@@ -54,6 +54,12 @@ export default function BookingApp() {
 
   /* body class drives the opaque nav (legacy body.booking-page) */
   useEffect(() => { document.body.classList.add("booking-page"); return () => document.body.classList.remove("booking-page"); }, []);
+  // deep link from an event or a concierge card: /booking?date=YYYY-MM-DD&slot=night opens the deck plan for that session
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search); const d = q.get("date"); const sl = q.get("slot") as Slot | null;
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= today && sl && ["morning", "afternoon", "night", "full"].includes(sl)) { setDate(d); setSlot(sl); setStep(2); }
+  }, []);
 
   /* cart = the server's live holds for this browser (chat and voice fill the same cart); sessionStorage only keeps guest count / arrival choices */
   useEffect(() => {
@@ -65,7 +71,7 @@ export default function BookingApp() {
         const c = (await r.json()) as { items: { hold_id: string; unit_id: string; seat: string; date: string; session: string; price_aed: number; expires_at: string }[] };
         const live: CartItem[] = c.items.map((i) => {
           const prev = saved.find((s) => s.holdId === i.hold_id);
-          const slotOf: Slot = /9:30|صباح|Morning/.test(i.session) ? "morning" : "afternoon";
+          const slotOf: Slot = /Morning|صباح/.test(i.session) ? "morning" : /Night|ليل/.test(i.session) ? "night" : /Full|كامل/.test(i.session) ? "full" : "afternoon";
           return prev ? { ...prev, expiresAt: i.expires_at } : { holdId: i.hold_id, unitId: i.unit_id, typeId: "", name: i.seat, img: "", date: i.date, slot: slotOf, guests: 1, arrival: ARRIVALS[slotOf][0], price: i.price_aed, expiresAt: i.expires_at };
         });
         if (live.length) { setCart(live); setDate(live[0].date); setSlot(live[0].slot); setStep(3); }
@@ -234,7 +240,7 @@ export default function BookingApp() {
   };
 
   const onTipMove = (id: string, e: MouseEvent) => setTip({ id, x: Math.min(e.clientX + 18, window.innerWidth - 300), y: Math.min(e.clientY + 18, window.innerHeight - 250) });
-  const slotLabel = (s: Slot) => (s === "morning" ? `${t("morning")} · ${t("morningTime")}` : `${t("afternoon")} · ${t("afternoonTime")}`);
+  const slotLabel = (s: Slot) => `${t(s)} · ${t(`${s}Time`)}`;
   const legend: [string, React.CSSProperties][] = [
     ["vipBooth", { background: "linear-gradient(#c9a26e,#a67e4e)", borderRadius: "50%" }],
     ["upperCabana", { background: "linear-gradient(#dcb07c,#c99a66)" }],
@@ -336,7 +342,7 @@ export default function BookingApp() {
                   <div className="bk-cart-img" style={{ backgroundImage: `url('${c.img}')` }} />
                   <div>
                     <div className="bk-cart-name">{c.name}</div>
-                    <div className="bk-cart-meta">{shortDate(c.date).toUpperCase()} · {(c.slot === "morning" ? t("morning") : t("afternoon")).toUpperCase()} · {t("guest", { count: c.guests })} · {t("arrive")} {c.arrival}</div>
+                    <div className="bk-cart-meta">{shortDate(c.date).toUpperCase()} · {t(c.slot).toUpperCase()} · {t("guest", { count: c.guests })} · {t("arrive")} {c.arrival}</div>
                   </div>
                   <div style={{ textAlign: "end" }}>
                     <div className="bk-cart-price">{aed(c.price, locale)}</div>
@@ -404,7 +410,7 @@ export default function BookingApp() {
               <h3 className="bk-modal-event">{dayLabel(fromIso(dayModal)).toUpperCase()}</h3>
               <div className="bk-modal-tim-lbl">{t("selectTiming")}</div>
               <div className="bk-time-opts">
-                {([...(["morning", "afternoon"] as const), ...((liveEvents[dayModal] ?? []).map((e) => e.session).filter((x) => x === "night" || x === "full") as Slot[])] as Slot[]).map((s) => (
+                {([...(["morning", "afternoon", "night"] as const), ...((liveEvents[dayModal] ?? []).map((e) => e.session).filter((x) => x === "full") as Slot[])] as Slot[]).map((s) => (
                   <button key={s} type="button" className={`bk-time${pendingSlot === s ? " selected" : ""}`} onClick={() => setPendingSlot(s)}>
                     <div className="top">{(s === "night" || s === "full") && liveEvents[dayModal]?.find((e) => e.session === s) ? (locale === "ar" ? liveEvents[dayModal].find((e) => e.session === s)!.titleAr ?? liveEvents[dayModal].find((e) => e.session === s)!.titleEn : liveEvents[dayModal].find((e) => e.session === s)!.titleEn) : t(s)}</div>
                     <div className="bot">{(() => { const e = liveEvents[dayModal]?.find((x) => x.session === s); return e?.startsAt ? `${e.startsAt}${e.endsAt ? ` – ${e.endsAt}` : ""}` : t(`${s}Time`); })()}</div>
@@ -434,10 +440,10 @@ export default function BookingApp() {
             <div className="bk-seat-info-col">
               <div className="bk-pkg-row">
                 <div>
-                  <div className="bk-pkg-name">{slot === "morning" ? t("morningPkg") : t("afternoonPkg")}</div>
-                  <div className="bk-pkg-time">{slot === "morning" ? t("morningTime") : t("afternoonTime")}</div>
+                  <div className="bk-pkg-name">{slot === "morning" ? t("morningPkg") : slot === "night" ? t("nightPkg") : slot === "full" ? t("fullPkg") : t("afternoonPkg")}</div>
+                  <div className="bk-pkg-time">{t(`${slot}Time`)}</div>
                 </div>
-                <div className="bk-pkg-vibe"><span>{slot === "morning" ? t("chill") : t("party")}</span></div>
+                <div className="bk-pkg-vibe"><span>{slot === "morning" ? t("chill") : slot === "night" ? t("dance") : t("party")}</span></div>
               </div>
               <div className="bk-detail-row">
                 <div>

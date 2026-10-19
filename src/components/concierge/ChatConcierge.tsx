@@ -20,8 +20,8 @@ export default function ChatConcierge() {
   const bottom = useRef<HTMLDivElement>(null);
 
   const T = ar
-    ? { title: "كونسيرج نوا", sub: "حجوزات · أسئلة · الوصول", placeholder: "اسأل عن المقاعد أو الأسعار أو احجز…", send: "إرسال", open: "تحدث مع نوا", goPay: "إتمام الدفع", off: "الكونسيرج غير مفعّل في هذه المعاينة بعد.", chips: ["ما المتاح هذا الجمعة بعد الظهر؟", "كم سعر الكابانا؟", "كيف أصل إلى نوا؟", "احجز لي سريراً نهارياً"], hello: "مرحباً، أنا كونسيرج نوا. كيف أساعدك اليوم؟" }
-    : { title: "NOA Concierge", sub: "Reservations · Questions · Getting here", placeholder: "Ask about seats, prices, or book…", send: "Send", open: "Chat with NOA", goPay: "Complete payment", off: "The concierge isn't configured on this preview yet.", chips: ["What's free this Friday afternoon?", "How much is a cabana?", "How do I get to NOA?", "Hold a daybed for me"], hello: "Hello, I'm the NOA concierge. How can I help today?" };
+    ? { title: "كونسيرج نوا", sub: "حجوزات · أسئلة · الوصول", placeholder: "اسأل عن المقاعد أو الأسعار أو احجز…", send: "إرسال", open: "تحدث مع نوا", goPay: "إتمام الدفع", off: "الكونسيرج غير مفعّل في هذه المعاينة بعد.", chips: ["ما البرنامج هذه العطلة؟", "احجز لي كابينة ليلة الجمعة", "كم سعر المقصورة؟", "هل يمكنني حجز مساج؟"], hello: "مرحباً، أنا كونسيرج نوا. كيف أساعدك اليوم؟" }
+    : { title: "NOA Concierge", sub: "Reservations · Questions · Getting here", placeholder: "Ask about seats, prices, or book…", send: "Send", open: "Chat with NOA", goPay: "Complete payment", off: "The concierge isn't configured on this preview yet.", chips: ["What's on this weekend?", "Hold a cabana for Friday night", "How much is the booth?", "Can I book a massage?"], hello: "Hello, I'm the NOA concierge. How can I help today?" };
 
   useEffect(() => { bottom.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, open]);
   useEffect(() => { if (open && !msgs.length) setMsgs([{ role: "assistant", content: T.hello }]); }, [open, msgs.length, T.hello]);

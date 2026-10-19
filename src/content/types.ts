@@ -33,6 +33,7 @@ export type PageId =
   | "home"
   | "morning-package"
   | "afternoon-package"
+  | "night-package"
   | "cabana"
   | "events"
   | "about"
@@ -88,6 +89,10 @@ export interface EventItem {
   /** from the database: regular | main | highlight, and published | past */
   kind?: string;
   status?: string;
+  /** bookable session and hours, from the database */
+  session?: "morning" | "afternoon" | "night" | "full";
+  startsAt?: string | null;
+  endsAt?: string | null;
 }
 
 export interface Faq {
@@ -141,6 +146,8 @@ export type Section =
   | (Base & { type: "cta"; pre: L; heading: L; body: L; primary: CtaLink; secondary: CtaLink })
   | (Base & { type: "subhero"; media: string; kicker: L; heading: L; sub: L })
   | (Base & { type: "prose"; kicker: L; heading: L; paragraphs: L[] })
+  | (Base & { type: "map"; kicker: L; heading: L; query: string; address: L; note: L })
+  | (Base & { type: "eventsProgramme"; kicker: L; heading: L; sub: L; empty: L })
   | (Base & {
       type: "splitProse";
       media: string;

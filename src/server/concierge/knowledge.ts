@@ -51,6 +51,21 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
     ? `- قواعد الحجز: يُحجز المقعد المختار لمدة ${holdMinutes} دقائق أثناء إتمام الدفع؛ بحد أقصى ${maxPerCart} مقاعد في السلة؛ الدفع عبر بطاقة أو Apple Pay أو Google Pay بالدرهم؛ ضريبة القيمة المضافة 5% تُضاف عند الدفع.`
     : `- Booking rules: a tapped seat is held for ${holdMinutes} minutes while the guest pays; at most ${maxPerCart} seats per cart; payment by card, Apple Pay or Google Pay in AED; 5% VAT is added at checkout.`);
 
+  lines.push(ar ? "## الجلسات اليومية" : "## Daily sessions");
+  lines.push(ar ? "- ثلاث جلسات كل يوم: الصباح 9:30 ص–2:00 م (أجواء هادئة)، بعد الظهر 2:00–9:30 م (أجواء الحفلة)، والليل 9:30 م–2:00 فجراً (أجواء الرقص؛ المسبح مغلق ليلاً). تُحجز المقاعد لكل جلسة على حدة." : "- Three sessions every day: Morning 9:30 AM–2:00 PM (chill), Afternoon 2:00–9:30 PM (party), Night 9:30 PM–2:00 AM (dance; the pool is closed at night). Seats are booked per session; night seats are priced like the afternoon unless an event sets its own price.");
+  lines.push(ar ? "## ما على المتن" : "## What is on board");
+  lines.push(ar
+    ? "- السطح الرئيسي: سطح شمسي عند المقدمة بعشرة أسرّة، مسبح لا متناهٍ (خليج وقناة) مع أربعة عشر سريراً نهارياً على حافته وثماني كبائن مسبح، غرفة علاج للمانيكير والباديكير والمساج، صالون شعر مع محطة وشم، دورات مياه للنساء والرجال في المنتصف وعند المؤخرة، حلبة رقص بطول 15 متراً تحت السقف مع منصة ومحطة دي جيه، أربع كبائن صالة تواجه المنصة، عشر طاولات عالية، البار الرئيسي، والاستقبال عند المؤخرة."
+    : "- Main deck: a bow sun deck with ten loungers, the infinity pool (a bay and a channel) with fourteen daybeds on its edge and eight pool cabanas, a treatment room for manicures, pedicures and massage, a hair salon with a tattoo station, women's and men's restrooms midships and at the stern, a 15 metre dance floor under the roof with the stage and DJ station, four lounge cabanas facing the stage, ten high tables, the main bar, and reception at the stern.");
+  lines.push(ar
+    ? "- السطح العلوي: ثماني كبائن تطل على الحلبة، مقصورة فوق المنصة (أولوية للأعضاء حتى 24 ساعة قبل الموعد)، بار وبار سوشي (أوماكاسي من 7 مساءً حتى 1 فجراً)، صالة في الهواء الطلق بست مجموعات أرائك على السياج، ثماني طاولات عالية، ودرج على الجانبين."
+    : "- Upper deck: eight cabanas looking down on the floor, the booth above the stage (members first until 24 hours before), a bar and sushi bar (omakase 7 PM to 1 AM), the alfresco lounge with six sofa groups along the rail, eight high tables, and stairs on both sides.");
+  lines.push(ar
+    ? "- العلاجات والصالون تُحجز مع المقعد عند الدفع أو في الاستقبال، وتُحتسب على السوار. الصالون ومحطة الوشم مفتوحان حتى منتصف الليل الخميس والجمعة والسبت. المسبح مغلق بعد الغسق."
+    : "- Treatments and the salon are booked with the seat at checkout or at reception, and charged to the wristband. The salon and tattoo station are open until midnight Thursday to Saturday. The pool is closed after dusk.");
+  lines.push(ar
+    ? "- القوارب: كل 30 دقيقة من رصيف مرسى دبي، المرسى 7، من 9:00 صباحاً. آخر قارب للعودة 2:30 ظهراً بعد الصباح، و10:00 مساءً بعد بعد الظهر، و2:30 فجراً بعد الليل. العبور 11 دقيقة."
+    : "- Boats: every 30 minutes from Dubai Marina Pier, Berth 7, from 9:00 AM. Last boats back 2:30 PM after the morning, 10:00 PM after the afternoon, 2:30 AM after the night. The crossing is 11 minutes.");
   lines.push(ar ? "## الباقات" : "## Packages");
   for (const p of Object.values(packages)) lines.push(`### ${pick(p.name, locale)} (${pick(p.vibe, locale)}, ${pick(p.time, locale)})`, pick(p.desc, locale));
 
