@@ -1145,3 +1145,11 @@ body{font-weight:300;}
   .bk-map-wrap{max-width:none;width:100%;overflow-x:auto;padding-bottom:10px;}
   .yacht-map{width:100%;min-width:1500px;}
 }
+/* seat states over the EPJ linework */
+.yacht-map .seat{cursor:pointer;transition:fill .15s;}
+.yacht-map .seat-g:not(.taken):not(.closed):hover .seat{fill:rgba(24,122,128,.14);}
+.yacht-map .seat-g.taken .seat{fill:rgba(90,74,54,.28)!important;stroke:rgba(90,74,54,.5);cursor:not-allowed;}
+.yacht-map .seat-g.mine .seat{fill:rgba(24,122,128,.22)!important;stroke:var(--bar,#187A80);stroke-width:1.6;}
+.yacht-map .seat-g.reserved .seat{stroke-dasharray:2 1.5;fill:rgba(255,255,255,.35)!important;}
+.yacht-map .seat-g.closed .seat{fill:rgba(255,255,255,.6)!important;stroke-opacity:.3;cursor:not-allowed;}
+.yacht-map .seat-g.taken text,.yacht-map .seat-g.closed text{opacity:.5;}

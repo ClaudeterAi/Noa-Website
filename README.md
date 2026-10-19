@@ -184,3 +184,11 @@ entry. Shown but not bookable: infinity pool, stage/dance floor, DJ, both bars, 
 pedicure/massage, stairs, arrival points, canopies. Not drawn: kitchen, prep/store, store, A/V room, artists' room, service stations,
 stowage, dumbwaiter (one hatched "Kitchen & service" block), captain's deck (by others). `npx tsx src/db/sync-units.ts` reconciles the
 database to the geometry; pass an SVG path to use a designer drawing instead.
+
+### Seat-map linework is the architect's drawing
+
+`public/map/main-deck.svg` and `upper-deck.svg` are the EPJ PDF's own vectors (sheets NA-ID-1000 / NA-ID-1100), cleaned of
+dimensions, grid lines, annotations and glyphs, calibrated from the cabana outlines (1:70 on A1 → 1 mm = 0.0405 pt) and exported at
+1:50 into map units. Regenerate with `scripts/map/extract-epj-linework.py` after `pdftocairo -svg` on a new drawing issue.
+`YachtMap.tsx` paints colour under that linework and the interactive seat layer over it; `boat.ts` boxes are measured from the same
+vectors. Nothing about the layout is drawn by hand.
