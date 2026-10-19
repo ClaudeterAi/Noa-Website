@@ -72,7 +72,7 @@ A("canopy-p", "upper", "canopy", 8840, 0, 12760, 3240, "Cabana canopies", "مظ�
 A("canopy-s", "upper", "canopy", 8840, 11760, 12760, 3240, "Cabana canopies", "مظلات الكابانا");
 A("canopy-p2", "upper", "canopy", 22050, 0, 7250, 3240, "Canopy", "مظلة");
 A("canopy-s2", "upper", "canopy", 22050, 11760, 7250, 3240, "Canopy", "مظلة");
-A("void", "upper", "label", 24000, 4200, 16800, 6600, "Open to the dance floor below", "مفتوح على حلبة الرقص بالأسفل");
+A("void", "upper", "label", 29600, 4200, 11200, 6600, "Open to the dance floor below", "مفتوح على حلبة الرقص بالأسفل");
 
 // Upper cabanas (FFL +4500): four per side over the lounge cabanas, 2650 wide
 for (let i = 0; i < 4; i++) { const x = 32200 + i * 2770; U(`upper-cabana-${i + 1}`, "upper-cabana", "upper", x, 0, 2650, 3400, `U${i + 1}`); U(`upper-cabana-${i + 5}`, "upper-cabana", "upper", x, 11600, 2650, 3400, `U${i + 5}`); }

@@ -1131,3 +1131,12 @@ body{font-weight:300;}
 .yacht-map .seat.reserved{fill:#e3dccd!important;stroke-dasharray:2 1.5;cursor:help;}
 .yacht-map .seat.closed{opacity:.18;cursor:not-allowed;}
 .yacht-map .seat.mine{stroke:var(--bar,#1a1a1a);stroke-width:1.6;}
+/* illustrated seat map states */
+.yacht-map .seat-g.taken .seat,.yacht-map .seat.taken{fill:#d9d4ca!important;}
+.yacht-map .seat-g.taken{opacity:.55;filter:none;}
+.yacht-map .seat-g.taken *{cursor:not-allowed;}
+.yacht-map .seat-g.reserved .seat{stroke-dasharray:2 1.5;fill:#eee7d9!important;}
+.yacht-map .seat-g.closed{opacity:.2;}
+.yacht-map .seat-g.mine .seat{stroke:var(--bar,#187A80);stroke-width:1.6;}
+.yacht-map .seat-g:not(.taken):not(.closed) .seat{cursor:pointer;}
+.yacht-map .seat-g:not(.taken):not(.closed):hover .seat{filter:brightness(.95);}

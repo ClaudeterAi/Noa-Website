@@ -65,17 +65,22 @@
     "guestsCount": "{count, plural, one {# guest} other {# guests}}",
     "viewMore": "VIEW MORE",
     "legend": {
-      "cabana": "Cabana",
+      "cabana": "Pool cabana",
       "frontCabana": "Front Cabana",
-      "daybed": "Daybed",
-      "sunbed": "Sunbed",
+      "daybed": "Pool daybed",
+      "sunbed": "Sun lounger",
       "jacuzzi": "Jacuzzi",
       "vip": "VIP Lounge",
       "balcony": "Balcony Sofa",
       "dj": "DJ Lounge",
-      "entry": "General Entry",
-      "sold": "Sold",
-      "reserved": "Members' priority"
+      "entry": "General entry",
+      "sold": "Sold / held",
+      "reserved": "Members' priority",
+      "vipBooth": "VIP booth",
+      "upperCabana": "Upper-deck cabana",
+      "lounge": "Lounge cabana",
+      "alfresco": "Alfresco table",
+      "table": "Cocktail table"
     },
     "confirmed": {
       "title": "Reservation Confirmed",
