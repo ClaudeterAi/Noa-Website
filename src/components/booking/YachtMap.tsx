@@ -83,7 +83,7 @@ export default function YachtMap({ labels, taken, mine, reserved, closed, onSeat
            ============================================================ */}
       <g className="upper-deck-strip">
         {/* "UPPER DECK" header */}
-        <text x="700" y="22" fontFamily="Josefin Sans" fontSize="11" letterSpacing="6" textAnchor="middle" fill="#1a1a1a" pointerEvents="none">{labels.upperDeck}</text>
+        <text x="700" y="22" style={{ fontFamily: "var(--font-sans)" }} fontSize="11" letterSpacing="6" textAnchor="middle" fill="#1a1a1a" pointerEvents="none">{labels.upperDeck}</text>
 
         {/* Raised platform — slightly different deck tone to read as elevated */}
         <rect x="100" y="30" width="1240" height="280" rx="14" fill="#f3e8c9" stroke="#1a1a1a" strokeWidth="1.5"/>
@@ -103,12 +103,12 @@ export default function YachtMap({ labels, taken, mine, reserved, closed, onSeat
           <line x1="135" y1="200" x2="190" y2="200" stroke="#8a7c66" strokeWidth=".6"/>
           <line x1="135" y1="220" x2="190" y2="220" stroke="#8a7c66" strokeWidth=".6"/>
           <line x1="135" y1="240" x2="190" y2="240" stroke="#8a7c66" strokeWidth=".6"/>
-          <text x="162" y="290" textAnchor="middle" fontFamily="Josefin Sans" fontSize="7" letterSpacing="2" fill="#8a7c66">{labels.stairs}</text>
+          <text x="162" y="290" textAnchor="middle" style={{ fontFamily: "var(--font-sans)" }} fontSize="7" letterSpacing="2" fill="#8a7c66">{labels.stairs}</text>
         </g>
 
         {/* SUNDECK — 6 sunbeds in a row across the top */}
         <g>
-          <text x="465" y="74" fontFamily="Josefin Sans" fontSize="9" letterSpacing="4" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.sundeck}</text>
+          <text x="465" y="74" style={{ fontFamily: "var(--font-sans)" }} fontSize="9" letterSpacing="4" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.sundeck}</text>
           <rect className={sc("seat sunbed", "sunbed-1")} data-seat="sunbed-1" x="220" y="85" width="75" height="55" rx="4" fill="#ead8b8"/>
           <rect x="220" y="85" width="75" height="55" rx="4" fill="url(#hatch)" pointerEvents="none" opacity=".55"/>
           <text className="seat-lbl sm" x="257" y="118" pointerEvents="none">S1</text>
@@ -136,7 +136,7 @@ export default function YachtMap({ labels, taken, mine, reserved, closed, onSeat
 
         {/* JACUZZI — oval hot tub in middle-left */}
         <g>
-          <text x="360" y="170" fontFamily="Josefin Sans" fontSize="10" letterSpacing="5" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.jacuzzi}</text>
+          <text x="360" y="170" style={{ fontFamily: "var(--font-sans)" }} fontSize="10" letterSpacing="5" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.jacuzzi}</text>
           <ellipse className={sc("seat jacuzzi", "jacuzzi-1")} data-seat="jacuzzi-1" cx="360" cy="225" rx="135" ry="48" fill="url(#jacuzziGrad)" stroke="#1a1a1a" strokeWidth="1.2"/>
           <ellipse cx="360" cy="225" rx="123" ry="36" fill="#dceaee" stroke="#7fb1bf" strokeWidth=".5" opacity=".75" pointerEvents="none"/>
           <g pointerEvents="none" stroke="#7fb1bf" strokeWidth=".5" fill="none" opacity=".5">
@@ -150,7 +150,7 @@ export default function YachtMap({ labels, taken, mine, reserved, closed, onSeat
 
         {/* VIP LOUNGES — 2 premium lounges centre-right */}
         <g>
-          <text x="615" y="170" fontFamily="Josefin Sans" fontSize="10" letterSpacing="5" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.vipLounge}</text>
+          <text x="615" y="170" style={{ fontFamily: "var(--font-sans)" }} fontSize="10" letterSpacing="5" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.vipLounge}</text>
           <rect className={sc("seat vip-lounge", "vip-lounge-1")} data-seat="vip-lounge-1" x="540" y="185" width="100" height="95" rx="5" fill="url(#vipFabric)"/>
           <line x1="540" y1="200" x2="640" y2="200" stroke="#1a1a1a" strokeWidth=".5" opacity=".5" pointerEvents="none"/>
           <line x1="540" y1="265" x2="640" y2="265" stroke="#1a1a1a" strokeWidth=".5" opacity=".5" pointerEvents="none"/>
@@ -164,7 +164,7 @@ export default function YachtMap({ labels, taken, mine, reserved, closed, onSeat
 
         {/* BALCONY — 5 sofas along the right side of the platform */}
         <g>
-          <text x="1020" y="170" fontFamily="Josefin Sans" fontSize="10" letterSpacing="5" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.balcony}</text>
+          <text x="1020" y="170" style={{ fontFamily: "var(--font-sans)" }} fontSize="10" letterSpacing="5" textAnchor="middle" fill="#8a7c66" pointerEvents="none">{labels.balcony}</text>
           <rect className={sc("seat balcony-sofa", "balcony-1")} data-seat="balcony-1" x="800" y="185" width="85" height="95" rx="5" fill="#7ba1a3"/>
           <line x1="800" y1="220" x2="885" y2="220" stroke="#1a1a1a" strokeWidth=".4" opacity=".4" pointerEvents="none"/>
           <text className="seat-lbl light sm" x="842" y="240" pointerEvents="none">B1</text>
@@ -364,7 +364,7 @@ export default function YachtMap({ labels, taken, mine, reserved, closed, onSeat
         <circle cx="832" cy="345" r="11" fill="#1a1a1a" stroke="#c9a875" strokeWidth=".8" pointerEvents="none"/>
         <circle cx="832" cy="345" r="2.5" fill="#c9a875" pointerEvents="none"/>
         {/* "DJ" header inside booth, on the right (DJ standing-space side) */}
-        <text x="880" y="329" textAnchor="middle" fontFamily="Josefin Sans" fontSize="10" letterSpacing="4" fill="#c9a875" pointerEvents="none">{labels.dj}</text>
+        <text x="880" y="329" textAnchor="middle" style={{ fontFamily: "var(--font-sans)" }} fontSize="10" letterSpacing="4" fill="#c9a875" pointerEvents="none">{labels.dj}</text>
 
         {/* Row 3: entries 9-12 (15px gap from booth) */}
         <circle className={sc("seat entry", "entry-9")} data-seat="entry-9"  cx="780" cy="395" r="15"/>
@@ -425,7 +425,7 @@ export default function YachtMap({ labels, taken, mine, reserved, closed, onSeat
       </g>
 
       {/* ===== SECTION LABELS — top layer so they sit above pool/bar ===== */}
-      <g className="section-lbl" pointerEvents="none" fontFamily="Josefin Sans" fill="#8a7c66" fontWeight="400">
+      <g className="section-lbl" pointerEvents="none" style={{ fontFamily: "var(--font-sans)" }} fill="#8a7c66" fontWeight="400">
         <text x="450" y="345" fontSize="20" letterSpacing="10" textAnchor="middle" fill="#5a7480" opacity=".75">{labels.pool}</text>
         <text x="450" y="365" fontSize="8"  letterSpacing="3"  textAnchor="middle" fill="#5a7480" opacity=".55">{labels.poolSub}</text>
         <text x="865" y="190" fontSize="11" letterSpacing="6"  textAnchor="middle">{labels.entry}</text>
