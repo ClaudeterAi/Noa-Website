@@ -4,6 +4,7 @@ import {
   bookingItems, bookings, guests, holds, inventoryUnits, sessions, settings, unitTypes,
 } from "@/db/schema";
 import { canBookPriority, getVipReleaseHours, type Tier } from "./vip";
+import { broadcastSafely } from "./realtime";
 
 export type Slot = "morning" | "afternoon";
 type DbOrTx = Db | Tx;
@@ -112,6 +113,12 @@ export interface HoldResult { holdId: string; sessionId: string; unitId: string;
  *      same unit produce exactly one row; the loser gets UnitUnavailableError.
  */
 export async function createHold(input: { date: string; slot: Slot; unitId: string; cartToken: string; guestId?: string; tier?: Tier }): Promise<HoldResult> {
+  const r = await createHoldTx(input);
+  broadcastSafely(input.date, input.slot, [{ unitId: input.unitId, state: "held", heldUntil: r.expiresAt }]);
+  return r;
+}
+
+async function createHoldTx(input: { date: string; slot: Slot; unitId: string; cartToken: string; guestId?: string; tier?: Tier }): Promise<HoldResult> {
   const holdMinutes = await getSetting("hold_minutes");
   const maxPerCart = await getSetting("max_holds_per_cart");
   return db.transaction(async (tx) => {
@@ -157,14 +164,22 @@ export async function createHold(input: { date: string; slot: Slot; unitId: stri
 
 export async function releaseHold(holdId: string, cartToken: string, reason = "cart"): Promise<boolean> {
   const res = await db.update(holds).set({ releasedAt: sql`now()`, releaseReason: reason })
-    .where(and(eq(holds.id, holdId), eq(holds.cartToken, cartToken), isNull(holds.releasedAt), isNull(holds.bookingId))).returning({ id: holds.id });
+    .where(and(eq(holds.id, holdId), eq(holds.cartToken, cartToken), isNull(holds.releasedAt), isNull(holds.bookingId))).returning({ id: holds.id, unitId: holds.unitId, sessionId: holds.sessionId });
+  if (res[0]) {
+    const [s] = await db.select({ date: sessions.date, slot: sessions.slot }).from(sessions).where(eq(sessions.id, res[0].sessionId));
+    if (s) broadcastSafely(s.date, s.slot, [{ unitId: res[0].unitId, state: "free" }]);
+  }
   return res.length > 0;
 }
 
 /** Cron: release expired holds and expire pending bookings whose holds are gone. */
 export async function sweepExpired(conn: DbOrTx = db): Promise<{ holds: number; bookings: number }> {
   const released = await conn.update(holds).set({ releasedAt: sql`now()`, releaseReason: "expired" })
-    .where(and(isNull(holds.releasedAt), lt(holds.expiresAt, sql`now()`))).returning({ bookingId: holds.bookingId });
+    .where(and(isNull(holds.releasedAt), lt(holds.expiresAt, sql`now()`))).returning({ bookingId: holds.bookingId, unitId: holds.unitId, sessionId: holds.sessionId });
+  if (released.length) {
+    const sess = await conn.select({ id: sessions.id, date: sessions.date, slot: sessions.slot }).from(sessions).where(inArray(sessions.id, [...new Set(released.map((r) => r.sessionId))]));
+    for (const se of sess) broadcastSafely(se.date, se.slot, released.filter((r) => r.sessionId === se.id && !r.bookingId).map((r) => ({ unitId: r.unitId, state: "free" as const })));
+  }
   const bookingIds = [...new Set(released.map((r) => r.bookingId).filter((x): x is string => !!x))];
   let expiredBookings = 0;
   if (bookingIds.length) {
@@ -273,16 +288,21 @@ export async function confirmBookingByPaymentIntent(paymentIntentId: string): Pr
     await tx.update(bookings).set({ status: "confirmed", confirmedAt: sql`now()` }).where(eq(bookings.id, b.id));
     await tx.update(holds).set({ releasedAt: sql`now()`, releaseReason: "converted" }).where(and(eq(holds.bookingId, b.id), isNull(holds.releasedAt)));
     await tx.update(guests).set({ lastBookingAt: sql`now()` }).where(eq(guests.id, b.guestId));
+    const items = await tx.select({ unitId: bookingItems.unitId, date: sessions.date, slot: sessions.slot }).from(bookingItems).innerJoin(sessions, eq(sessions.id, bookingItems.sessionId)).where(eq(bookingItems.bookingId, b.id));
+    for (const key of new Set(items.map((i) => `${i.date}#${i.slot}`))) { const [d, sl] = key.split("#"); broadcastSafely(d, sl, items.filter((i) => `${i.date}#${i.slot}` === key).map((i) => ({ unitId: i.unitId, state: "booked" as const }))); }
     return "confirmed";
   });
 }
 
 export async function cancelBooking(bookingId: string, status: "cancelled" | "refunded" = "cancelled") {
-  await db.transaction(async (tx) => {
+  const freed = await db.transaction(async (tx) => {
+    const items = await tx.select({ unitId: bookingItems.unitId, date: sessions.date, slot: sessions.slot }).from(bookingItems).innerJoin(sessions, eq(sessions.id, bookingItems.sessionId)).where(and(eq(bookingItems.bookingId, bookingId), eq(bookingItems.active, true)));
     await tx.update(bookings).set({ status, cancelledAt: sql`now()` }).where(eq(bookings.id, bookingId));
     await tx.update(bookingItems).set({ active: false }).where(eq(bookingItems.bookingId, bookingId));
     await tx.update(holds).set({ releasedAt: sql`now()`, releaseReason: "admin" }).where(and(eq(holds.bookingId, bookingId), isNull(holds.releasedAt)));
+    return items;
   });
+  for (const key of new Set(freed.map((i) => `${i.date}#${i.slot}`))) { const [d, sl] = key.split("#"); broadcastSafely(d, sl, freed.filter((i) => `${i.date}#${i.slot}` === key).map((i) => ({ unitId: i.unitId, state: "free" as const }))); }
 }
 
 /* ------------------------------------------------------------------- guests */

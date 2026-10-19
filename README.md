@@ -148,3 +148,13 @@ Kind: regular · main (featured upcoming) · highlight (best past — kept in th
 
 Code: `src/server/events/` (enrich, kb-sync, repo, public), admin at `/admin/events`. Tests: `tests/events.test.ts`.
 Session enum gained `night` and `full` for event sessions; booking-page support for those slots is a follow-up.
+
+## Live seat map (WebSockets)
+
+```
+browser on step 2 ──wss──▶ API Gateway (noa-seatmap-ws) ──▶ Lambda $connect: store {connectionId, date#slot} in DynamoDB (TTL 3 h)
+engine: hold / release / confirm / cancel / sweep ──▶ src/server/realtime.ts: query connections for that session → PostToConnection
+browser: applies {unitId, state} instantly; polls every 30 s as a safety net (4 s when no socket); resyncs on reconnect
+```
+Correctness never depends on the socket — the database is the truth. Infra lives in AWS (eu-central-1 until the UAE move):
+DynamoDB `noa-ws-connections`, Lambda `noa-ws-connect`, API `noa-seatmap-ws` stage `prod`. Env: `NEXT_PUBLIC_WS_URL`, `WS_MANAGEMENT_ENDPOINT`, `WS_TABLE`.

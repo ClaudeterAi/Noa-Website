@@ -7,6 +7,7 @@ import { pick, registry } from "@/content/registry";
 import YachtMap from "./YachtMap";
 import PaymentPanel, { paymentsConfigured } from "./PaymentPanel";
 import { api, isApiError, type UnitAvailability, type UnitTypeInfo } from "./api";
+import { useLiveSeats } from "./useLiveSeats";
 import { ARRIVALS, DAY_IMG, unitTypes as placeholderTypes, type Slot } from "./inventory";
 
 /* ---------- helpers ---------- */
@@ -85,14 +86,31 @@ export default function BookingApp() {
       setAvail(new Map(r.units.map((u) => [u.unitId, u])));
     } catch { /* keep last known state */ }
   }, [date, slot]);
+  const inCart = useMemo(() => new Set(cart.map((c) => c.unitId)), [cart]);
+  const inCartRef = useRef(inCart); inCartRef.current = inCart;
+  /* live pushes: apply seat changes instantly; on reconnect, resync from the server */
+  const live = useLiveSeats(step >= 2 ? date : null, step >= 2 ? slot : null, (p) => {
+    skew.current = new Date(p.serverTime).getTime() - Date.now();
+    setAvail((prev) => {
+      const next = new Map(prev);
+      for (const c of p.changes) {
+        const u = next.get(c.unitId); if (!u) continue;
+        const mine = inCartRef.current.has(c.unitId);
+        next.set(c.unitId, { ...u, state: mine ? "yours" : c.state, heldUntil: c.heldUntil ?? (c.state === "free" ? undefined : u.heldUntil) });
+      }
+      return next;
+    });
+  }, () => void refresh());
+  const liveRef = useRef(live); liveRef.current = live;
   useEffect(() => {
     if (step !== 2) return;
     void refresh();
-    const id = setInterval(() => { if (document.visibilityState === "visible") void refresh(); }, 4_000);
+    // poll every 4 s without a live socket, every 30 s with one (safety net)
+    const id = setInterval(() => { if (document.visibilityState === "visible") void refresh(); }, liveRef.current ? 30_000 : 4_000);
     const onVis = () => { if (document.visibilityState === "visible") void refresh(); };
     document.addEventListener("visibilitychange", onVis);
     return () => { clearInterval(id); document.removeEventListener("visibilitychange", onVis); };
-  }, [step, refresh]);
+  }, [step, refresh, live]);
 
   /** Seat → type info from the database. Images are placeholders keyed by type until media slots are filled (Day 4). */
   const infoOf = useCallback((unitId: string) => {
@@ -101,7 +119,6 @@ export default function BookingApp() {
     const img = typeId ? placeholderTypes[typeId]?.img ?? "" : "";
     return ty ? { ...ty, name: locale === "ar" ? ty.nameAr : ty.nameEn, desc: locale === "ar" ? ty.descAr : ty.descEn, img } : null;
   }, [avail, cart, types, locale]);
-  const inCart = useMemo(() => new Set(cart.map((c) => c.unitId)), [cart]);
   const taken = useMemo(() => new Set([...avail.values()].filter((u) => (u.state === "held" || u.state === "booked") && !inCart.has(u.unitId)).map((u) => u.unitId)), [avail, inCart]);
   const reserved = useMemo(() => new Set([...avail.values()].filter((u) => u.state === "reserved").map((u) => u.unitId)), [avail]);
 
