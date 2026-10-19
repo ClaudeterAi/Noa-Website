@@ -30,7 +30,7 @@ def extract(src, deck):
             w=bb[2]-bb[0]; h=bb[3]-bb[1]
             if w<2.5 and h<2.5: continue
             # dimension leaders and section lines: single straight segments longer than 600 mm inside rooms, 2 m elsewhere
-            lim = 600 if u["type"] in ("cabana","upper-cabana","alfresco","vip-booth","lounge") else 2000
+            lim = 2200 if u["type"] in ("cabana","upper-cabana","alfresco","vip-booth","lounge") else 2000
             if len(el)==1 and (w<0.4 or h<0.4) and max(w,h)/k>lim: continue
             # arrowheads / markers: tiny closed triangles
             if 'Z' in el.d().upper() and max(w,h)<3: continue
@@ -38,7 +38,7 @@ def extract(src, deck):
             if u["type"] in ("cabana","upper-cabana","lounge","vip-booth","alfresco"):   # rooms: drop their own walls/rails; a daybed's outline IS the piece
                 uw=u["w"]*k; uh=u["h"]*k; ux=x0+u["x"]*k; uy=y0+u["y"]*k
                 near=lambda a,b,t=90*k: abs(a-b)<t
-                if (w>=0.92*uw and (near(bb[1],uy) or near(bb[3],uy+uh))) or (h>=0.92*uh and (near(bb[0],ux) or near(bb[2],ux+uw))): continue
+                if ((w>=0.92*uw and h<3*k) and (near(bb[1],uy) or near(bb[3],uy+uh))) or ((h>=0.92*uh and w<3*k) and (near(bb[0],ux) or near(bb[2],ux+uw))): continue
                 if w>=0.92*uw and h>=0.92*uh: continue
             # outer outlines that duplicate the unit block itself (the tinted base already draws that shape)
             if w/k > u["w"]*0.86 and h/k > u["h"]*0.86: continue
@@ -56,13 +56,13 @@ def extract(src, deck):
             uw0=u["w"]/50; uh0=u["h"]/50
             def usable(p):
                 d,kind,lx,ly,lw,lh,furn=p
-                if (furn!=1 and u["type"]!="lounge") or lw>=0.8*uw0 or lh>=0.8*uh0: return False
+                if lw>=0.8*uw0 or lh>=0.8*uh0: return False
                 if u["type"]=="lounge" and max(lw,lh)>16: return False   # lounge: cluster only the small pieces (poufs, side tables); sofas are ribbons
                 straight = (lw<0.4 or lh<0.4)
-                if straight and max(lw,lh)>12: return False       # section/leader lines through the room
+                if straight and max(lw,lh)>(12 if u["type"]=="lounge" else 32): return False       # section/leader lines through the room (table edges are ≤ 30)
                 return lw>=1.5 or lh>=1.5
             boxes=[[p[2],p[3],p[2]+p[4],p[3]+p[5]] for p in paths if usable(p)]
-            tol = 0.12 if u["type"]=="lounge" else 0.5     # lounge poufs touch their neighbours' seams; only merge strokes that actually meet
+            tol = 0.12 if u["type"]=="lounge" else 1.4     # lounge poufs touch their neighbours' seams; only merge strokes that actually meet
             merged=True
             while merged:
                 merged=False; out2=[]
@@ -76,7 +76,7 @@ def extract(src, deck):
             uw=u["w"]/50; uh=u["h"]/50
             for b in boxes:
                 bw=b[2]-b[0]; bh=b[3]-b[1]
-                if 3<=bw<=0.6*uw and 3<=bh<=0.9*uh: fills.append([round(b[0],1),round(b[1],1),round(bw,1),round(bh,1)])
+                if 3<=bw<=0.96*uw and 3<=bh<=0.96*uh and not (bw>=0.9*uw and bh>=0.9*uh): fills.append([round(b[0],1),round(b[1],1),round(bw,1),round(bh,1)])
         # poufs / side tables drawn as two half-outlines (top+bottom or left+right): pair them into one body
         halves=[p for p in paths if 4.5<=max(p[4],p[5])<=14 and (abs(p[5]-p[4]/2)<p[4]*0.18 or abs(p[4]-p[5]/2)<p[5]*0.18)]
         used=set()
@@ -111,6 +111,18 @@ def extract(src, deck):
 res={}
 res.update(extract("/tmp/boat/main.svg","main"))
 res.update(extract("/tmp/boat/upper.svg","upper"))
+# identical rooms: where a room's own strokes were tangled by section marks, take the bodies from its best sibling in the same row
+import collections
+byid={u["id"]:u for u in units}
+groups=collections.defaultdict(list)
+for uid,v in res.items():
+    u=byid[uid]
+    if u["type"] in ("cabana","upper-cabana","alfresco"): groups[(u["type"], u["y"]<7000, u["w"], u["h"])].append(uid)
+for key,ids in groups.items():
+    best=max(ids, key=lambda i: len(res[i]["f"]))
+    for i in ids:
+        if len(res[i]["f"]) < 0.6*len(res[best]["f"]):
+            res[i]["f"]=res[best]["f"]; res[i]["p"]=res[best]["p"]; print("sibling bodies:", i, "<-", best)
 json.dump(res, open("/home/claude/noa/src/components/booking/furniture.json","w"), separators=(",",":"))
 import os; print("units:", len(res), "paths:", sum(len(v) for v in res.values()), "size KB:", os.path.getsize("/home/claude/noa/src/components/booking/furniture.json")//1024)
 print({k:len(v) for k,v in list(res.items())[:12]})

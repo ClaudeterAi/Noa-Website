@@ -24,8 +24,6 @@ const A = (id: string, deck: Deck, kind: Amenity["kind"], x: number, y: number, 
 /* ------------------------------------------------------------------ MAIN DECK — every box measured from NA-ID-1000 vectors */
 // Extended sun deck: ten loungers along the bow rail (1153 × 601), in five pairs
 [2660, 3445, 4532, 5318, 6403, 7188, 8275, 9061, 10146, 10931].forEach((y, i) => U(`sunbed-${i + 1}`, "sunbed", "main", 673, y, 1153, 601, `S${i + 1}`));
-A("arr-bow-p", "main", "arrival", 1000, 200, 1300, 900, "Arrival / departure", "الوصول / المغادرة");
-A("arr-bow-s", "main", "arrival", 1000, 13100, 1300, 900, "Arrival / departure", "الوصول / المغادرة");
 
 // Infinity pool: bay 5000 × 12100 at the bow, channel to the steps
 A("pool-bay", "main", "pool", 2300, 1048, 5000, 12100, "Infinity pool", "المسبح اللامتناهي");
@@ -63,9 +61,7 @@ A("reception", "main", "label", 45200, 0, 3000, 3300, "Reception · foyer", "ا�
 A("wc-w-stern", "main", "restroom", 48250, 0, 3450, 3300, "Women's restroom", "دورة مياه السيدات");
 A("wc-m-stern", "main", "restroom", 48250, 10850, 3450, 3230, "Men's restroom", "دورة مياه الرجال");
 A("boh", "main", "boh", 45200, 3350, 6500, 7500, "Kitchen & service", "المطبخ والخدمات");
-A("boh-2", "main", "boh", 45200, 10850, 3050, 3230, "Staff", "الموظفون");
-A("arr-stern-p", "main", "arrival", 50300, 200, 1300, 900, "Arrival / departure", "الوصول / المغادرة");
-A("arr-stern-s", "main", "arrival", 50300, 13100, 1300, 900, "Arrival / departure", "الوصول / المغادرة");
+A("boh-2", "main", "boh", 45200, 10850, 3050, 3230, "Staff only", "للموظفين فقط");
 
 /* ------------------------------------------------------------------ UPPER DECK — from NA-ID-1100 vectors */
 A("void", "upper", "label", 30700, 4030, 10800, 6100, "Open to the dance floor below", "مفتوح على حلبة الرقص بالأسفل");
