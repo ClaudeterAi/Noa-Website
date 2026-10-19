@@ -7,10 +7,11 @@ import { AmenityIcon } from "./Icons";
 import FaqList from "./FaqList";
 import ContactForm from "./ContactForm";
 import { publishedEvents } from "@/server/events/public";
+import { getMediaMap } from "@/server/media";
 import type { EventItem } from "@/content/types";
 
-const bg = (mediaId: string): CSSProperties => {
-  const url = mediaUrl(mediaId);
+const bgFrom = (lookup: (id: string | undefined) => string | null) => (mediaId: string): CSSProperties => {
+  const url = lookup(mediaId) ?? mediaUrl(mediaId);
   return url ? { backgroundImage: `url('${url}')` } : {};
 };
 
@@ -22,6 +23,9 @@ function CtaButton({ link, locale, className = "pkg-btn" }: { link: CtaLink; loc
 }
 
 export async function SectionRenderer({ section: s, locale }: { section: Section; locale: Locale }) {
+  const media = await getMediaMap();   // admin uploads overlay the registry placeholders
+  const mUrl = (id: string | undefined) => (id ? media[id]?.url ?? null : null);
+  const bg = bgFrom(mUrl);
   const live = s.type === "eventsGrid" || s.type === "eventStrip" ? await publishedEvents() : null;
   const liveList = (ids: string[], take?: number): EventItem[] => {
     const fromDb = live?.upcoming ?? [];
@@ -30,15 +34,16 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
   };
   switch (s.type) {
     case "hero": {
-      const video = registry.media[s.media];
-      const poster = registry.media["hero-poster"] ?? registry.media["hero-still"];
-      const still = registry.media["hero-still"];
+      const video = { url: mUrl(s.media) };
+      const poster = { url: mUrl("hero-poster") ?? mUrl("hero-still") };
+      const still = { url: mUrl("hero-still") };
+      const isPlaceholderFilm = !!video.url && video.url.startsWith("/media/hero-placeholder");
       return (
         <section className="hero" id={s.id}>
           {video?.url ? (
             <video className="hero-bg hero-video" autoPlay muted loop playsInline preload="metadata" poster={poster?.url ?? undefined} aria-hidden="true">
-              <source src={video.url.replace(/\.mp4$/, ".webm")} type="video/webm" />
-              <source src={video.url} type="video/mp4" />
+              {isPlaceholderFilm && <source src={video.url.replace(/\.mp4$/, ".webm")} type="video/webm" />}
+              <source src={video.url} type={video.url.endsWith(".webm") ? "video/webm" : "video/mp4"} />
             </video>
           ) : (
             <div className="hero-bg" style={still?.url ? bg("hero-still") : undefined} data-placeholder="hero-video" />

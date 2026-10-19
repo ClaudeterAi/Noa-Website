@@ -46,3 +46,14 @@ export async function setEventStatusAction(id: string, status: "draft" | "publis
 export async function autofillEventAction(draft: EventDraft) {
   try { await requireAdmin("editor"); return ok(await autofillEvent(draft)); } catch (e) { return fail(e); }
 }
+
+/* ---------- media ---------- */
+import { assignSlot } from "@/server/media";
+
+export async function assignMediaSlotAction(slotId: string, assetId: string | null) {
+  try {
+    const actor = await requireAdmin("editor"); await assignSlot(slotId, assetId, actor.email);
+    for (const p of ["/en", "/ar", "/en/morning-package", "/ar/morning-package", "/en/afternoon-package", "/ar/afternoon-package", "/en/cabana", "/ar/cabana", "/en/about", "/ar/about", "/en/location", "/ar/location", "/en/faq", "/ar/faq", "/en/contact", "/ar/contact", "/en/events", "/ar/events"]) revalidatePath(p);
+    revalidatePath("/admin/media"); return ok();
+  } catch (e) { return fail(e); }
+}
