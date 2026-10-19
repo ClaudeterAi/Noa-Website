@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { cancelAction, refundAction, retryNotificationAction, setSessionStatusAction, setTierAction, updateSettingAction, updateUnitAction, updateUnitTypeAction } from "./actions";
+import { cancelAction, refundAction, retryNotificationAction, setCallbackStatusAction, setSessionStatusAction, setTierAction, updateSettingAction, updateUnitAction, updateUnitTypeAction } from "./actions";
 
 type R = { ok: boolean; error?: string };
 function useAct() {
@@ -57,11 +57,11 @@ export function Toggle({ on, label, onToggle }: { on: boolean; label: string; on
 export const UnitVipToggle = ({ id, on }: { id: string; on: boolean }) => <Toggle on={on} label="Members priority" onToggle={(n) => updateUnitAction(id, { vipPriority: n })} />;
 export const UnitActiveToggle = ({ id, on }: { id: string; on: boolean }) => <Toggle on={on} label="Active" onToggle={(n) => updateUnitAction(id, { active: n })} />;
 
-export function SettingField({ k, value, kind }: { k: "hold_minutes" | "hold_extension_minutes" | "vat_rate" | "vip_release_hours" | "tier_rules" | "max_holds_per_cart"; value: unknown; kind: "int" | "rate" | "json" }) {
+export function SettingField({ k, value, kind }: { k: "hold_minutes" | "hold_extension_minutes" | "vat_rate" | "vip_release_hours" | "tier_rules" | "max_holds_per_cart" | "ops_email" | "shuttle_alert_hours"; value: unknown; kind: "int" | "rate" | "json" }) {
   const { pending, err, run } = useAct();
   const [v, setV] = useState(kind === "json" ? JSON.stringify(value, null, 2) : String(value ?? ""));
   const save = () => run(async () => {
-    try { const parsed = kind === "json" ? JSON.parse(v) : Number(v); return await updateSettingAction(k, parsed); } catch (e) { return { ok: false, error: String(e) }; }
+    try { const parsed = kind === "json" ? JSON.parse(v) : k === "ops_email" ? v.trim() : Number(v); return await updateSettingAction(k, parsed); } catch (e) { return { ok: false, error: String(e) }; }
   });
   return (
     <div className="card">
@@ -75,4 +75,10 @@ export function SettingField({ k, value, kind }: { k: "hold_minutes" | "hold_ext
 export function RetryButton({ id }: { id: string }) {
   const { pending, err, run } = useAct();
   return <span className="row"><button type="button" className="ghost" disabled={pending} onClick={() => run(() => retryNotificationAction(id))}>Retry</button>{err && <span className="err">{err}</span>}</span>;
+}
+
+export function CallbackToggle({ id, status }: { id: string; status: string }) {
+  const { pending, err, run } = useAct();
+  const next = status === "done" ? "open" : "done";
+  return <span className="row"><button type="button" className={next === "done" ? "" : "ghost"} disabled={pending} onClick={() => run(() => setCallbackStatusAction(id, next))}>{next === "done" ? "Mark done" : "Reopen"}</button>{err && <span className="err">{err}</span>}</span>;
 }

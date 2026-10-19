@@ -22,6 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/admin/media">Media</Link>
             <Link href="/admin/guests">Guests</Link>
             <Link href="/admin/inventory">Inventory</Link>
+            <Link href="/admin/callbacks">Call-backs</Link>
             <Link href="/admin/notifications">Messages</Link>
             {s.role === "owner" && <Link href="/admin/settings">Settings</Link>}
             <Link href="/admin/audit">Audit</Link>

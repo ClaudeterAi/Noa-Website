@@ -139,7 +139,7 @@ export async function listSessions(from: string, to: string) {
 
 /* ---------- settings ---------- */
 
-const SETTING_KEYS = ["hold_minutes", "hold_extension_minutes", "vat_rate", "vip_release_hours", "tier_rules", "max_holds_per_cart"] as const;
+const SETTING_KEYS = ["hold_minutes", "hold_extension_minutes", "vat_rate", "vip_release_hours", "tier_rules", "max_holds_per_cart", "ops_email", "shuttle_alert_hours"] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
 export async function listSettings() {
@@ -149,7 +149,8 @@ export async function listSettings() {
 
 export async function updateSetting(actor: Actor, key: SettingKey, value: unknown) {
   if (!SETTING_KEYS.includes(key)) throw new Error("Unknown setting");
-  if (["hold_minutes", "hold_extension_minutes", "vip_release_hours", "max_holds_per_cart"].includes(key) && (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 1440)) throw new Error(`${key} must be 1–1440`);
+  if (key === "ops_email" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(value))) throw new Error("ops_email must be an email address");
+  if (["hold_minutes", "hold_extension_minutes", "vip_release_hours", "max_holds_per_cart", "shuttle_alert_hours"].includes(key) && (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 1440)) throw new Error(`${key} must be 1–1440`);
   if (key === "vat_rate" && (typeof value !== "number" || value < 0 || value > 1)) throw new Error("vat_rate must be between 0 and 1");
   const [before] = await db.select().from(settings).where(eq(settings.key, key));
   const [after] = await db.insert(settings).values({ key, value: value as Record<string, unknown> }).onConflictDoUpdate({ target: settings.key, set: { value: value as Record<string, unknown>, updatedAt: sql`now()` } }).returning();
@@ -170,4 +171,17 @@ export async function retryNotification(actor: Actor, id: string) {
 }
 export async function listAudit(limit = 200) {
   return db.select().from(auditLog).orderBy(desc(auditLog.createdAt)).limit(limit);
+}
+
+/* ---------- call-back requests ---------- */
+import { callbackRequests } from "@/db/schema";
+
+export async function listCallbacks(status?: "open" | "done") {
+  return db.select().from(callbackRequests).where(status ? eq(callbackRequests.status, status) : undefined).orderBy(desc(callbackRequests.createdAt)).limit(300);
+}
+export async function setCallbackStatus(actor: Actor, id: string, status: "open" | "done") {
+  const [before] = await db.select().from(callbackRequests).where(eq(callbackRequests.id, id));
+  if (!before) throw new Error("Not found");
+  await db.update(callbackRequests).set({ status, handledBy: status === "done" ? actor.email : null, handledAt: status === "done" ? sql`now()` : null }).where(eq(callbackRequests.id, id));
+  await audit(actor, "callback.status", "callback_requests", id, { status: before.status }, { status });
 }

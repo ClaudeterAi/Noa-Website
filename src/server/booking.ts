@@ -12,7 +12,7 @@ type DbOrTx = Db | Tx;
 
 /* ------------------------------------------------------------------ settings */
 
-const DEFAULTS = { hold_minutes: 7, hold_extension_minutes: 3, vat_rate: 0.05, max_holds_per_cart: 6 } as const;
+const DEFAULTS = { hold_minutes: 7, hold_extension_minutes: 3, vat_rate: 0.05, max_holds_per_cart: 6, ops_email: "hello@noa-dubai.com", shuttle_alert_hours: 2 } as const;
 type SettingKey = keyof typeof DEFAULTS;
 
 export async function getSetting<K extends SettingKey>(key: K, conn: DbOrTx = db): Promise<(typeof DEFAULTS)[K]> {

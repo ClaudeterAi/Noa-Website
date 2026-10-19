@@ -57,3 +57,7 @@ export async function assignMediaSlotAction(slotId: string, assetId: string | nu
     revalidatePath("/admin/media"); return ok();
   } catch (e) { return fail(e); }
 }
+
+export async function setCallbackStatusAction(id: string, status: "open" | "done") {
+  try { const actor = await requireAdmin("frontdesk"); await A.setCallbackStatus(actor, id, status); revalidatePath("/admin/callbacks"); return ok(); } catch (e) { return fail(e); }
+}

@@ -23,6 +23,8 @@ export async function seed(opts: { onlyIfEmpty?: boolean } = {}) {
 
   await db.insert(settings).values([
     { key: "hold_minutes", value: 7 },
+    { key: "ops_email", value: "hello@noa-dubai.com" },          // staff alerts: new bookings, call-back requests
+    { key: "shuttle_alert_hours", value: 2 },                    // hours before arrival for the shuttle WhatsApp/email
     { key: "max_holds_per_cart", value: 6 },
     { key: "hold_extension_minutes", value: 3 },
     { key: "vat_rate", value: 0.05 },

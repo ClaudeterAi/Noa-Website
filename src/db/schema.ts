@@ -309,3 +309,21 @@ export const mediaSlots = pgTable("media_slots", {
   updatedBy: text("updated_by"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/* ---------------- call-back requests (voice/chat hand-off to staff) ---------------- */
+
+export const callbackRequests = pgTable("callback_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email"),
+  topic: text("topic").notNull(),              // group | private-hire | press | complaint | change-booking | other
+  notes: text("notes"),
+  locale: text("locale").notNull().default("en"),
+  source: text("source").notNull(),            // voice | chat | web
+  bookingRef: text("booking_ref"),
+  status: text("status").notNull().default("open"),   // open | done
+  handledBy: text("handled_by"),
+  handledAt: timestamp("handled_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index("callback_status_idx").on(t.status, t.createdAt)]);

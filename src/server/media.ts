@@ -30,9 +30,9 @@ export function siteSlots() {
 }
 
 export async function presignUpload(input: { filename: string; mime: string; bytes: number }, actor: string) {
-  const b = bucket(); if (!b) throw new Error("S3_MEDIA_BUCKET is not configured");
   const allowed = ALLOWED[input.mime]; if (!allowed) throw new Error(`Unsupported file type ${input.mime}`);
   if (input.bytes <= 0 || input.bytes > MAX_BYTES[allowed.kind]) throw new Error(`File too large (max ${MAX_BYTES[allowed.kind] / 1024 / 1024} MB)`);
+  const b = bucket(); if (!b) throw new Error("S3_MEDIA_BUCKET is not configured");
   const safe = input.filename.toLowerCase().replace(/\.[a-z0-9]+$/, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "").slice(0, 60) || "file";
   const key = `media/${createHash("sha256").update(`${actor}:${randomUUID()}`).digest("hex").slice(0, 12)}/${safe}.${allowed.ext}`;
   // size is verified at register time via HEAD; no ContentLength in the signature so any client can PUT

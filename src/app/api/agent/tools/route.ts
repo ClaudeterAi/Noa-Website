@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     let tier: "guest" | "preferred" | "vip" = "guest"; let guestId: string | undefined;
     const gid = b.guest_session ? verifyGuestSessionValue(b.guest_session) : null;
     if (gid) { const [g] = await db.select({ id: guests.id, tier: guests.tier }).from(guests).where(eq(guests.id, gid)); if (g) { tier = g.tier; guestId = g.id; } }
-    const result = await runTool(b.tool, b.input, { cartToken: b.cart_token, locale: b.locale, tier, guestId });
+    const result = await runTool(b.tool, b.input, { cartToken: b.cart_token, locale: b.locale, tier, guestId, source: "voice" });
     return json(result);
   } catch (e) { return error(422, "VALIDATION_ERROR", e instanceof Error ? e.message : "Invalid request"); }
 }

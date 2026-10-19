@@ -3,7 +3,8 @@ import { eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { bookings, payments, webhookEvents } from "@/db/schema";
 import { confirmBookingByPaymentIntent } from "@/server/booking";
-import { enqueueBookingMessages } from "@/server/notifications/outbox";
+import { enqueueBookingMessages, enqueueStaffEmail } from "@/server/notifications/outbox";
+import { staffBookingSummary } from "@/server/notifications/staff";
 import { stripe } from "@/server/stripe";
 
 export const runtime = "nodejs";
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
           const refund = await s.refunds.create({ payment_intent: pi.id, reason: "requested_by_customer", metadata: { reason: "hold_expired" } }, { idempotencyKey: `late-${pi.id}` });
           if (b) await db.insert(payments).values({ bookingId: b.id, provider: "stripe", providerId: refund.id, kind: "refund", amount: refund.amount, status: "refunded", raw: refund as unknown as Record<string, unknown> }).onConflictDoNothing();
         }
-        if (b && outcome === "confirmed") await enqueueBookingMessages(b.id, "booking_confirmed");
+        if (b && outcome === "confirmed") { await enqueueBookingMessages(b.id, "booking_confirmed"); const st = await staffBookingSummary(b.id); if (st) await enqueueStaffEmail(st.to, "staff_new_booking", st.subject, st.text, undefined, b.id); }
         if (b && outcome === "late") await enqueueBookingMessages(b.id, "booking_late_refunded");
       }
     }

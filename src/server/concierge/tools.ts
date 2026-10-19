@@ -1,6 +1,8 @@
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import { db } from "@/db/client";
-import { holds, inventoryUnits, sessions, unitTypes } from "@/db/schema";
+import { callbackRequests, holds, inventoryUnits, sessions, unitTypes } from "@/db/schema";
+import { enqueueStaffEmail } from "@/server/notifications/outbox";
+import { getSetting } from "@/server/booking";
 import { CartLimitError, createHold, getAvailability, listUnitTypes, releaseHold, UnitReservedError, UnitUnavailableError, type Slot } from "@/server/booking";
 import type { Tier } from "@/server/vip";
 import { navTargets } from "./sitemap";
@@ -10,7 +12,7 @@ import { navTargets } from "./sitemap";
  * cart token the booking page uses, so a seat held in chat or by voice appears in the guest's
  * cart on /booking and payment happens there (no card data ever passes through an agent).
  */
-export interface AgentContext { cartToken: string; locale: "en" | "ar"; tier: Tier; guestId?: string }
+export interface AgentContext { cartToken: string; locale: "en" | "ar"; tier: Tier; guestId?: string; source?: "chat" | "voice" }
 
 const SLOT = { morning: { en: "Morning (9:30 AM–2:00 PM)", ar: "الصباح (9:30 ص–2:00 م)" }, afternoon: { en: "Afternoon (2:00–9:30 PM)", ar: "بعد الظهر (2:00–9:30 م)" }, night: { en: "Night session", ar: "الجلسة الليلية" }, full: { en: "Full day", ar: "يوم كامل" } } as const;
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
@@ -42,6 +44,11 @@ export const toolDefinitions = [
     input_schema: { type: "object", properties: {}, required: [] },
   },
   {
+    name: "request_callback",
+    description: "Hand the guest to a person: record a call-back request for NOA staff (groups of 12+, private hire, corporate events, press, complaints, changes to a paid reservation, anything you cannot do). Ask for name and phone first; topic must be one of group, private-hire, press, complaint, change-booking, other. Staff are notified immediately.",
+    input_schema: { type: "object", properties: { name: { type: "string" }, phone: { type: "string" }, email: { type: "string" }, topic: { type: "string", enum: ["group", "private-hire", "press", "complaint", "change-booking", "other"] }, notes: { type: "string", description: "what the guest wants, in one or two sentences" }, booking_ref: { type: "string" } }, required: ["name", "phone", "topic"] },
+  },
+  {
     name: "find_page",
     description: "Find the page (and section) on the NOA website that answers a navigation request, e.g. 'cabana prices', 'how do I get there'. Returns the path to link to or navigate to.",
     input_schema: { type: "object", properties: { query: { type: "string" } }, required: ["query"] },
@@ -58,6 +65,7 @@ export async function runTool(name: ToolName, input: Record<string, unknown>, ct
     case "get_cart": return cart(ctx);
     case "checkout_link": return { url: `/${ctx.locale}/booking`, note: ctx.locale === "ar" ? "يُفتح الدفع في صفحة الحجز؛ المقاعد المحجوزة تظهر في السلة." : "Payment opens on the booking page; held seats are already in the cart." };
     case "find_page": return findPage(String(input.query), ctx.locale);
+    case "request_callback": return requestCallback(input, ctx);
   }
 }
 
@@ -119,4 +127,13 @@ export function findPage(query: string, locale: "en" | "ar") {
   if (!best || score(best) === 0) return { path: `/${locale}`, page: "home", title: targets[0]?.title ?? "NOA" };
   const section = best.sections.find((s) => s.label && q.includes(s.label.toLowerCase().split(" ")[0]) && s.label.length > 3);
   return { path: section ? `${best.path}#${section.id}` : best.path, page: best.page, section: section?.id, title: best.title };
+}
+
+export async function requestCallback(input: Record<string, unknown>, ctx: AgentContext) {
+  const name = String(input.name ?? "").trim(), phone = String(input.phone ?? "").trim(), topic = String(input.topic ?? "other");
+  if (name.length < 2 || phone.replace(/\D/g, "").length < 7) return { error: "A name and a reachable phone number are required before requesting a call-back." };
+  const [row] = await db.insert(callbackRequests).values({ name, phone, email: input.email ? String(input.email).trim().toLowerCase() : null, topic, notes: input.notes ? String(input.notes).slice(0, 1000) : null, locale: ctx.locale, source: ctx.source ?? "chat", bookingRef: input.booking_ref ? String(input.booking_ref) : null }).returning();
+  const to = await getSetting("ops_email");
+  await enqueueStaffEmail(to, "staff_callback", `Call-back request · ${topic} · ${name}`, [`Name: ${name}`, `Phone: ${phone}`, `Email: ${row.email ?? "—"}`, `Topic: ${topic}`, `Booking: ${row.bookingRef ?? "—"}`, `Language: ${ctx.locale}`, `Via: ${row.source}`, "", row.notes ?? ""].join("\n"));
+  return { recorded: true, id: row.id, next_step: ctx.locale === "ar" ? "أخبر الضيف أن فريق نوا سيتصل به قريباً خلال ساعات العمل." : "Tell the guest the NOA team will call them back during opening hours." };
 }
