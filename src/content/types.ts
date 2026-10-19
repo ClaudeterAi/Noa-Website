@@ -85,6 +85,9 @@ export interface EventItem {
   artist: L;
   media?: string;
   isPlaceholder: boolean;
+  /** from the database: regular | main | highlight, and published | past */
+  kind?: string;
+  status?: string;
 }
 
 export interface Faq {
@@ -110,7 +113,15 @@ interface Base {
 }
 
 export type Section =
-  | (Base & { type: "hero"; media: string })
+  | (Base & { type: "hero"; media: string; quiet?: boolean })
+  /* editorial home (design pass 2) */
+  | (Base & { type: "editorialIntro"; eyebrow: L; heading: L; paragraphs: L[]; facts: { label: L; lines: L[] }[]; link?: CtaLink; media: string[] })
+  | (Base & { type: "tileCarousels"; tiles: { media: string[]; heading: L; sub: L; caption?: L; href?: Href }[] })
+  | (Base & { type: "packageEditorial"; packageId: string; flip?: boolean })
+  | (Base & { type: "galleryCarousel"; heading: L; sub: L; media: string[]; link?: CtaLink })
+  | (Base & { type: "textPortrait"; heading: L; sub: L; paragraphs: L[]; media: string; link?: CtaLink; flip?: boolean })
+  | (Base & { type: "posterCarousel"; heading: L; sub?: L; source: "upcoming" | "highlights"; aspect: "2/3" | "1/1"; href: Href; fallbackMedia: string[] })
+  | (Base & { type: "newsletter"; kicker: L; heading: L; body: L })
   | (Base & { type: "ticker"; items: L[] })
   | (Base & { type: "split"; cells: { media: string; heading: L; sub: L; href?: Href }[] })
   | (Base & { type: "package"; packageId: string; flip?: boolean })

@@ -173,3 +173,13 @@ Email → Cognito emails a one-time code (native `USER_AUTH` + `EMAIL_OTP`, no L
 `noa_guest` cookie the engine already honours: VIP/preferred priority seats, "welcome back" with the last seat, details pre-filled
 at checkout. Routes: `/api/guest/start`, `/verify`, `/me`, `/signout`. Code: `src/server/guest-auth.ts`, `src/components/booking/GuestSignIn.tsx`.
 Cognito's default sender is capped at 50 emails/day; before launch point the pools at SES on NOA's domain.
+
+## Editorial home (design pass 2)
+
+Home page rebuilt on the grammar of the reference study (yonabeach.com): photography framed by white margins, text beside images
+never on them (hero excepted), 35/65 asymmetry mirrored section to section, framed carousels with thin arrows outside the frame,
+centred headings, warm neutrals, 96–160px between sections. New section types in `src/content/types.ts`: editorialIntro,
+tileCarousels, packageEditorial, galleryCarousel, textPortrait, posterCarousel (upcoming 2:3 / highlights 1:1 from the database),
+newsletter (`POST /api/newsletter` → marketing consent on the guest record). Carousel: `src/components/ui/Carousel.tsx` (scroll-snap,
+no library). Placeholder photography is curated Unsplash, every slot replaceable from `/admin/media`. The old section types remain
+for the inner pages until those get the same treatment.

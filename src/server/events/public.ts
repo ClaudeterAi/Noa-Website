@@ -16,7 +16,7 @@ export async function publishedEvents(): Promise<{ upcoming: EventItem[]; highli
       const head = e.lineup.find((a) => a.role === "headliner") ?? e.lineup[0];
       const artist = head ? `${head.name}${head.origin ? ` · ${head.origin}` : ""}` : (e.pitchEn ?? "");
       const l = (en: string, ar: string): L => ({ en, ar: ar || en, arStatus: e.arStatus === "reviewed" ? "reviewed" : "draft" });
-      return { id: e.id, date: e.date, dateLabel: l(label("en"), label("ar")), shortDate: l(short("en"), short("ar")), name: l(e.titleEn, e.titleAr ?? ""), artist: l(artist, artist), media: e.media.poster, isPlaceholder: false };
+      return { id: e.id, date: e.date, dateLabel: l(label("en"), label("ar")), shortDate: l(short("en"), short("ar")), name: l(e.titleEn, e.titleAr ?? ""), artist: l(artist, artist), media: e.media.poster, isPlaceholder: false, kind: e.kind, status: e.status };
     };
     return {
       upcoming: rows.filter((e) => e.status === "published" && e.date >= today).sort((a, b) => (b.kind === "main" ? 1 : 0) - (a.kind === "main" ? 1 : 0) || b.sortWeight - a.sortWeight || a.date.localeCompare(b.date)).map(toItem),
