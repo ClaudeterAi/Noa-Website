@@ -1395,3 +1395,6 @@ footer a:hover{color:#fff;}
 .yacht-map .seat-g.closed .seat{fill:rgba(255,255,255,.6)!important;}
 /* tiny SVG labels: exact advances, no pixel-snapped glyph gaps */
 .yacht-map text{text-rendering:geometricPrecision;}
+
+/* Safari refused autoplay (Low Power Mode): show the still instead of a paused frame with a play glyph */
+.hero-video.hero-video-blocked{opacity:0;}
