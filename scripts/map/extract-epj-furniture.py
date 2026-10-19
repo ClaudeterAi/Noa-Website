@@ -29,15 +29,53 @@ def extract(src, deck):
             if dash and dash not in ("none",""): continue
             w=bb[2]-bb[0]; h=bb[3]-bb[1]
             if w<2.5 and h<2.5: continue
-            # dimension leaders: single straight segments longer than 2 m
-            if len(el)==1 and (w<0.4 or h<0.4) and max(w,h)/k>2000: continue
+            # dimension leaders and section lines: single straight segments longer than 600 mm inside rooms, 2 m elsewhere
+            lim = 600 if u["type"] in ("cabana","upper-cabana","alfresco","vip-booth","lounge") else 2000
+            if len(el)==1 and (w<0.4 or h<0.4) and max(w,h)/k>lim: continue
             # arrowheads / markers: tiny closed triangles
             if 'Z' in el.d().upper() and max(w,h)<3: continue
+            # perimeter outlines of the unit itself (walls, posts rails): anything spanning ≥ 92% of the box in either axis along an edge
+            if u["type"] in ("cabana","upper-cabana","lounge","vip-booth","alfresco"):   # rooms: drop their own walls/rails; a daybed's outline IS the piece
+                uw=u["w"]*k; uh=u["h"]*k; ux=x0+u["x"]*k; uy=y0+u["y"]*k
+                near=lambda a,b,t=90*k: abs(a-b)<t
+                if (w>=0.92*uw and (near(bb[1],uy) or near(bb[3],uy+uh))) or (h>=0.92*uh and (near(bb[0],ux) or near(bb[2],ux+uw))): continue
+                if w>=0.92*uw and h>=0.92*uh: continue
+            # outer outlines that duplicate the unit block itself (the tinted base already draws that shape)
+            if w/k > u["w"]*0.86 and h/k > u["h"]*0.86: continue
             p=Path(el.d(relative=False)); p*=f"scale({1/k/50}) translate({-(x0+u['x']*k)},{-(y0+u['y']*k)})"; p.reify()
             d=re.sub(r"(-?\d+\.\d{2,})", lambda m: f"{float(m.group(1)):.1f}", p.d(relative=False))
             closed = any(isinstance(s, Close) for s in el) or (abs(el.first_point - el.current_point) < 0.6 if el.first_point is not None and el.current_point is not None else False)
-            paths.append([d, 1 if closed else 0, 1 if st=="#767676" else 0])
-        out[u["id"]]=paths
+            # bbox in unit-local map units, so the renderer can lay a soft cushion/table fill under open polylines too
+            lx=(bb[0]-(x0+u['x']*k))/k/50; ly=(bb[1]-(y0+u['y']*k))/k/50; lw=w/k/50; lh=h/k/50
+            segs=len(el)
+            pad = 1 if closed else (2 if (segs>=3 and 5<=lw<=42 and 5<=lh<=42) else 0)   # 2 = cushion-like open polyline
+            paths.append([d, pad, round(lx,1), round(ly,1), round(lw,1), round(lh,1), 1 if st=="#767676" else 0])
+        # furniture pieces as connected groups of strokes → one soft fill per piece (sofas, tables, poufs); rooms only
+        fills=[]
+        if u["type"] in ("cabana","upper-cabana","alfresco","vip-booth"):
+            uw0=u["w"]/50; uh0=u["h"]/50
+            def usable(p):
+                d,kind,lx,ly,lw,lh,furn=p
+                if furn!=1 or lw>=0.8*uw0 or lh>=0.8*uh0: return False
+                straight = (lw<0.4 or lh<0.4)
+                if straight and max(lw,lh)>12: return False       # section/leader lines through the room
+                return lw>=1.5 or lh>=1.5
+            boxes=[[p[2],p[3],p[2]+p[4],p[3]+p[5]] for p in paths if usable(p)]
+            merged=True
+            while merged:
+                merged=False; out2=[]
+                while boxes:
+                    a=boxes.pop()
+                    for i,b in enumerate(out2):
+                        if a[0]<=b[2]+0.5 and a[2]>=b[0]-0.5 and a[1]<=b[3]+0.5 and a[3]>=b[1]-0.5:
+                            out2[i]=[min(a[0],b[0]),min(a[1],b[1]),max(a[2],b[2]),max(a[3],b[3])]; merged=True; break
+                    else: out2.append(a)
+                boxes=out2
+            uw=u["w"]/50; uh=u["h"]/50
+            for b in boxes:
+                bw=b[2]-b[0]; bh=b[3]-b[1]
+                if 3<=bw<=0.6*uw and 3<=bh<=0.9*uh: fills.append([round(b[0],1),round(b[1],1),round(bw,1),round(bh,1)])
+        out[u["id"]]={"p":paths,"f":fills}
     return out
 res={}
 res.update(extract("/tmp/boat/main.svg","main"))

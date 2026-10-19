@@ -1153,3 +1153,10 @@ body{font-weight:300;}
 .yacht-map .seat-g.reserved .seat{stroke-dasharray:2 1.5;fill:rgba(255,255,255,.35)!important;}
 .yacht-map .seat-g.closed .seat{fill:rgba(255,255,255,.6)!important;stroke-opacity:.3;cursor:not-allowed;}
 .yacht-map .seat-g.taken text,.yacht-map .seat-g.closed text{opacity:.5;}
+/* interactive layer stays invisible until a state applies — the illustration carries the look */
+.yacht-map .seat{stroke:none;fill:transparent;}
+.yacht-map .seat-g:not(.taken):not(.closed):hover .seat{fill:rgba(255,255,255,.18);stroke:rgba(24,122,128,.9);stroke-width:1.2;}
+.yacht-map .seat-g.mine .seat{fill:rgba(24,122,128,.16)!important;stroke:var(--bar,#187A80);stroke-width:1.6;}
+.yacht-map .seat-g.taken .seat{fill:rgba(90,74,54,.32)!important;stroke:none;}
+.yacht-map .seat-g.reserved .seat{stroke:rgba(90,74,54,.7);stroke-dasharray:2 1.5;stroke-width:.8;fill:rgba(255,255,255,.3)!important;}
+.yacht-map .seat-g.closed .seat{fill:rgba(255,255,255,.6)!important;}

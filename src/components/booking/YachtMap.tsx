@@ -4,7 +4,8 @@ import type { MouseEvent } from "react";
 import { BOAT_AMENITIES, BOAT_UNITS, HULL, SCALE, type Deck } from "./boat";
 import furniture from "./furniture.json";
 
-const FURN = furniture as unknown as Record<string, [string, number, number][]>;
+type Strokes = [string, number, number, number, number, number, number][];
+const FURN = furniture as unknown as Record<string, { p: Strokes; f: [number, number, number, number][] }>;
 
 export interface YachtLabels { bow: string; stern: string; port: string; starboard: string; main: string; upper: string; locale: "en" | "ar" }
 
@@ -58,7 +59,12 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         <linearGradient id="loungeFabric" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#d2a776" /><stop offset="1" stopColor="#bb8f5c" /></linearGradient>
         <linearGradient id="vipFabric" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#c9a26e" /><stop offset="1" stopColor="#a67e4e" /></linearGradient>
         <linearGradient id="linen" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#efe4cf" /><stop offset="1" stopColor="#e4d5b9" /></linearGradient>
-        <filter id="lift" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy=".9" stdDeviation=".9" floodColor="#4a3a24" floodOpacity=".28" /></filter>
+        <filter id="lift" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="1.6" stdDeviation="1.5" floodColor="#4a3a24" floodOpacity=".32" /></filter>
+        <filter id="piece" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy=".6" stdDeviation=".45" floodColor="#4a3a24" floodOpacity=".28" /></filter>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.2" /></filter>
+        <linearGradient id="cushion" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#fdfaf4" /><stop offset="1" stopColor="#ebe2d0" /></linearGradient>
+        <linearGradient id="edgeLight" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#fff" stopOpacity=".55" /><stop offset=".35" stopColor="#fff" stopOpacity="0" /><stop offset="1" stopColor="#3a2c1c" stopOpacity=".16" /></linearGradient>
+        <radialGradient id="poolDepth" cx="50%" cy="50%" r="70%"><stop offset="0" stopColor="#d4e9ec" /><stop offset=".7" stopColor="#a9d0d7" /><stop offset="1" stopColor="#8fbfc8" /></radialGradient>
       </defs>
 
       <text x={-PAD + 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(-90 ${-PAD + 7} ${H / 2})`}>{labels.bow}</text>
@@ -68,7 +74,7 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
 
       {/* 1 · deck */}
       {deck === "main"
-        ? <path d={hull} fill="url(#hullGrad)" stroke={INK} strokeWidth="1.1" filter="url(#hullShadow)" />
+        ? <><path d={hull} fill="url(#hullGrad)" stroke="#8a7a63" strokeWidth=".9" filter="url(#hullShadow)" /><path d={hull} fill="none" stroke="#3a2c1c" strokeWidth="6" strokeOpacity=".06" filter="url(#soft)" /></>
         : <><path d={hull} fill="none" stroke={INK_SOFT} strokeWidth=".7" strokeDasharray="3 3" opacity=".6" /><path d={slab} fill="url(#hullGrad)" stroke={INK} strokeWidth="1.1" filter="url(#hullShadow)" /></>}
       <path d={deck === "main" ? hull : slab} fill="url(#planks)" pointerEvents="none" />
 
@@ -77,7 +83,13 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         const x = sx(a.x), y = sy(a.y), w = sx(a.w), h = sx(a.h), cx = x + w / 2, cy = y + h / 2, nm = a.name[L]?.toUpperCase() ?? "";
         const cap = (fs: number, yy: number, color = INK_SOFT, ls = 1) => (nm ? <text x={cx} y={yy} fontSize={fs} letterSpacing={ls} fill={color} style={F} textAnchor="middle" pointerEvents="none">{nm}</text> : null);
         switch (a.kind) {
-          case "pool": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="1.2" fill="url(#poolGrad)" stroke="#8fb7bf" strokeWidth=".7" /><rect x={x + 1.2} y={y + 1.2} width={w - 2.4} height={h - 2.4} rx="1" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth=".5" />{[0.3, 0.6].map((q) => <path key={q} d={`M${x + 4},${y + h * q} q${w / 8},-1.4 ${w / 4},0 t${w / 4},0 t${w / 4},0`} fill="none" stroke="#fff" strokeOpacity=".45" strokeWidth=".6" />)}{cap(6.5, cy + 2.4, "#2f6b74", 2.4)}</g>;
+          case "pool": return <g key={a.id} pointerEvents="none">
+            <rect x={x} y={y} width={w} height={h} rx="1.2" fill="url(#poolDepth)" />
+            <rect x={x} y={y} width={w} height={h} rx="1.2" fill="none" stroke="#5f8f98" strokeWidth="2.2" strokeOpacity=".35" filter="url(#soft)" />
+            <rect x={x + 0.6} y={y + 0.6} width={w - 1.2} height={h - 1.2} rx="1" fill="none" stroke="#fff" strokeOpacity=".55" strokeWidth=".6" />
+            {[0.28, 0.5, 0.72].map((q) => <path key={q} d={`M${x + 5},${y + h * q} q${w / 10},-1.2 ${w / 5},0 t${w / 5},0 t${w / 5},0 t${w / 5},0`} fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth=".7" strokeLinecap="round" />)}
+            {cap(6.5, cy + 2.4, "#245f68", 2.4)}
+          </g>;
           case "stairs": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="1" fill="#efe8da" stroke={INK_SOFT} strokeWidth=".5" />{Array.from({ length: 8 }).map((_, i) => <line key={i} x1={x + 1.5} y1={y + 2 + (i * (h - 4)) / 7} x2={x + w - 1.5} y2={y + 2 + (i * (h - 4)) / 7} stroke={INK_SOFT} strokeWidth=".45" />)}</g>;
           case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="#efe7d7" stroke={INK_SOFT} strokeWidth=".6" strokeDasharray="4 2.5" />{nm && <text x={x + w * 0.78} y={cy + 2} fontSize="5.4" letterSpacing="2.2" fill={INK_SOFT} style={F} textAnchor="middle" pointerEvents="none">{nm}</text>}</g>;
           case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="#e4dac6" stroke={INK} strokeWidth=".5" strokeDasharray="2.5 1.5" /><rect x={x + 8} y={y + 8} width={w - 16} height={h - 16} rx="1.5" fill="none" stroke={INK} strokeWidth=".4" strokeDasharray="2 1.5" />{cap(4.4, cy + 1.6, INK, 1.2)}</g>;
@@ -95,15 +107,24 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
       {units.map((u) => {
         const x = sx(u.x), y = sy(u.y), w = sx(u.w), h = sx(u.h), round = !!u.r && u.r >= u.w / 2;
         const fill = { cabana: "url(#cabFabric)", "upper-cabana": "url(#cabFabric)", lounge: "url(#loungeFabric)", "vip-booth": "url(#vipFabric)", daybed: "url(#linen)", sunbed: "url(#linen)", table: "#efe6d3", alfresco: "url(#linen)" }[u.type] ?? "#efe6d3";
-        const lifted = u.type !== "table";
-        const lines = FURN[u.id] ?? [];
+        const lifted = true;
+        const lines = FURN[u.id]?.p ?? [], pieces = FURN[u.id]?.f ?? [];
         return (
           <g key={`f-${u.id}`} transform={`translate(${x} ${y})`} pointerEvents="none" filter={lifted ? "url(#lift)" : undefined}>
-            {round ? <circle cx={w / 2} cy={h / 2} r={w / 2} fill={fill} /> : <rect x="0" y="0" width={w} height={h} rx={u.r ? sx(u.r) : 1.5} fill={fill} />}
+            {round ? <circle cx={w / 2} cy={h / 2} r={w / 2} fill={u.type === "table" ? "url(#cushion)" : fill} stroke={u.type === "table" ? "#9c8a6c" : "none"} strokeWidth=".45" /> : <rect x="0" y="0" width={w} height={h} rx={u.r ? sx(u.r) : 1.5} fill={fill} />}
+            {u.type === "table" && <circle cx={w / 2} cy={h / 2} r={w / 2 * 0.62} fill="none" stroke="#9c8a6c" strokeWidth=".3" opacity=".7" />}
+            {round ? <circle cx={w / 2} cy={h / 2} r={w / 2} fill="url(#edgeLight)" /> : <rect x="0" y="0" width={w} height={h} rx={u.r ? sx(u.r) : 1.5} fill="url(#edgeLight)" />}
+            {(u.type === "daybed" || u.type === "sunbed") && <rect x="1.4" y="1.4" width={w - 2.8} height={h - 2.8} rx="1.8" fill="url(#cushion)" filter="url(#piece)" />}
             <g clipPath={`url(#clip-${u.id})`}>
-              {lines.map(([d, closed], i) => closed
-                ? <path key={i} d={d} fill="#f8f2e6" stroke={INK} strokeWidth=".45" strokeLinejoin="round" />
-                : <g key={i}><path d={d} fill="none" stroke="#f8f2e6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" opacity=".9" /><path d={d} fill="none" stroke={INK} strokeWidth=".5" strokeLinecap="round" strokeLinejoin="round" /></g>)}
+              {/* soft fills under the pieces: closed shapes by outline, cushion-like polylines by their box */}
+              <g filter="url(#piece)">
+                {pieces.map(([px, py, pw, ph], i) => <rect key={`p${i}`} x={px} y={py} width={pw} height={ph} rx="1.6" fill="url(#cushion)" />)}
+                {lines.map(([d, kind, bx, by, bw, bh], i) => kind === 1
+                  ? <path key={i} d={d} fill="url(#cushion)" stroke="none" />
+                  : kind === 2 ? <rect key={i} x={bx + 0.3} y={by + 0.3} width={bw - 0.6} height={bh - 0.6} rx="1.3" fill="url(#cushion)" /> : null)}
+              </g>
+              {/* the architect's strokes */}
+              {lines.map(([d, kind], i) => <path key={i} d={d} fill="none" stroke={kind ? "#6b5a44" : "#7d6d56"} strokeWidth={kind ? ".42" : ".36"} strokeLinecap="round" strokeLinejoin="round" opacity={kind ? 1 : 0.85} />)}
             </g>
           </g>
         );
