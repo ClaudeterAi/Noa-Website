@@ -7,6 +7,17 @@ import localFont from "next/font/local";
  * for the AR faces; the EN faces fall back for any Latin inside Arabic text.
  */
 
+/** Barlow (OFL): open-licence stand-in for Bahnschrift — Light body, Regular labels, SemiBold headings, Bold hero. */
+export const barlow = localFont({
+  variable: "--font-barlow", display: "swap",
+  src: [
+    { path: "./barlow-latin-300.woff2", weight: "300", style: "normal" },
+    { path: "./barlow-latin-400.woff2", weight: "400", style: "normal" },
+    { path: "./barlow-latin-600.woff2", weight: "600", style: "normal" },
+    { path: "./barlow-latin-700.woff2", weight: "700", style: "normal" },
+  ],
+});
+
 export const josefin = localFont({
   variable: "--font-josefin", display: "swap",
   src: [

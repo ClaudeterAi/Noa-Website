@@ -9,7 +9,7 @@ import Footer from "@/components/layout/Footer";
 import Effects from "@/components/layout/Effects";
 import ChatConcierge from "@/components/concierge/ChatConcierge";
 import VoiceConcierge from "@/components/concierge/VoiceConcierge";
-import { cormorant, josefin, naskh, plexArabic } from "@/fonts";
+import { barlow, naskh, plexArabic } from "@/fonts";
 import "@/styles/globals.css";
 
 
@@ -42,7 +42,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   const booking = getPage("booking");
 
   return (
-    <html lang={loc} dir={DIR[loc]} className={`${josefin.variable} ${cormorant.variable} ${plexArabic.variable} ${naskh.variable}`}>
+    <html lang={loc} dir={DIR[loc]} className={`${barlow.variable} ${plexArabic.variable} ${naskh.variable}`}>
       <body>
         <NextIntlClientProvider messages={messages}>
           <Effects />

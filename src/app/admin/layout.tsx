@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { adminConfigured, authOptions, type AdminSession } from "@/server/admin/auth";
-import { cormorant, josefin } from "@/fonts";
+import { barlow } from "@/fonts";
 import "@/styles/globals.css";
 import "./admin.css";
 
@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "NOA Admin", robots: { index: false, 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const s = adminConfigured() ? ((await getServerSession(authOptions)) as AdminSession | null) : null;
   return (
-    <html lang="en" className={`${josefin.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${barlow.variable}`}>
       <body className="ad">
         {s?.role && (
           <nav className="ad-nav">
