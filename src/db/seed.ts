@@ -4,7 +4,11 @@ import { inventoryUnits, settings, unitTypes } from "./schema";
 import { unitTypes as types, units } from "@/components/booking/inventory";
 
 /** Seeds inventory from the Day 1 catalogue (same rows the admin will edit on Day 3). Idempotent. */
-export async function seed() {
+export async function seed(opts: { onlyIfEmpty?: boolean } = {}) {
+  if (opts.onlyIfEmpty) {
+    const [{ n }] = await db.execute<{ n: number }>(sql`SELECT count(*)::int AS n FROM unit_types`).then((r) => r.rows);
+    if (n > 0) { console.log("seed: inventory already present, skipping (admin edits are never overwritten)"); return; }
+  }
   await db.insert(unitTypes).values(Object.values(types).map((t) => ({
     id: t.id, cls: t.cls, nameEn: t.name.en, nameAr: t.name.ar, descEn: t.desc.en, descAr: t.desc.ar,
     pax: t.pax, priceMorning: t.mPrice, priceAfternoon: t.price, perPerson: !!t.perPerson, tier: t.tier, imageSlot: null,
