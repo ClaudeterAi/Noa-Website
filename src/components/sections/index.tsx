@@ -50,13 +50,13 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
       const isPlaceholderFilm = !!video.url && video.url.startsWith("/media/hero-placeholder");
       return (
         <section className={`hero${s.quiet ? " hero-quiet" : ""}`} id={s.id}>
-          {video?.url ? (
+          {/* the still is always underneath: if a browser refuses to autoplay the film, the hero is a photograph, never a blank */}
+          <div className="hero-bg hero-still" style={still?.url ? bg("hero-still") : poster?.url ? { backgroundImage: `url('${poster.url}')` } : undefined} data-placeholder={video?.url ? undefined : "hero-video"} />
+          {video?.url && (
             <HeroVideo className="hero-bg hero-video" poster={poster?.url ?? undefined} sources={[
               ...(isPlaceholderFilm ? [{ src: video.url.replace(/\.mp4$/, ".webm"), type: "video/webm" }] : []),
               { src: video.url, type: video.url.endsWith(".webm") ? "video/webm" : "video/mp4" },
             ]} />
-          ) : (
-            <div className="hero-bg" style={still?.url ? bg("hero-still") : undefined} data-placeholder="hero-video" />
           )}
           <div className="hero-fade" />
         </section>

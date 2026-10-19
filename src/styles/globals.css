@@ -1450,7 +1450,10 @@ footer a:hover{color:#fff;}
 .ed-night-cta{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--head,#156A89);border-bottom:1px solid var(--accent,#27A0A1);padding-bottom:3px;}
 @media(max-width:980px){.ed-night-grid{grid-template-columns:repeat(2,1fr);}.ed-next{grid-template-columns:1fr;}}
 @media(max-width:680px){.ed-night-grid{grid-template-columns:1fr 1fr;gap:14px;}.ed-night-name{font-size:.86rem;}.ed-night-who{font-size:.84rem;}}
-/* Safari refused autoplay (Low Power Mode): show the still instead of a paused frame with a play glyph */
+/* the film sits over the still and only shows once it is actually playing; a refused autoplay leaves the photograph */
+.hero-still{background-size:cover;background-position:center;}
+.hero-video{opacity:0;transition:opacity .9s ease;}
+.hero-video.hero-video-playing{opacity:1;}
 .hero-video.hero-video-blocked{opacity:0;}
 
 /* ---------- motion: masked word reveals, directional image wipes with drift, staggered fades ---------- */

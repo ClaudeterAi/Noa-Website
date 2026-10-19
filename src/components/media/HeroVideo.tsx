@@ -15,7 +15,11 @@ export default function HeroVideo({ className, poster, sources }: { className: s
     if (!v) return;
     v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
     let stopped = false;
-    const tryPlay = () => { if (stopped) return; const p = v.play(); if (p) p.then(() => v.classList.remove("hero-video-blocked")).catch(() => v.classList.add("hero-video-blocked")); };
+    const tryPlay = () => { if (stopped) return; const p = v.play(); if (p) p.then(() => { v.classList.remove("hero-video-blocked"); v.classList.add("hero-video-playing"); }).catch(() => v.classList.add("hero-video-blocked")); };
+    const show = () => { v.classList.remove("hero-video-blocked"); v.classList.add("hero-video-playing"); };
+    v.addEventListener("playing", show); v.addEventListener("timeupdate", show, { once: true });
+    const check = window.setInterval(() => { if (!v.paused && v.currentTime > 0) { show(); window.clearInterval(check); } }, 250);
+    window.setTimeout(() => window.clearInterval(check), 15000);
     tryPlay();
     const onVis = () => { if (document.visibilityState === "visible") tryPlay(); };
     document.addEventListener("visibilitychange", onVis);
