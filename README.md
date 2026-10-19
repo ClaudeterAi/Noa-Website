@@ -183,3 +183,11 @@ tileCarousels, packageEditorial, galleryCarousel, textPortrait, posterCarousel (
 newsletter (`POST /api/newsletter` → marketing consent on the guest record). Carousel: `src/components/ui/Carousel.tsx` (scroll-snap,
 no library). Placeholder photography is curated Unsplash, every slot replaceable from `/admin/media`. The old section types remain
 for the inner pages until those get the same treatment.
+
+## Palette (19 Oct 2026)
+
+Three colours, values from Pantone's published chips (web simulations; swatch cards remain the print reference):
+sand — page/frames (11-0701 Whisper White #EDE6DA, tint #F6F2EA, band 13-1106 Sandshell #DFCDBE); sea green — header/footer
+(deep shade #0F6B5F of 16-5421 Sea Green; the Pantone #149C87 is the accent for rules, dots, hovers — it fails AA for small text
+on sand); sea blue — text (19-4535 Deep Sea #006174 headings/links, ink #0B2F3A body). Tokens at the end of `globals.css`
+(`--c-*`, `--bg`, `--ink`, `--head`, `--accent`, `--bar`). Palette sheet with contrast checks: `noa-palette.png` in the PR.
