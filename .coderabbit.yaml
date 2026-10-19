@@ -29,5 +29,9 @@ reviews:
       instructions: "User-facing strings need English and Arabic (src/messages). Check 44px touch targets, keyboard access for modals, and no horizontal overflow at 390px."
     - path: "src/server/admin/**"
       instructions: "Refunds and cancellations are admin-only; every mutation must write an audit_log row with before/after."
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns: [".gemini/styleguide.md"]   # one review guide for both reviewers
 chat:
   auto_reply: true
