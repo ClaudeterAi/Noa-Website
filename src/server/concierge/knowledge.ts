@@ -51,6 +51,8 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
     ? `- قواعد الحجز: يُحجز المقعد المختار لمدة ${holdMinutes} دقائق أثناء إتمام الدفع؛ بحد أقصى ${maxPerCart} مقاعد في السلة؛ الدفع عبر بطاقة أو Apple Pay أو Google Pay بالدرهم؛ ضريبة القيمة المضافة 5% تُضاف عند الدفع.`
     : `- Booking rules: a tapped seat is held for ${holdMinutes} minutes while the guest pays; at most ${maxPerCart} seats per cart; payment by card, Apple Pay or Google Pay in AED; 5% VAT is added at checkout.`);
 
+  lines.push(ar ? "## الجلسات اليومية" : "## Daily sessions");
+  lines.push(ar ? "- ثلاث جلسات كل يوم: الصباح 9:30 ص–2:00 م (أجواء هادئة)، بعد الظهر 2:00–9:30 م (أجواء الحفلة)، والليل 9:30 م–2:00 فجراً (أجواء الرقص؛ المسبح مغلق ليلاً). تُحجز المقاعد لكل جلسة على حدة." : "- Three sessions every day: Morning 9:30 AM–2:00 PM (chill), Afternoon 2:00–9:30 PM (party), Night 9:30 PM–2:00 AM (dance; the pool is closed at night). Seats are booked per session; night seats are priced like the afternoon unless an event sets its own price.");
   lines.push(ar ? "## الباقات" : "## Packages");
   for (const p of Object.values(packages)) lines.push(`### ${pick(p.name, locale)} (${pick(p.vibe, locale)}, ${pick(p.time, locale)})`, pick(p.desc, locale));
 

@@ -12,19 +12,19 @@ import { navTargets } from "./sitemap";
  */
 export interface AgentContext { cartToken: string; locale: "en" | "ar"; tier: Tier; guestId?: string }
 
-const SLOT = { morning: { en: "Morning (9:30 AM–2:00 PM)", ar: "الصباح (9:30 ص–2:00 م)" }, afternoon: { en: "Afternoon (2:00–9:30 PM)", ar: "بعد الظهر (2:00–9:30 م)" }, night: { en: "Night session", ar: "الجلسة الليلية" }, full: { en: "Full day", ar: "يوم كامل" } } as const;
+const SLOT = { morning: { en: "Morning (9:30 AM–2:00 PM)", ar: "الصباح (9:30 ص–2:00 م)" }, afternoon: { en: "Afternoon (2:00–9:30 PM)", ar: "بعد الظهر (2:00–9:30 م)" }, night: { en: "Night (9:30 PM–2:00 AM)", ar: "الجلسة الليلية" }, full: { en: "Full day", ar: "يوم كامل" } } as const;
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 
 export const toolDefinitions = [
   {
     name: "get_availability",
     description: "Live seat availability for a date and session. Returns, per seat type, how many are free, the price in AED and whether members-only priority applies. Always call this before quoting availability or prices.",
-    input_schema: { type: "object", properties: { date: { type: "string", description: "YYYY-MM-DD" }, slot: { type: "string", enum: ["morning", "afternoon"] } }, required: ["date", "slot"] },
+    input_schema: { type: "object", properties: { date: { type: "string", description: "YYYY-MM-DD" }, slot: { type: "string", enum: ["morning", "afternoon", "night"] } }, required: ["date", "slot"] },
   },
   {
     name: "hold_seat",
     description: "Hold the best free seat of a given type for the guest for the hold window (default 7 minutes). Use after the guest confirms date, session and seat type. Returns the hold and its expiry. Do not hold more than the guest asked for.",
-    input_schema: { type: "object", properties: { date: { type: "string" }, slot: { type: "string", enum: ["morning", "afternoon"] }, unit_type: { type: "string", description: "unit type id from get_availability, e.g. cabana, daybed, sunbed, entry" }, quantity: { type: "integer", minimum: 1, maximum: 6, default: 1 } }, required: ["date", "slot", "unit_type"] },
+    input_schema: { type: "object", properties: { date: { type: "string" }, slot: { type: "string", enum: ["morning", "afternoon", "night"] }, unit_type: { type: "string", description: "unit type id from get_availability, e.g. cabana, daybed, sunbed, entry" }, quantity: { type: "integer", minimum: 1, maximum: 6, default: 1 } }, required: ["date", "slot", "unit_type"] },
   },
   {
     name: "release_hold",
@@ -62,7 +62,7 @@ export async function runTool(name: ToolName, input: Record<string, unknown>, ct
 }
 
 export async function availabilitySummary(date: string, slot: Slot, ctx: AgentContext) {
-  if (!isoDate.test(date) || !(slot in SLOT)) return { error: "date must be YYYY-MM-DD and slot morning|afternoon" };
+  if (!isoDate.test(date) || !(slot in SLOT)) return { error: "date must be YYYY-MM-DD and slot morning|afternoon|night" };
   const [units, types] = await Promise.all([getAvailability(date, slot, ctx.cartToken, ctx.tier), listUnitTypes()]);
   const byType: Record<string, { type: string; name: string; free: number; reserved_for_members: number; yours: number; price_aed: number; capacity: number; per_person: boolean }> = {};
   for (const u of units) {
@@ -74,7 +74,7 @@ export async function availabilitySummary(date: string, slot: Slot, ctx: AgentCo
 }
 
 export async function holdSeat(date: string, slot: Slot, unitType: string, quantity: number, ctx: AgentContext) {
-  if (!isoDate.test(date) || !(slot in SLOT)) return { error: "date must be YYYY-MM-DD and slot morning|afternoon" };
+  if (!isoDate.test(date) || !(slot in SLOT)) return { error: "date must be YYYY-MM-DD and slot morning|afternoon|night" };
   const qty = Math.min(Math.max(1, quantity | 0), 6);
   const units = await getAvailability(date, slot, ctx.cartToken, ctx.tier);
   const candidates = units.filter((u) => u.unitTypeId === unitType && u.state === "free");

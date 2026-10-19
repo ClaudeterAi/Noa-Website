@@ -46,6 +46,7 @@ export const pages: Page[] = [
       },
       { id: "pkg-morning", type: "packageEditorial", packageId: "morning" },
       { id: "pkg-afternoon", type: "packageEditorial", packageId: "afternoon", flip: true },
+      { id: "pkg-night", type: "packageEditorial", packageId: "night" },
       {
         id: "restaurant", type: "galleryCarousel",
         heading: t("Panoramic Restaurant", "المطعم البانورامي"),

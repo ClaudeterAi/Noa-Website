@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const parsed = Query.safeParse({ date: url.searchParams.get("date"), slot: url.searchParams.get("slot") });
-    if (!parsed.success) return error(422, "VALIDATION_ERROR", "date (YYYY-MM-DD) and slot (morning|afternoon) are required", parsed.error.issues);
+    if (!parsed.success) return error(422, "VALIDATION_ERROR", "date (YYYY-MM-DD) and slot (morning|afternoon|night) are required", parsed.error.issues);
     const me = await getCurrentGuest();
     const units = await getAvailability(parsed.data.date, parsed.data.slot, await getCartToken(), me?.tier ?? "guest");
     return json({ date: parsed.data.date, slot: parsed.data.slot, serverTime: new Date().toISOString(), tier: me?.tier ?? "guest", holdMinutes: await getSetting("hold_minutes"), types: await listUnitTypes(), units }, { headers: { "Cache-Control": "no-store" } });

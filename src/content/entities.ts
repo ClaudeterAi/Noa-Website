@@ -25,6 +25,7 @@ export const media: Record<string, MediaSlot> = {
   "split-club": img("split-club", u("photo-1566073771259-6a8506099945", 900), "Beach club deck", "سطح النادي الشاطئي"),
   "pkg-morning": img("pkg-morning", u("photo-1520250497591-112f2f40a3f4", 2000), "Morning by the lagoon pool", "الصباح عند مسبح البحيرة"),
   "pkg-afternoon": img("pkg-afternoon", u("photo-1566073771259-6a8506099945", 2000), "Golden hour on the deck", "الساعة الذهبية على السطح"),
+  "pkg-night": img("pkg-night", u("photo-1514525253161-7a46d19cd819"), "Night session", "جلسة الليل"),
   "pkg-cabana": img("pkg-cabana", u("photo-1445019980597-93fa8acb246c"), "Private cabana", "كابانا خاصة"),
   "rest-1": img("rest-1", u("photo-1565299624946-b28f40a0ae38", 900), "Restaurant plate", "طبق من المطعم"),
   "rest-2": img("rest-2", u("photo-1553621042-f6e147245754", 900), "Dining on the water", "تناول الطعام على الماء"),
@@ -109,9 +110,23 @@ export const packages: Record<string, Package> = {
     more: { label: t("See More", "اعرف المزيد"), href: { page: "afternoon-package" } },
     book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
   },
+  night: {
+    id: "night",
+    number: "03",
+    name: t("Night\nPackage", "باقة\nالليل"),
+    vibe: t("Dance Vibe", "أجواء الرقص"),
+    time: t("9:30 PM – 2:00 AM", "9:30 مساءً – 2:00 فجراً"),
+    desc: t(
+      "When the sun goes, the deck changes. The night session is NOA after dark — the DJ on the dance floor, the lounge cabanas lit low, cocktails at the bar, and the city skyline across the water. The pool closes at dusk; the music does not.",
+      "حين تغيب الشمس يتبدّل السطح. جلسة الليل هي نوا بعد الغروب: الدي جيه على حلبة الرقص، وكبائن الصالة بإضاءة خافتة، والكوكتيلات في البار، وأفق المدينة عبر الماء. يُغلق المسبح عند الغسق، أما الموسيقى فلا."
+    ),
+    media: "pkg-night",
+    more: { label: t("See More", "اعرف المزيد"), href: { page: "events" } },
+    book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
+  },
   cabana: {
     id: "cabana",
-    number: "03",
+    number: "04",
     name: t("Private\nCabana", "كابانا\nخاصة"),
     vibe: t("Exclusive · All Day", "حصرية · طوال اليوم"),
     time: t("9:30 AM — 9:30 PM", "9:30 صباحاً — 9:30 مساءً"),
