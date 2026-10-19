@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { CtaLink, Locale, Section } from "@/content/types";
+import type { CtaLink, L, Locale, Section } from "@/content/types";
 import { hrefPath, mediaUrl, pick, registry } from "@/content/registry";
 import { Link } from "@/i18n/navigation";
 import { Rich } from "@/components/Text";
@@ -8,7 +8,16 @@ import FaqList from "./FaqList";
 import ContactForm from "./ContactForm";
 import { publishedEvents } from "@/server/events/public";
 import { getMediaMap } from "@/server/media";
+import Carousel from "@/components/ui/Carousel";
+import NewsletterForm from "@/components/sections/NewsletterForm";
 import type { EventItem } from "@/content/types";
+
+/** Event art: an uploaded poster URL, a registry slot id, or the DJ placeholder. */
+const eventImage = (media: string | undefined, lookup: (id: string | undefined) => string | null) => {
+  if (!media) return lookup("deck-dj-1") ?? lookup("split-dj") ?? "";
+  if (media.startsWith("/") || media.startsWith("http")) return media;
+  return lookup(media) ?? lookup("deck-dj-1") ?? "";
+};
 
 const bgFrom = (lookup: (id: string | undefined) => string | null) => (mediaId: string): CSSProperties => {
   const url = lookup(mediaId) ?? mediaUrl(mediaId);
@@ -26,7 +35,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
   const media = await getMediaMap();   // admin uploads overlay the registry placeholders
   const mUrl = (id: string | undefined) => (id ? media[id]?.url ?? null : null);
   const bg = bgFrom(mUrl);
-  const live = s.type === "eventsGrid" || s.type === "eventStrip" ? await publishedEvents() : null;
+  const live = s.type === "eventsGrid" || s.type === "eventStrip" || s.type === "posterCarousel" ? await publishedEvents() : null;
   const liveList = (ids: string[], take?: number): EventItem[] => {
     const fromDb = live?.upcoming ?? [];
     if (fromDb.length) return take ? fromDb.slice(0, take) : fromDb;
@@ -39,7 +48,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
       const still = { url: mUrl("hero-still") };
       const isPlaceholderFilm = !!video.url && video.url.startsWith("/media/hero-placeholder");
       return (
-        <section className="hero" id={s.id}>
+        <section className={`hero${s.quiet ? " hero-quiet" : ""}`} id={s.id}>
           {video?.url ? (
             <video className="hero-bg hero-video" autoPlay muted loop playsInline preload="metadata" poster={poster?.url ?? undefined} aria-hidden="true">
               {isPlaceholderFilm && <source src={video.url.replace(/\.mp4$/, ".webm")} type="video/webm" />}
@@ -121,6 +130,120 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
         </section>
       );
 
+    /* ---------------- editorial home (design pass 2) ---------------- */
+    case "editorialIntro": {
+      return (
+        <section className="ed-intro" id={s.id}>
+          <div className="ed-intro-copy rv">
+            <div className="ed-eyebrow">{pick(s.eyebrow, locale)}</div>
+            <h2 className="ed-h">{pick(s.heading, locale)}</h2>
+            {s.paragraphs.map((p, i) => <p key={i} className="ed-p">{pick(p, locale)}</p>)}
+            <dl className="ed-facts">
+              {s.facts.map((f, i) => (
+                <div key={i} className="ed-fact"><dt>{pick(f.label, locale)}</dt><dd>{f.lines.map((l, j) => <span key={j}>{pick(l, locale)}</span>)}</dd></div>
+              ))}
+            </dl>
+            {s.link && <CtaA link={s.link} locale={locale} className="ed-link" />}
+          </div>
+          <div className="ed-intro-media rv">
+            <Carousel arrows="none" ariaLabel={pick(s.heading, locale)}>
+              {s.media.map((m) => <div key={m} className="ed-frame ed-frame-landscape" style={bg(m)} role="img" aria-label={media[m]?.alt?.[locale] ?? ""} />)}
+            </Carousel>
+          </div>
+        </section>
+      );
+    }
+    case "tileCarousels": {
+      return (
+        <section className="ed-tiles" id={s.id}>
+          {s.tiles.map((tile, i) => (
+            <div key={i} className="ed-tile rv">
+              <Carousel arrows="inside" ariaLabel={pick(tile.heading, locale)}>
+                {tile.media.map((m) => <div key={m} className="ed-frame ed-frame-portrait" style={bg(m)} role="img" aria-label={media[m]?.alt?.[locale] ?? ""} />)}
+              </Carousel>
+              <div className="ed-tile-label">
+                <div className="ed-tile-h">{pick(tile.heading, locale)}</div>
+                <div className="ed-tile-sub">{pick(tile.sub, locale)}</div>
+              </div>
+              {tile.caption && <div className="ed-tile-cap">{pick(tile.caption, locale)}</div>}
+              {tile.href && <Link href={hrefPath(tile.href)} className="ed-tile-link" aria-label={pick(tile.heading, locale)} />}
+            </div>
+          ))}
+        </section>
+      );
+    }
+    case "packageEditorial": {
+      const p = registry.packages[s.packageId];
+      return (
+        <section className={`ed-pkg${s.flip ? " flip" : ""}`} id={s.id}>
+          <div className="ed-pkg-copy rv">
+            <h2 className="ed-h">{pick(p.name, locale).replace("\n", " ")}</h2>
+            <div className="ed-pkg-vibe">{pick(p.vibe, locale)}</div>
+            <div className="ed-pkg-time">{pick(p.time, locale)}</div>
+            <p className="ed-p">{pick(p.desc, locale)}</p>
+            <div className="ed-actions"><CtaA link={p.more} locale={locale} className="ed-link" /><CtaButton link={p.book} locale={locale} /></div>
+          </div>
+          <div className="ed-pkg-media rv"><div className="ed-frame ed-frame-bleed" style={bg(p.media)} role="img" aria-label={media[p.media]?.alt?.[locale] ?? ""} /></div>
+        </section>
+      );
+    }
+    case "galleryCarousel": {
+      return (
+        <section className="ed-gallery" id={s.id}>
+          <div className="ed-center rv"><h2 className="ed-h">{pick(s.heading, locale)}</h2><div className="ed-sub">{pick(s.sub, locale)}</div></div>
+          <div className="rv">
+            <Carousel perView={2} arrows="outside" dots={false} ariaLabel={pick(s.heading, locale)}>
+              {s.media.map((m) => <div key={m} className="ed-frame ed-frame-tall" style={bg(m)} role="img" aria-label={media[m]?.alt?.[locale] ?? ""} />)}
+            </Carousel>
+          </div>
+          {s.link && <div className="ed-center rv"><CtaA link={s.link} locale={locale} className="ed-link ed-link-arrow" /></div>}
+        </section>
+      );
+    }
+    case "textPortrait": {
+      return (
+        <section className={`ed-portrait${s.flip ? " flip" : ""}`} id={s.id}>
+          <div className="ed-portrait-copy rv">
+            <h2 className="ed-h">{pick(s.heading, locale)}</h2>
+            <div className="ed-sub">{pick(s.sub, locale)}</div>
+            {s.paragraphs.map((p, i) => <p key={i} className="ed-p">{pick(p, locale)}</p>)}
+            {s.link && <CtaButton link={s.link} locale={locale} />}
+          </div>
+          <div className="ed-portrait-media rv"><div className="ed-frame ed-frame-portrait" style={bg(s.media)} role="img" aria-label={media[s.media]?.alt?.[locale] ?? ""} /></div>
+        </section>
+      );
+    }
+    case "posterCarousel": {
+      const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
+      const pool: Array<{ id: string; date: string; name: L; artist: L; shortDate: L; media?: string; kind?: string; status?: string }> = s.source === "upcoming" ? (live?.upcoming ?? []) : (live?.highlights ?? []);
+      const picked = s.source === "upcoming" ? pool.filter((e) => e.date >= today).slice(0, 8) : pool.slice(0, 8);
+      const slides = picked.length
+        ? picked.map((e) => ({ key: e.id, img: eventImage(e.media, mUrl), name: pick(e.name, locale).replace("\n", " "), who: pick(e.artist, locale), when: pick(e.shortDate, locale) }))
+        : s.fallbackMedia.map((m, i) => ({ key: m, img: mUrl(m) ?? "", name: locale === "ar" ? "قريباً" : "Coming soon", who: "", when: locale === "ar" ? `البرنامج ${i + 1}` : `Line-up ${i + 1}` }));
+      return (
+        <section className={`ed-posters ed-posters-${s.aspect === "1/1" ? "sq" : "tall"}`} id={s.id}>
+          <div className="ed-center rv"><h2 className="ed-h">{pick(s.heading, locale)}</h2>{s.sub && <div className="ed-sub">{pick(s.sub, locale)}</div>}</div>
+          <div className="rv">
+            <Carousel perView={3} arrows="outside" dots={slides.length > 3} ariaLabel={pick(s.heading, locale)}>
+              {slides.map((sl) => (
+                <Link key={sl.key} href={hrefPath(s.href)} className="ed-poster">
+                  <div className={`ed-frame ${s.aspect === "1/1" ? "ed-frame-square" : "ed-frame-poster"}`} style={{ backgroundImage: `url('${sl.img}')` }} />
+                  <div className="ed-poster-meta"><div className="ed-poster-name">{sl.name}</div><div className="ed-poster-sub">{[sl.who, sl.when].filter(Boolean).join(" · ")}</div></div>
+                </Link>
+              ))}
+            </Carousel>
+          </div>
+        </section>
+      );
+    }
+    case "newsletter": {
+      return (
+        <section className="ed-news" id={s.id}>
+          <div className="ed-center"><div className="ed-eyebrow">{pick(s.kicker, locale)}</div><h2 className="ed-h">{pick(s.heading, locale)}</h2><p className="ed-p">{pick(s.body, locale)}</p></div>
+          <NewsletterForm locale={locale} />
+        </section>
+      );
+    }
     case "eventsGrid":
       return (
         <section className="events" id={s.id}>
