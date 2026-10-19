@@ -116,7 +116,7 @@ The layout is data. A new boat = a new SVG + one command:
 
 ## Fonts
 
-Self-hosted in `src/fonts/` (SIL OFL): Josefin Sans, Cormorant, IBM Plex Sans Arabic, Noto Naskh Arabic — 12 woff2 files, 552 KB.
+Self-hosted in `src/fonts/` (SIL OFL). Site-wide family: **Barlow** (open-licence stand-in for Bahnschrift, which is a Windows-only system font with no webfont licence) — Light 300 body, Regular 400 labels/nav, SemiBold 600 headings, Bold 700 hero/logo. Arabic: IBM Plex Sans Arabic. Josefin Sans / Cormorant / Noto Naskh files remain in the folder for an easy revert.
 Builds have no dependency on fonts.googleapis.com (a Vercel preview build failed on that fetch on 16 Oct); visitors load fonts from Vercel's edge.
 
 ## Concierge — chat (Claude) and voice (ElevenLabs) (Day 4)

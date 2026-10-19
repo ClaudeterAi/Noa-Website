@@ -2,12 +2,12 @@
    Only change: font families now resolve through CSS variables so the Arabic
    locale can swap typefaces without touching any rule below. */
 :root{
-  --font-sans: var(--font-josefin), 'Josefin Sans', sans-serif;
-  --font-serif: var(--font-cormorant), 'Cormorant', serif;
+  --font-sans: var(--font-barlow), 'Barlow', 'Bahnschrift', 'DIN Alternate', sans-serif;
+  --font-serif: var(--font-barlow), 'Barlow', 'Bahnschrift', 'DIN Alternate', sans-serif;   /* one family site-wide */
 }
 html[lang="ar"]{
-  --font-sans: var(--font-plex-arabic), 'IBM Plex Sans Arabic', var(--font-josefin), sans-serif;
-  --font-serif: var(--font-naskh), 'Noto Naskh Arabic', var(--font-cormorant), serif;
+  --font-sans: var(--font-plex-arabic), 'IBM Plex Sans Arabic', var(--font-barlow), sans-serif;
+  --font-serif: var(--font-plex-arabic), 'IBM Plex Sans Arabic', var(--font-barlow), sans-serif;
 }
 
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -1110,3 +1110,14 @@ html[dir="rtl"] .cc-msg.assistant{align-self:flex-end;} html[dir="rtl"] .cc-msg.
 .yacht-map .seat.closed{opacity:.18;cursor:not-allowed;}
 /* guest sign-in block inside checkout */
 .bk-signin{border:1px solid #e6e2db;padding:16px;margin-bottom:18px;background:#faf9f7;}
+
+/* ==== Type scale on Barlow (Bahnschrift stand-in): Light body · Regular labels · SemiBold headings · Bold hero ==== */
+body{font-weight:300;}
+.nav-links a,.nav-book,a.nav-book,.nav-mob a,.pkg-btn,.events-all,.hero-cta,.bk-floor-next,.bk-floor-back,.bk-modal-cta,.bk-add-cart,.bk-confirm-btn,.ft-h,.cc-fab,.vc-fab,.bk-step-pre,.cta-pre,.pkg-pre,.incl-h,.tariff-h,.specs-h,.form-h{font-weight:400;}
+.split-h,.pkg-h,.rest-h,.events-h,.evt-name,.amen-h,.loc-h,.faq-h,.cta-h,.subhero-h,.prose-h,.split-prose-h,.event-strip-h,.bk-step-h,.bk-modal-event,.bk-seat-img-name,.bk-detail-name{font-weight:600;letter-spacing:.14em;}
+.hero-h,.hero-title,.ft-logo,.logo{font-weight:700;}
+.logo{letter-spacing:.4em;}
+/* passages that were set in the italic serif read as upright Light now */
+.pkg-desc,.evt-who,.amen-d,.loc-val,.faq-ans p,.cta-body,.ft-about,.ft-col a,.subhero-sub,.subhero-h em,.prose p,.split-prose-p,.incl-sub,.incl-val,.tariff-sub,.tariff-desc,.specs-sub,.form-sub,.form-meta,.contact-cell,.event-row-who,.bk-pkg-time,.bk-time .bot{font-style:normal;font-weight:300;}
+.subhero-h em{font-weight:600;}
+.tariff-price,.spec-n,.bk-tt-price,.bk-price-val,.bk-total-val{font-weight:600;font-style:normal;}
