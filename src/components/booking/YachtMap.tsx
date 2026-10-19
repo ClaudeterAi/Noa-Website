@@ -86,7 +86,19 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         const yy = a.kind === "stage" ? y + h - 6 : a.kind === "restroom" || a.kind === "salon" ? y + h - 4 : y + h / 2 + 2;
         return <text key={a.id} x={x + w / 2} y={yy} fontSize={big ? 6.5 : 4.6} letterSpacing={big ? 2.4 : 1} fill={a.kind === "pool" ? "#2f6b74" : INK_SOFT} style={F} textAnchor="middle" pointerEvents="none" opacity={a.kind === "pool" ? 1 : 0.9}>{nm}</text>;
       })}
-      {amen.filter((a) => a.kind === "arrival").map((a) => { const cx = sx(a.x) + sx(a.w) / 2, cy = sy(a.y) + sx(a.h) / 2; return <g key={a.id} pointerEvents="none"><rect x={sx(a.x)} y={sy(a.y)} width={sx(a.w)} height={sx(a.h)} rx="1.2" fill="#dbe7ea" stroke="#7fa3ab" strokeWidth=".5" /><path d={`M${cx - 4},${cy} h8 m-3,-3 l3,3 l-3,3`} fill="none" stroke="#2f6b74" strokeWidth=".9" /></g>; })}
+      {amen.filter((a) => a.kind === "arrival").map((a) => {
+        const x = sx(a.x), y = sy(a.y), w = sx(a.w), h = sx(a.h), cx = x + w / 2, cy = y + h / 2, top = a.y < 7000;
+        const caption = L === "ar" ? "القارب المكوكي · الوصول والمغادرة" : "SHUTTLE · ARRIVAL & DEPARTURE";
+        return (
+          <g key={a.id} pointerEvents="none">
+            <rect x={x} y={y} width={w} height={h} rx="1.2" fill="#dbe7ea" stroke="#7fa3ab" strokeWidth=".5" />
+            {/* small boat glyph + arrow */}
+            <path d={`M${cx - 6},${cy + 1.5} h12 l-2,2.6 h-8 z`} fill="#2f6b74" />
+            <path d={`M${cx - 1},${cy + 1.5} v-5 l4,5`} fill="none" stroke="#2f6b74" strokeWidth=".7" />
+            <text x={cx} y={top ? y + h + 5 : y - 2.5} fontSize="3.6" letterSpacing="1" fill="#2f6b74" style={F} textAnchor="middle">{caption}</text>
+          </g>
+        );
+      })}
 
       {/* 5 · interactive seats: transparent hit areas + state + corner label */}
       {units.map((u) => {
