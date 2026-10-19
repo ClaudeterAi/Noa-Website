@@ -54,7 +54,7 @@
     "chill": "CHILL VIBE",
     "party": "PARTY VIBE",
     "bookNow": "Book Now",
-    "soldOut": "Sold out",
+    "soldOut": "This event is sold out.",
     "guestLabel": "Guest",
     "arrivalTime": "Arrival Time",
     "price": "Price",
@@ -98,6 +98,14 @@
     "holdNote": "Seats are held for {minutes} minutes while you complete your reservation.",
     "seatReserved": "This seat is reserved for returning guests until {time}. It opens to everyone after that.",
     "legendReserved": "Members' priority",
-    "cartLimit": "You already hold the maximum number of seats. Complete your reservation or remove one first."
+    "cartLimit": "You already hold the maximum number of seats. Complete your reservation or remove one first.",
+    "night": "Night",
+    "full": "Full day",
+    "event": "Event",
+    "nightTime": "9:30PM – 2AM",
+    "fullTime": "9:30AM – 9:30PM",
+    "seatClosed": "This seat type is not on sale for this event.",
+    "salesNotOpen": "Sales for this event open on {time}. Members can book early.",
+    "salesClosed": "Sales for this event have closed."
   }
 }

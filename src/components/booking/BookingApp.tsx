@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/routing";
 import { pick, registry } from "@/content/registry";
 import YachtMap from "./YachtMap";
 import PaymentPanel, { paymentsConfigured } from "./PaymentPanel";
-import { api, isApiError, type UnitAvailability, type UnitTypeInfo } from "./api";
+import { api, isApiError, type CalendarEvent, type UnitAvailability, type UnitTypeInfo } from "./api";
 import { useLiveSeats } from "./useLiveSeats";
 import { ARRIVALS, DAY_IMG, unitTypes as placeholderTypes, type Slot } from "./inventory";
 
@@ -121,6 +121,7 @@ export default function BookingApp() {
   }, [avail, cart, types, locale]);
   const taken = useMemo(() => new Set([...avail.values()].filter((u) => (u.state === "held" || u.state === "booked") && !inCart.has(u.unitId)).map((u) => u.unitId)), [avail, inCart]);
   const reserved = useMemo(() => new Set([...avail.values()].filter((u) => u.state === "reserved").map((u) => u.unitId)), [avail]);
+  const closed = useMemo(() => new Set([...avail.values()].filter((u) => u.state === "closed").map((u) => u.unitId)), [avail]);
 
   /* ---------- hold expiry: drop expired items, tell the guest ---------- */
   useEffect(() => {
@@ -145,7 +146,14 @@ export default function BookingApp() {
   const offset = (new Date(view.y, view.m, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(view.y, view.m + 1, 0).getDate();
   const eventsByDate = useMemo(() => Object.fromEntries(Object.values(registry.events).map((e) => [e.date, e])), []);
+  const [liveEvents, setLiveEvents] = useState<Record<string, CalendarEvent[]>>({});
+  useEffect(() => {
+    const month = `${view.y}-${String(view.m + 1).padStart(2, "0")}`;
+    api.calendar(month).then((r) => setLiveEvents((prev) => ({ ...prev, ...Object.fromEntries(r.events.reduce((m, e) => m.set(e.date, [...(m.get(e.date) ?? []), e]), new Map<string, CalendarEvent[]>())) }))).catch(() => undefined);
+  }, [view.y, view.m]);
+  const liveEventTitle = (d: string) => { const e = liveEvents[d]?.[0]; return e ? (locale === "ar" ? e.titleAr ?? e.titleEn : e.titleEn) : null; };
   const dayLabel = (d: Date) => {
+    const liveT = liveEventTitle(iso(d)); if (liveT) return liveT;
     const ev = eventsByDate[iso(d)];
     if (ev) return pick(ev.name, locale).replace("\n", " ");
     const wd = new Intl.DateTimeFormat(fmtLocale, { weekday: "long" }).format(d);
@@ -161,6 +169,7 @@ export default function BookingApp() {
     if (!date || !slot || holding) return;
     if (inCart.has(unitId)) { goStep(3); return; }
     const u = avail.get(unitId);
+    if (u?.state === "closed") { setNotice(t("seatClosed")); return; }
     if (u?.state === "reserved" && u.releaseAt) { setNotice(t("seatReserved", { time: releaseLabel(u.releaseAt) })); return; }
     setTip(null); setHolding(unitId); setNotice(null);
     try {
@@ -171,7 +180,9 @@ export default function BookingApp() {
       setGuests(ty?.pax ?? 1); setArrival(ARRIVALS[slot][0]);
     } catch (e) {
       const r = e as { code?: string; message: string };
-      setNotice(r.code === "UNIT_UNAVAILABLE" ? t("seatTaken") : r.code === "UNIT_RESERVED" ? t("seatReserved", { time: u?.releaseAt ? releaseLabel(u.releaseAt) : "" }) : r.code === "CART_LIMIT" ? t("cartLimit") : r.message);
+      const d = (e as { details?: { opensAt?: string } }).details;
+      setNotice(r.code === "UNIT_UNAVAILABLE" ? t("seatTaken") : r.code === "UNIT_RESERVED" ? t("seatReserved", { time: u?.releaseAt ? releaseLabel(u.releaseAt) : "" }) : r.code === "CART_LIMIT" ? t("cartLimit")
+        : r.code === "SALES_NOT_OPEN" ? t("salesNotOpen", { time: d?.opensAt ? releaseLabel(d.opensAt) : "" }) : r.code === "SALES_CLOSED" ? t("salesClosed") : r.code === "SOLD_OUT" ? t("soldOut") : r.code === "TYPE_NOT_ON_SALE" ? t("seatClosed") : r.message);
       void refresh();
     } finally { setHolding(null); }
   };
@@ -268,7 +279,8 @@ export default function BookingApp() {
               <div key={i} className={`bk-day${past ? " disabled" : ""}`} role={past ? undefined : "button"} tabIndex={past ? -1 : 0}
                 onClick={open} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); } }}>
                 <div className="bk-day-n">{String(i + 1).padStart(2, "0")}</div>
-                <div className="bk-day-ev" style={{ backgroundImage: `url('${(ev?.media && registry.media[ev.media]?.url) || DAY_IMG[d.getDay()]}')` }} />
+                <div className="bk-day-ev" style={{ backgroundImage: `url('${liveEvents[iso(d)]?.[0]?.poster || (ev?.media && registry.media[ev.media]?.url) || DAY_IMG[d.getDay()]}')` }} />
+                {liveEvents[iso(d)]?.length ? <div className="bk-day-badge">{liveEvents[iso(d)][0].session === "night" ? t("night") : liveEvents[iso(d)][0].session === "full" ? t("full") : t("event")}</div> : null}
                 <div className="bk-day-ev-label">{dayLabel(d).toUpperCase()}</div>
               </div>
             );
@@ -285,7 +297,7 @@ export default function BookingApp() {
         </div>
         {notice && step === 2 && <p className="form-meta bk-notice" role="alert">{notice}</p>}
         <div className={`bk-map-wrap${holding ? " is-holding" : ""}`}>
-          <YachtMap labels={yachtLabels} taken={taken} mine={inCart} reserved={reserved} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
+          <YachtMap labels={yachtLabels} taken={taken} mine={inCart} reserved={reserved} closed={closed} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
         </div>
         <div className="bk-legend">
           {legend.map(([k, style]) => <span key={k}><span className="bk-legend-swatch" style={style} />{t(`legend.${k}`)}</span>)}
@@ -378,10 +390,10 @@ export default function BookingApp() {
               <h3 className="bk-modal-event">{dayLabel(fromIso(dayModal)).toUpperCase()}</h3>
               <div className="bk-modal-tim-lbl">{t("selectTiming")}</div>
               <div className="bk-time-opts">
-                {(["morning", "afternoon"] as const).map((s) => (
+                {([...(["morning", "afternoon"] as const), ...((liveEvents[dayModal] ?? []).map((e) => e.session).filter((x) => x === "night" || x === "full") as Slot[])] as Slot[]).map((s) => (
                   <button key={s} type="button" className={`bk-time${pendingSlot === s ? " selected" : ""}`} onClick={() => setPendingSlot(s)}>
-                    <div className="top">{t(s)}</div>
-                    <div className="bot">{t(`${s}Time`)}</div>
+                    <div className="top">{(s === "night" || s === "full") && liveEvents[dayModal]?.find((e) => e.session === s) ? (locale === "ar" ? liveEvents[dayModal].find((e) => e.session === s)!.titleAr ?? liveEvents[dayModal].find((e) => e.session === s)!.titleEn : liveEvents[dayModal].find((e) => e.session === s)!.titleEn) : t(s)}</div>
+                    <div className="bot">{(() => { const e = liveEvents[dayModal]?.find((x) => x.session === s); return e?.startsAt ? `${e.startsAt}${e.endsAt ? ` – ${e.endsAt}` : ""}` : t(`${s}Time`); })()}</div>
                   </button>
                 ))}
               </div>

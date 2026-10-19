@@ -3,6 +3,7 @@ import { db } from "@/db/client";
 import { auditLog, events } from "@/db/schema";
 import { elevenLabsKb, enqueueKbSync, processKbSync } from "./kb-sync";
 import { enrichEvent, type EventDraft } from "./enrich";
+import { getOrCreateSession } from "@/server/booking";
 
 /** Refresh the public pages that show events. No-op outside a Next request (scripts, tests); ISR (60 s) is the safety net. */
 async function revalidateEventPages() {
@@ -41,7 +42,8 @@ export async function setEventStatus(actor: Actor, id: string, status: "draft" |
   const row = await db.transaction(async (tx) => {
     const [before] = await tx.select().from(events).where(eq(events.id, id));
     if (!before) throw new Error("Event not found");
-    const [after] = await tx.update(events).set({ status, publishedAt: status === "published" ? sql`now()` : before.publishedAt, updatedAt: sql`now()` }).where(eq(events.id, id)).returning();
+    const sessionRow = status === "published" ? await getOrCreateSession(before.date, before.session, tx) : null;   // the event night becomes a bookable session
+    const [after] = await tx.update(events).set({ status, sessionId: sessionRow?.id ?? before.sessionId, publishedAt: status === "published" ? sql`now()` : before.publishedAt, updatedAt: sql`now()` }).where(eq(events.id, id)).returning();
     await tx.insert(auditLog).values({ actor: actor.email, role: actor.role, action: `event.${status}`, entity: "events", entityId: id, before: { status: before.status }, after: { status } });
     await enqueueKbSync("event", id, status === "published" || (status === "past" && after.kind === "highlight") ? "upsert" : "delete", tx);
     return after;

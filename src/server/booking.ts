@@ -5,8 +5,9 @@ import {
 } from "@/db/schema";
 import { canBookPriority, getVipReleaseHours, type Tier } from "./vip";
 import { broadcastSafely } from "./realtime";
+import { basePrice, CapacityReachedError, eventForSession, eventPrice, saleState, SaleNotOpenError, sessionCommitted, typeOnSale, TypeNotOnSaleError } from "@/server/events/ticketing";
 
-export type Slot = "morning" | "afternoon";
+export type Slot = "morning" | "afternoon" | "night" | "full";
 type DbOrTx = Db | Tx;
 
 /* ------------------------------------------------------------------ settings */
@@ -25,7 +26,7 @@ export async function getOrCreateSession(date: string, slot: Slot, conn: DbOrTx 
   const found = await conn.select().from(sessions).where(and(eq(sessions.date, date), eq(sessions.slot, slot))).limit(1);
   if (found[0]) return found[0];
   const hours = await getVipReleaseHours(conn);
-  const start = slot === "morning" ? "09:30" : "14:00";
+  const start = { morning: "09:30", afternoon: "14:00", night: "21:30", full: "09:30" }[slot];
   const inserted = await conn.insert(sessions).values({
     date, slot,
     vipReleaseAt: sql`(${date}::date + ${start}::time) AT TIME ZONE 'Asia/Dubai' - make_interval(hours => ${hours})`,
@@ -52,7 +53,7 @@ export interface UnitAvailability {
   unitTypeId: string;
   price: number;
   pax: number;
-  state: "free" | "held" | "booked" | "yours" | "reserved";
+  state: "free" | "held" | "booked" | "yours" | "reserved" | "closed";
   heldUntil?: string;
   vipPriority: boolean;
   /** when a VIP-priority unit opens to everyone */
@@ -66,6 +67,8 @@ export interface UnitAvailability {
 export async function getAvailability(date: string, slot: Slot, cartToken?: string, tier: Tier = "guest"): Promise<UnitAvailability[]> {
   const session = await getOrCreateSession(date, slot);
   const reservedNow = !!session.vipReleaseAt && session.vipReleaseAt.getTime() > Date.now() && !canBookPriority(tier);
+  const ev = await eventForSession(date, slot);
+  const sale = saleState(ev, tier);
   const rows = await db.execute<{
     unit_id: string; unit_type_id: string; pax: number; price_morning: number; price_afternoon: number;
     vip_priority: boolean; hold_token: string | null; hold_expires: string | null; booked: boolean;
@@ -83,9 +86,12 @@ export async function getAvailability(date: string, slot: Slot, cartToken?: stri
     unitId: r.unit_id,
     unitTypeId: r.unit_type_id,
     pax: r.pax,
-    price: slot === "morning" ? r.price_morning : r.price_afternoon,
+    price: eventPrice(ev, r.unit_type_id, basePrice(slot, r.price_morning, r.price_afternoon)),
     vipPriority: r.vip_priority,
-    state: r.booked ? "booked" : r.hold_token ? (cartToken && r.hold_token === cartToken ? "yours" : "held") : r.vip_priority && reservedNow ? "reserved" : "free",
+    state: r.booked ? "booked" : r.hold_token ? (cartToken && r.hold_token === cartToken ? "yours" : "held")
+      : !typeOnSale(ev, r.unit_type_id) || sale === "closed" ? "closed"
+      : sale === "not_yet" ? "reserved"
+      : r.vip_priority && reservedNow ? "reserved" : "free",
     heldUntil: r.hold_expires ? new Date(r.hold_expires).toISOString() : undefined,
     releaseAt: r.vip_priority && session.vipReleaseAt ? session.vipReleaseAt.toISOString() : undefined,
   }));
@@ -125,10 +131,18 @@ async function createHoldTx(input: { date: string; slot: Slot; unitId: string; c
     const session = await getOrCreateSession(input.date, input.slot, tx);
     if (session.status !== "open") throw new UnitUnavailableError(input.unitId);
 
-    const [unit] = await tx.select({ vipPriority: inventoryUnits.vipPriority, active: inventoryUnits.active }).from(inventoryUnits).where(eq(inventoryUnits.id, input.unitId));
+    const [unit] = await tx.select({ vipPriority: inventoryUnits.vipPriority, active: inventoryUnits.active, unitTypeId: inventoryUnits.unitTypeId }).from(inventoryUnits).where(eq(inventoryUnits.id, input.unitId));
     if (!unit || !unit.active) throw new UnitUnavailableError(input.unitId);
     if (unit.vipPriority && session.vipReleaseAt && session.vipReleaseAt.getTime() > Date.now() && !canBookPriority(input.tier ?? "guest")) {
       throw new UnitReservedError(input.unitId, session.vipReleaseAt);
+    }
+    // event ticketing: sales window (members presale), seat types on sale, capacity cap
+    const ev = await eventForSession(input.date, input.slot, tx);
+    if (ev) {
+      const st = saleState(ev, input.tier ?? "guest");
+      if (st === "closed" || st === "not_yet") throw new SaleNotOpenError(st, ev.ticketing.salesOpenAt);
+      if (!typeOnSale(ev, unit.unitTypeId)) throw new TypeNotOnSaleError(unit.unitTypeId);
+      if (ev.ticketing.capacityCap && (await sessionCommitted(session.id, tx)) >= ev.ticketing.capacityCap) throw new CapacityReachedError(ev.ticketing.capacityCap);
     }
 
     await tx.update(holds)
@@ -218,7 +232,7 @@ export async function createPendingBooking(cartToken: string, lines: CartLine[],
 
   return db.transaction(async (tx) => {
     const holdRows = await tx.select({
-      hold: holds, slot: sessions.slot, priceMorning: unitTypes.priceMorning, priceAfternoon: unitTypes.priceAfternoon,
+      hold: holds, slot: sessions.slot, date: sessions.date, unitTypeId: inventoryUnits.unitTypeId, priceMorning: unitTypes.priceMorning, priceAfternoon: unitTypes.priceAfternoon,
       perPerson: unitTypes.perPerson, pax: unitTypes.pax,
     }).from(holds)
       .innerJoin(sessions, eq(sessions.id, holds.sessionId))
@@ -233,9 +247,11 @@ export async function createPendingBooking(cartToken: string, lines: CartLine[],
 
     const guestRow = await upsertGuest(guest, tx);
 
+    const evCache = new Map<string, Awaited<ReturnType<typeof eventForSession>>>();
+    for (const h of holdRows) { const k = `${h.date}#${h.slot}`; if (!evCache.has(k)) evCache.set(k, await eventForSession(h.date, h.slot, tx)); }
     const items = lines.map((l) => {
       const h = holdRows.find((r) => r.hold.id === l.holdId)!;
-      const unit = h.slot === "morning" ? h.priceMorning : h.priceAfternoon;
+      const unit = eventPrice(evCache.get(`${h.date}#${h.slot}`) ?? null, h.unitTypeId, basePrice(h.slot, h.priceMorning, h.priceAfternoon));
       const guestsN = Math.min(Math.max(1, l.guests), h.pax);
       return { h, guests: guestsN, arrivalTime: l.arrivalTime, price: h.perPerson ? unit * guestsN : unit };
     });
