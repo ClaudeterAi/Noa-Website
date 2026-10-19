@@ -8,6 +8,7 @@ import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import Effects from "@/components/layout/Effects";
 import Motion from "@/components/layout/Motion";
+import Scroll from "@/components/layout/Scroll";
 import ChatConcierge from "@/components/concierge/ChatConcierge";
 import VoiceConcierge from "@/components/concierge/VoiceConcierge";
 import { barlow, naskh, plexArabic } from "@/fonts";
@@ -47,6 +48,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
       <body>
         <NextIntlClientProvider messages={messages}>
           <Effects />
+          <Scroll />
           <Motion />
           <Nav
             main={registry.nav.main.map((id) => toLink(id))}

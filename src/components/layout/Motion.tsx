@@ -12,7 +12,7 @@ import { useEffect } from "react";
 const IMG = ".ed-frame,.split-img,.pkg-img,.ed-night-img,.ed-next-img,.rest-img,.ed-map-frame,.subhero-bg,.evt-img,.tile-img,.gal-cell,.ed-tile-img,.ed-portrait,.ed-pkg-img,.ed-poster,.ed-gallery-img,.ed-intro-img";
 const UP = "p,li,.ed-sub,.ed-kicker,.ed-fact,.tariff-card,.faq-q,.ed-night,.inc-row,.spec,.contact-cell,.ed-link,.cta-btn,.btn,.pkg-meta,.ed-tile,.ed-month-h,.card,.tile,blockquote";
 const WORDS = "h1,h2,h3,.ed-h,.prose-h,.subhero-h,.ed-next-name,.pkg-h,.rest-h";
-const SKIP = ".bk-app,.yacht-map,.cc-panel,.ad,header,nav,footer,.booking-page,[data-no-motion]";
+const SKIP = ".bk-app,.yacht-map,.cc-panel,.ad,header,nav,footer,.booking-page,[data-no-motion],[data-scrub],.hero,.ed-stack,.ed-ticker";
 
 function splitWords(el: HTMLElement) {
   if (el.dataset.words === "1") return;
@@ -72,7 +72,7 @@ export default function Motion() {
         el.dataset.m = "up"; io.observe(el);
       });
     };
-    tag();
+    window.setTimeout(tag, 120);
     const mo = new MutationObserver(() => { clearTimeout(t); t = window.setTimeout(tag, 60); });
     let t = 0;
     mo.observe(document.body, { childList: true, subtree: true });

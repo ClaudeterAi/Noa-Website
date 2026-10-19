@@ -1485,3 +1485,31 @@ footer a:hover{color:#fff;}
 .no-motion [data-m]{opacity:1!important;transform:none!important;}
 .no-motion [data-m="img"]::after{display:none;}
 @media(prefers-reduced-motion:reduce){[data-m],.mwi{transition:none!important;animation:none!important;opacity:1!important;transform:none!important;}[data-m="img"]::after{display:none!important;}}
+
+/* ---------- scroll choreography (GSAP + Lenis) ---------- */
+html.lenis,html.lenis body{height:auto;}
+.lenis.lenis-smooth{scroll-behavior:auto!important;}
+.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain;}
+.lenis.lenis-stopped{overflow:hidden;}
+html.scrub .hero{overflow:hidden;background:var(--bg);}
+html.scrub .hero .hero-bg{transform-origin:50% 50%;will-change:transform;}
+.hero-line{position:absolute;left:var(--gutter);right:var(--gutter);bottom:3.2%;text-align:center;color:#fff;font-size:clamp(1.25rem,2.8vw,2.4rem);font-weight:600;letter-spacing:.02em;line-height:1.1;text-shadow:0 2px 24px rgba(0,0,0,.35);pointer-events:none;z-index:3;}
+html.scrub .hero-line{color:var(--head);text-shadow:none;}
+.chw{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.1em;margin-bottom:-.1em;}
+.ch{display:inline-block;will-change:transform;}
+.ed-stack{position:relative;}
+.ed-stack.pinned{height:100vh;height:100svh;overflow:hidden;background:var(--bg);}
+.ed-stack.pinned .ed-pkg.stacked{position:absolute;inset:0;height:100vh;height:100svh;align-items:center;padding-top:0;padding-bottom:0;background:var(--bg);will-change:transform;}
+.ed-stack.pinned .ed-pkg.stacked .ed-frame-bleed{min-height:0;height:100%;}
+.ed-stack.pinned .ed-pkg-media{transform-origin:50% 50%;will-change:transform,filter;}
+.ed-ticker{overflow:hidden;padding:clamp(28px,4vw,54px) 0 0;border-top:1px solid var(--ed-hair);border-bottom:1px solid var(--ed-hair);margin:var(--ed-gap) 0 0;background:var(--bg);}
+.ed-ticker-track{display:flex;white-space:nowrap;will-change:transform;padding-bottom:clamp(28px,4vw,54px);}
+.ed-ticker-item{display:inline-flex;align-items:center;font-size:clamp(1.1rem,2.4vw,2rem);letter-spacing:.14em;text-transform:uppercase;color:var(--head);font-weight:600;padding-inline-end:1.2em;}
+.ed-ticker-item i{display:inline-block;width:.42em;height:.42em;border-radius:50%;background:var(--accent);margin-inline-start:1.2em;}
+html.scrub .ed-gallery{will-change:clip-path;}
+html.scrub .ed-poster,html.scrub .ed-tile,html.scrub .ed-night{will-change:transform,opacity;}
+/* night tokens reach the panels and frames too */
+.ed-news{background:var(--ed-sand);}
+.ed-frame{background-color:var(--ed-sand);}
+
+html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
