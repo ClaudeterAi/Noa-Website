@@ -973,13 +973,13 @@ input,select,textarea{font-size:16px;}
     overflow: visible;
     position: relative;
     width: var(--bkw);
-    height: calc(var(--bkw) * 1400 / 1000);
+    height: calc(var(--bkw) * 1092 / 352);
   }
   .yacht-map{
     position: absolute;
     top: 50%;
     left: 50%;
-    width: calc(var(--bkw) * 1400 / 1000);
+    width: calc(var(--bkw) * 1092 / 352);
     height: var(--bkw);
     min-width: 0;
     max-width: none;
@@ -1121,3 +1121,13 @@ body{font-weight:300;}
 .pkg-desc,.evt-who,.amen-d,.loc-val,.faq-ans p,.cta-body,.ft-about,.ft-col a,.subhero-sub,.subhero-h em,.prose p,.split-prose-p,.incl-sub,.incl-val,.tariff-sub,.tariff-desc,.specs-sub,.form-sub,.form-meta,.contact-cell,.event-row-who,.bk-pkg-time,.bk-time .bot{font-style:normal;font-weight:300;}
 .subhero-h em{font-weight:600;}
 .tariff-price,.spec-n,.bk-tt-price,.bk-price-val,.bk-total-val{font-weight:600;font-style:normal;}
+/* deck switch above the seat map */
+.bk-decks{display:flex;gap:0;margin:0 0 14px;border:1px solid var(--head,#1a1a1a);width:max-content;}
+.bk-deck{padding:10px 22px;font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;background:transparent;border:0;color:var(--head,#1a1a1a);cursor:pointer;min-height:40px;}
+.bk-deck.on{background:var(--bar,#1a1a1a);color:#fff;}
+.yacht-map .seat{cursor:pointer;transition:filter .2s,opacity .2s;}
+.yacht-map .seat:hover{filter:brightness(.94);}
+.yacht-map .seat.taken{fill:#cfc8bb!important;opacity:.55;cursor:not-allowed;}
+.yacht-map .seat.reserved{fill:#e3dccd!important;stroke-dasharray:2 1.5;cursor:help;}
+.yacht-map .seat.closed{opacity:.18;cursor:not-allowed;}
+.yacht-map .seat.mine{stroke:var(--bar,#1a1a1a);stroke-width:1.6;}

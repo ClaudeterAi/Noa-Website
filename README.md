@@ -173,3 +173,14 @@ Email → Cognito emails a one-time code (native `USER_AUTH` + `EMAIL_OTP`, no L
 `noa_guest` cookie the engine already honours: VIP/preferred priority seats, "welcome back" with the last seat, details pre-filled
 at checkout. Routes: `/api/guest/start`, `/verify`, `/me`, `/signout`. Code: `src/server/guest-auth.ts`, `src/components/booking/GuestSignIn.tsx`.
 Cognito's default sender is capped at 50 emails/day; before launch point the pools at SES on NOA's domain.
+
+## The boat (final layout, 19 Oct 2026)
+
+Seat map and inventory follow the Atelier EPJ detailed-design set (EPJ-NA-DXB-01, NA-ID-1000 main deck, NA-ID-1100 upper deck,
+rev 00 · 17.07.2026). Geometry in `src/components/booking/boat.ts` (mm from the bow and the port rail, hull 52 000 × 15 000, drawn at
+1:50); `YachtMap.tsx` renders one deck at a time. Sellable units: 10 sun loungers, 14 pool daybeds, 8 pool cabanas, 10 cocktail
+tables, 4 lounge cabanas (main deck); 8 upper-deck cabanas, 1 VIP booth (VIP-priority), 12 alfresco tables (upper deck); 40 general
+entry. Shown but not bookable: infinity pool, stage/dance floor, DJ, both bars, reception, restrooms, salon/tattoo, manicure/
+pedicure/massage, stairs, arrival points, canopies. Not drawn: kitchen, prep/store, store, A/V room, artists' room, service stations,
+stowage, dumbwaiter (one hatched "Kitchen & service" block), captain's deck (by others). `npx tsx src/db/sync-units.ts` reconciles the
+database to the geometry; pass an SVG path to use a designer drawing instead.

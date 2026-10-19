@@ -246,8 +246,9 @@ export default function BookingApp() {
     ["reserved", { background: "#fff", border: "1px solid #1a1a1a", backgroundImage: "repeating-linear-gradient(135deg,#1a1a1a 0,#1a1a1a 1px,#fff 1px,#fff 5px)", opacity: 0.6 }],
   ];
   const yachtLabels = locale === "ar"
-    ? { upperDeck: "السطح العلوي", stairs: "الدرج ↓", sundeck: "سطح الشمس", jacuzzi: "جاكوزي", vipLounge: "صالة VIP", balcony: "الشرفة", dj: "دي جيه", pool: "المسبح", poolSub: "22 م · مياه مالحة · حافة لا متناهية", entry: "الدخول" }
-    : { upperDeck: "UPPER DECK", stairs: "STAIRS ↓", sundeck: "SUNDECK", jacuzzi: "JACUZZI", vipLounge: "VIP LOUNGE", balcony: "BALCONY", dj: "DJ", pool: "POOL", poolSub: "22m · saltwater · infinity edge", entry: "ENTRY" };
+    ? { bow: "المقدمة", stern: "المؤخرة", port: "الجانب الأيسر", starboard: "الجانب الأيمن", main: "السطح الرئيسي", upper: "السطح العلوي", locale: "ar" as const }
+    : { bow: "BOW", stern: "STERN", port: "PORT", starboard: "STARBOARD", main: "MAIN DECK", upper: "UPPER DECK", locale: "en" as const };
+  const [deck, setDeck] = useState<"main" | "upper">("main");
 
   return (
     <main>
@@ -301,7 +302,10 @@ export default function BookingApp() {
         </div>
         {notice && step === 2 && <p className="form-meta bk-notice" role="alert">{notice}</p>}
         <div className={`bk-map-wrap${holding ? " is-holding" : ""}`}>
-          <YachtMap labels={yachtLabels} taken={taken} mine={inCart} reserved={reserved} closed={closed} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
+          <div className="bk-decks" role="tablist" aria-label={yachtLabels.main + " / " + yachtLabels.upper}>
+            {(["main", "upper"] as const).map((d) => <button key={d} type="button" role="tab" aria-selected={deck === d} className={`bk-deck${deck === d ? " on" : ""}`} onClick={() => setDeck(d)}>{d === "main" ? yachtLabels.main : yachtLabels.upper}</button>)}
+          </div>
+          <YachtMap deck={deck} labels={yachtLabels} taken={taken} mine={inCart} reserved={reserved} closed={closed} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
         </div>
         <div className="bk-legend">
           {legend.map(([k, style]) => <span key={k}><span className="bk-legend-swatch" style={style} />{t(`legend.${k}`)}</span>)}
