@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { Pool } from "pg";
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
@@ -21,8 +23,15 @@ function makePool() {
     connectionString: url,
     max: Number(process.env.PG_POOL_MAX ?? 5),
     idleTimeoutMillis: 10_000,
-    ssl: url.includes("rds.amazonaws.com") ? { rejectUnauthorized: true } : undefined,
+    ssl: url.includes("rds.amazonaws.com") ? { rejectUnauthorized: true, ca: rdsCa() } : undefined,
+    connectionTimeoutMillis: 8_000,
+    statement_timeout: 5_000,
   });
+}
+
+/** Amazon RDS global CA bundle (committed) so TLS to RDS is verified, not just encrypted. */
+function rdsCa(): string {
+  return readFileSync(path.join(process.cwd(), "src", "db", "rds-global-bundle.pem"), "utf-8");
 }
 
 export function getPool(): Pool { return (globalThis.__noaPool ??= makePool()); }
