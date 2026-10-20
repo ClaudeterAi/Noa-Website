@@ -1488,10 +1488,7 @@ html.lenis,html.lenis body{height:auto;}
 .lenis.lenis-smooth{scroll-behavior:auto!important;}
 .lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain;}
 .lenis.lenis-stopped{overflow:hidden;}
-html.scrub .hero{overflow:hidden;background:var(--bg);}
-html.scrub .hero .hero-bg{transform-origin:50% 50%;}
 .hero-line{position:absolute;left:var(--gutter);right:var(--gutter);bottom:3.2%;text-align:center;color:#fff;font-size:clamp(1.25rem,2.8vw,2.4rem);font-weight:600;letter-spacing:.02em;line-height:1.1;text-shadow:0 2px 24px rgba(0,0,0,.35);pointer-events:none;z-index:3;}
-html.scrub .hero-line{color:var(--head);text-shadow:none;}
 .chw{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.1em;margin-bottom:-.1em;}
 .ch{display:inline-block;}
 .ed-stack{position:relative;}

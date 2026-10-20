@@ -9,12 +9,10 @@ import Lenis from "lenis";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Scroll choreography. Smooth scroll (Lenis) drives GSAP ScrollTrigger, and every scene is scrubbed to the scroll
- * position, so scrolling back plays it in reverse. The one big idea: the page turns from day to night as the Night
- * package arrives, and stays night until the footer. Pins are desktop only; reduced motion disables everything.
+ * Scroll choreography. Smooth scroll (Lenis) drives GSAP ScrollTrigger; scrubbed scenes reverse when scrolling back.
+ * The hero is never touched. Pins are desktop only; reduced motion disables everything.
  */
-const DAY = { "--bg": "#EDE6DA", "--ink": "#10384A", "--head": "#156A89", "--ed-ink": "#10384A", "--ed-mute": "rgba(21,106,137,.72)", "--ed-hair": "rgba(39,160,161,.26)", "--ed-sand": "#DFCDBE" };
-const NIGHT = { "--bg": "#0C2227", "--ink": "#E9E1D2", "--head": "#E6DCC8", "--ed-ink": "#E9E1D2", "--ed-mute": "rgba(233,225,210,.62)", "--ed-hair": "rgba(233,225,210,.18)", "--ed-sand": "#10313A" };
+// palette tokens stay as designed; no scroll-driven colour change
 
 function chars(el: HTMLElement) {
   if (el.dataset.chars) return Array.from(el.querySelectorAll<HTMLElement>(".ch"));
@@ -53,34 +51,13 @@ export default function Scroll() {
 
     const mm = gsap.matchMedia();
     const ctx = gsap.context(() => {
-      const root = document.documentElement;
       const desktop = window.innerWidth > 1024;
       const q = (s: string) => Array.from(main.querySelectorAll<HTMLElement>(s));
       const mark = (els: HTMLElement[]) => els.forEach((e) => { e.dataset.scrub = "1"; });
 
-      /* ---------- hero: pinned, the film tightens into a framed window while the line writes in ---------- */
+      /* ---------- hero: left exactly as it is; the film plays, nothing moves it ---------- */
       const hero = main.querySelector<HTMLElement>(".hero");
-      if (hero) {
-        mark([hero]);
-        const film = hero.querySelectorAll<HTMLElement>(".hero-bg");
-        let line = hero.querySelector<HTMLElement>(".hero-line");
-        if (!line) {
-          line = document.createElement("div"); line.className = "hero-line";
-          line.textContent = document.documentElement.lang === "ar" ? "بعد الظهر هادئ. أما الليل فلا." : "The afternoon is slow. The night is not.";
-          hero.appendChild(line);
-        }
-        const cs = chars(line);
-        gsap.set(cs, { yPercent: 110, opacity: 0 });
-        if (desktop) {
-          const tl = gsap.timeline({ scrollTrigger: { trigger: hero, start: "top top", end: "+=140%", scrub: true, pin: true, anticipatePin: 1, invalidateOnRefresh: true } });
-          tl.to(film, { scale: 0.74, borderRadius: 6, ease: "none", duration: 1 }, 0)
-            .to(cs, { yPercent: 0, opacity: 1, stagger: 0.012, ease: "power2.out", duration: 0.5 }, 0.35);
-          const fade = hero.querySelector(".hero-fade"); if (fade) tl.to(fade, { opacity: 0, ease: "none", duration: 0.4 }, 0);
-        } else {
-          gsap.to(film, { yPercent: 18, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } });
-          gsap.to(cs, { yPercent: 0, opacity: 1, stagger: 0.012, ease: "power2.out", scrollTrigger: { trigger: hero, start: "top top", end: "60% top", scrub: true } });
-        }
-      }
+      if (hero) mark([hero]);
 
       /* ---------- intro: copy drifts up, the two aerials move at different depths ---------- */
       const intro = main.querySelector<HTMLElement>(".ed-intro");
@@ -98,7 +75,6 @@ export default function Scroll() {
           wrap = document.createElement("div"); wrap.className = "ed-stack";
           pkgs[0].parentNode?.insertBefore(wrap, pkgs[0]); pkgs.forEach((p) => wrap.appendChild(p));
         }
-        const nightIdx = pkgs.findIndex((p) => p.id === "pkg-night");
         if (desktop) {
           wrap.classList.add("pinned");
           pkgs.forEach((p, i) => { p.classList.add("stacked"); gsap.set(p, { yPercent: i === 0 ? 0 : 100, y: 0, zIndex: i + 1 }); gsap.set(p.querySelectorAll(".ed-pkg-copy, .ed-pkg-media"), { y: 0, opacity: 1 }); });
@@ -109,11 +85,9 @@ export default function Scroll() {
             const prevMedia = pkgs[i - 1].querySelector(".ed-pkg-media"), prevCopy = pkgs[i - 1].querySelector(".ed-pkg-copy");
             if (prevMedia) tl.to(prevMedia, { opacity: 0.35, scale: 0.96, ease: "power2.inOut", duration: 1 }, i - 1);
             if (prevCopy) tl.to(prevCopy, { opacity: 0.15, yPercent: -6, ease: "power2.inOut", duration: 1 }, i - 1);
-            if (i === nightIdx) tl.to(root, { ...NIGHT, ease: "none", duration: 1 }, i - 1);
           });
         } else {
           pkgs.forEach((p) => { const m = p.querySelector(".ed-pkg-media"); if (m) gsap.fromTo(m, { yPercent: 8 }, { yPercent: -8, ease: "none", scrollTrigger: { trigger: p, start: "top bottom", end: "bottom top", scrub: true } }); });
-          if (nightIdx >= 0) gsap.to(root, { ...NIGHT, ease: "none", scrollTrigger: { trigger: pkgs[nightIdx], start: "top 80%", end: "top 20%", scrub: true } });
         }
       }
 
@@ -167,14 +141,12 @@ export default function Scroll() {
 
       /* page load: header settles */
       const nav = document.querySelector("#nav"); if (nav) gsap.fromTo(nav, { yPercent: -30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "power3.out", delay: 0.2, clearProps: "transform,opacity" });
-      // day tokens whenever we land
-      gsap.set(root, { ...DAY });
     }, main);
 
     requestAnimationFrame(() => ScrollTrigger.refresh());
     const onLoad = () => ScrollTrigger.refresh();
     window.addEventListener("load", onLoad);
-    return () => { window.removeEventListener("load", onLoad); ctx.revert(); mm.revert(); gsap.ticker.remove(tick); lenis.destroy(); document.documentElement.classList.remove("scrub"); gsap.set(document.documentElement, { clearProps: Object.keys(DAY).join(",") }); };
+    return () => { window.removeEventListener("load", onLoad); ctx.revert(); mm.revert(); gsap.ticker.remove(tick); lenis.destroy(); document.documentElement.classList.remove("scrub"); };
   }, [pathname]);
   return null;
 }
