@@ -65,7 +65,8 @@ export default function PerspectiveSlider({ cards, rtl = false, hint, label }: P
     const setX = nodes.map((n) => gsap.quickSetter(n, "x", "px"));
     const setR = nodes.map((n) => gsap.quickSetter(n, "rotateY", "deg"));
     const loop = nodes.length * step;
-    const s = { cur: 0, target: 0, rotVel: 0, rot: 0, drag: false, lastX: 0, pid: -1 };
+    // axis: 0 = undecided, 1 = horizontal (carousel drags), -1 = vertical (page scroll, carousel ignores it)
+    const s = { cur: 0, target: 0, rotVel: 0, rot: 0, drag: false, lastX: 0, startX: 0, startY: 0, axis: 0, pid: -1 };
     let raf = 0, visible = true, tabVisible = !document.hidden;
 
     const place = () => {
@@ -102,19 +103,26 @@ export default function PerspectiveSlider({ cards, rtl = false, hint, label }: P
     };
     const onDown = (e: PointerEvent) => {
       if (e.pointerType === "mouse" && e.button !== 0) return;
-      s.drag = true; s.lastX = e.clientX; s.pid = e.pointerId;
-      el.setPointerCapture?.(e.pointerId);
-      el.classList.add("is-dragging");
+      s.drag = true; s.lastX = s.startX = e.clientX; s.startY = e.clientY; s.pid = e.pointerId;
+      s.axis = e.pointerType === "mouse" ? 1 : 0; // a mouse drag is always sideways; touch decides after 6px
+      if (s.axis === 1) { el.setPointerCapture?.(e.pointerId); el.classList.add("is-dragging"); }
     };
     const onMove = (e: PointerEvent) => {
       if (!s.drag || e.pointerId !== s.pid) return;
+      if (s.axis === 0) {
+        const dx = Math.abs(e.clientX - s.startX), dy = Math.abs(e.clientY - s.startY);
+        if (dx < 6 && dy < 6) return;
+        s.axis = dx > dy ? 1 : -1;
+        if (s.axis === 1) { el.setPointerCapture?.(e.pointerId); el.classList.add("is-dragging"); s.lastX = e.clientX; }
+      }
+      if (s.axis !== 1) return;
       const d = e.clientX - s.lastX; s.lastX = e.clientX;
       s.target -= d * dir;
       kick();
     };
     const onUp = (e: PointerEvent) => {
       if (e.pointerId !== s.pid) return;
-      s.drag = false; s.pid = -1;
+      s.drag = false; s.pid = -1; s.axis = 0;
       el.classList.remove("is-dragging");
       kick();
     };
@@ -167,16 +175,16 @@ export default function PerspectiveSlider({ cards, rtl = false, hint, label }: P
         const detail = card.querySelector<HTMLElement>(".ps-detail");
         const frame = card.querySelector<HTMLElement>(".ps-frame");
         if (!detail || !frame) return;
-        const split = SplitText.create(detail.querySelectorAll(".ps-desc, .ps-cap"), { type: "lines", mask: "lines" });
+        const split = SplitText.create(detail.querySelectorAll(".ps-desc, .ps-cap"), { type: "lines", mask: "lines", aria: "none" } /* keep the real text readable to screen readers */);
         gsap.set(split.lines, { yPercent: 100 });
-        gsap.set(detail, { autoAlpha: 0 });
+        gsap.set(detail, { opacity: 0 });
         const enter = () => {
           gsap.killTweensOf([split.lines, detail]);
-          gsap.timeline({ defaults: { ease: "power3.out", overwrite: "auto" } }).set(detail, { autoAlpha: 1 }).to(split.lines, { yPercent: 0, duration: 0.35, stagger: 0.06 });
+          gsap.timeline({ defaults: { ease: "power3.out", overwrite: "auto" } }).set(detail, { opacity: 1 }).to(split.lines, { yPercent: 0, duration: 0.35, stagger: 0.06 });
         };
         const leave = () => {
           gsap.killTweensOf([split.lines, detail]);
-          gsap.timeline({ defaults: { ease: "power3.in", overwrite: "auto" } }).to(split.lines, { yPercent: 100, duration: 0.35, stagger: 0.04 }).set(detail, { autoAlpha: 0 });
+          gsap.timeline({ defaults: { ease: "power3.in", overwrite: "auto" } }).to(split.lines, { yPercent: 100, duration: 0.35, stagger: 0.04 }).set(detail, { opacity: 0 });
         };
         frame.addEventListener("mouseenter", enter);
         frame.addEventListener("mouseleave", leave);
