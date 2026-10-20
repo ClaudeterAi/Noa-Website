@@ -18,7 +18,7 @@ const img = (id: string, url: string, altEn: string, altAr: string): MediaSlot =
 
 export const media: Record<string, MediaSlot> = {
   // Placeholder film: "Aerial panorama of a tourist port at sunset" (Mixkit License, free for commercial use). Replaced by NOA's own edit via the media manager.
-  "hero-video": { id: "hero-video", kind: "video", url: "/media/hero-placeholder.mp4", source: "placeholder" },
+  "hero-video": { id: "hero-video", kind: "video", url: "/media/hero-noa.mp4", source: "placeholder" },   // NOA film, 9 s seamless loop, no audio track; placeholder file kept
   "hero-poster": { id: "hero-poster", kind: "image", url: "/media/hero-placeholder.jpg", source: "placeholder" },
   // Seat photos for the "Choose your seat" carousel on the package pages. Unsplash placeholders; NOA replaces them in the admin media manager.
   "seat-general": img("seat-general", u("photo-1561501900-3701fa6a0864", 900), "Infinity pool with loungers at sunset", "مسبح لا متناهٍ مع كراسي استلقاء عند الغروب"),

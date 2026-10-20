@@ -51,7 +51,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
       const video = { url: mUrl(s.media) };
       const poster = { url: mUrl("hero-poster") ?? mUrl("hero-still") };
       const still = { url: mUrl("hero-still") };
-      const isPlaceholderFilm = !!video.url && video.url.startsWith("/media/hero-placeholder");
+      const isPlaceholderFilm = !!video.url && /^\/media\/hero-[a-z-]+\.mp4$/.test(video.url);   // films shipped in /public/media come with a .webm twin
       return (
         <section className={`hero${s.quiet ? " hero-quiet" : ""}`} id={s.id}>
           {video?.url ? (
