@@ -16,7 +16,7 @@ export default function Confirmation() {
   const params = useSearchParams();
   const pi = params.get("payment_intent");
   const redirectStatus = params.get("redirect_status");
-  const [state, setState] = useState<{ ref?: string; status: string; total?: number }>({ status: "checking" });
+  const [state, setState] = useState<{ ref?: string; status: string; total?: number; ticket?: string }>({ status: "checking" });
 
   useEffect(() => {
     document.body.classList.add("booking-page");
@@ -53,6 +53,13 @@ export default function Confirmation() {
         <h2>{state.status === "confirmed" ? t("confirmed.title") : state.status === "checking" || state.status === "pending" ? t("checking") : t("paymentFailed")}</h2>
         <p>{body}</p>
         {state.ref && <p>{t("confirmed.ref")}: <strong>{state.ref}</strong></p>}
+        {state.status === "confirmed" && state.ticket && (
+          <div className="ticket-inline">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`/api/bookings/qr/${state.ticket}.svg`} alt="" width={180} height={180} />
+            <p className="ticket-note"><a href={`/${locale}/booking/ticket?t=${state.ticket}`}>{locale === "ar" ? "افتح سوار الدخول" : "Open your wristband code"}</a> · {locale === "ar" ? "اعرضه عند مكتب الرصيف" : "show it at the pier desk"}</p>
+          </div>
+        )}
         <Link href={state.status === "confirmed" ? "/" : "/booking"} className="pkg-btn" style={{ background: "#1a1a1a", color: "#fff", display: "inline-block" }} lang={locale}>
           {state.status === "confirmed" ? t("confirmed.back") : t("bookNow")}
         </Link>

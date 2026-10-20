@@ -1734,3 +1734,14 @@ html[dir="rtl"] .nav-hl{left:0;right:auto;}
 /* Booking pages: the legacy body.booking-page rule (top of file) painted the logo and links #1a1a1a for the old white bar.
    The bar is sea green everywhere now, so they take the same light text as every other page. */
 body.booking-page #nav .logo,body.booking-page #nav .nav-links a,body.booking-page #nav .nav-ham{color:var(--on-bar);}
+
+/* wristband */
+.ticket-inline{margin:18px auto 6px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.ticket-inline img{background:#fff;padding:10px;border-radius:4px;box-shadow:0 10px 30px rgba(30,40,40,.12);}
+.ticket-note{font-size:.9rem;color:var(--ed-mute);}
+.ticket{display:grid;place-items:center;min-height:70vh;padding:120px var(--gutter) 60px;}
+.ticket-card{background:#fff;border-radius:6px;padding:36px 32px;max-width:420px;width:100%;text-align:center;box-shadow:0 22px 60px rgba(30,40,40,.14);}
+.ticket-kicker{font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ed-mute);margin-bottom:10px;}
+.ticket-card h1{font-size:1.9rem;letter-spacing:.12em;color:var(--head);margin:0 0 4px;}
+.ticket-card ul{list-style:none;padding:0;margin:14px 0 18px;font-size:.92rem;color:var(--ed-ink);}
+.ticket-qr{width:240px;height:240px;margin:0 auto;display:block;}

@@ -73,3 +73,10 @@ body.ad button:disabled{cursor:not-allowed;}
 .cal-slot{display:flex;flex-direction:column;border-top:1px solid #eee;padding-top:4px;color:#333;}
 .cal-slot-name{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:#777;}
 .cal-rev{color:#156A89;}
+
+/* check-in */
+.checkin-card{border:1px solid #e3e3e3;border-left:6px solid #bbb;padding:18px 20px;max-width:720px;background:#fff;}
+.checkin-card.ready{border-left-color:#27A0A1;}
+.checkin-card.done{border-left-color:#156A89;background:#f3f8f8;}
+.checkin-card.blocked{border-left-color:#c0392b;}
+.ok-text{color:#156A89;}

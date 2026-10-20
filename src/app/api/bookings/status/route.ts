@@ -1,3 +1,4 @@
+import { ticketToken } from "@/server/ticket";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { bookings } from "@/db/schema";
@@ -17,6 +18,6 @@ export async function GET(req: Request) {
     const [b] = await db.select({ ref: bookings.ref, status: bookings.status, total: bookings.total, locale: bookings.locale })
       .from(bookings).where(and(eq(bookings.stripePaymentIntentId, pi), eq(bookings.cartToken, cartToken))).limit(1);
     if (!b) return error(404, "NOT_FOUND", "Booking not found");
-    return json(b, { headers: { "Cache-Control": "no-store" } });
+    return json({ ...b, ticket: b.status === "confirmed" ? ticketToken(b.ref) : undefined }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) { return handle(e); }
 }

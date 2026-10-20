@@ -57,3 +57,7 @@ export async function assignMediaSlotAction(slotId: string, assetId: string | nu
     revalidatePath("/admin/media"); return ok();
   } catch (e) { return fail(e); }
 }
+
+export async function checkInAction(ref: string) {
+  try { const actor = await requireAdmin("frontdesk"); const r = await A.checkInBooking(actor, ref); revalidatePath("/admin/checkin"); revalidatePath("/admin/bookings"); return ok(r); } catch (e) { return fail(e); }
+}

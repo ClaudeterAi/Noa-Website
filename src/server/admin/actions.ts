@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { auditLog, bookingItems, bookings, guests, inventoryUnits, notificationLog, payments, sessions, settings, unitTypes } from "@/db/schema";
 import { cancelBooking } from "@/server/booking";
@@ -119,6 +119,29 @@ export async function calendarMonth(year: number, month: number) {
     WHERE s.date BETWEEN ${from} AND ${to}
     GROUP BY s.id, s.date, s.slot ORDER BY s.date, s.slot`);
   return rows.rows;
+}
+
+/* ---------- pier check-in ---------- */
+
+/** Issue the wristband: marks the booking checked in once. Confirmed bookings only; a second scan reports the first time. */
+export async function checkInBooking(actor: Actor, ref: string) {
+  const [b] = await db.select().from(bookings).where(eq(bookings.ref, ref));
+  if (!b) throw new Error("Booking not found");
+  if (b.status !== "confirmed") throw new Error(`Cannot check in a ${b.status} booking`);
+  if (b.checkedInAt) return { already: true, at: b.checkedInAt, by: b.checkedInBy };
+  const [row] = await db.update(bookings).set({ checkedInAt: sql`now()`, checkedInBy: actor.email }).where(and(eq(bookings.id, b.id), isNull(bookings.checkedInAt))).returning({ at: bookings.checkedInAt });
+  await audit(actor, "booking.checkin", "booking", b.id, { checkedInAt: null }, { checkedInAt: row?.at, by: actor.email });
+  return { already: false, at: row?.at ?? new Date(), by: actor.email };
+}
+
+export async function bookingByRef(ref: string) {
+  const [b] = await db.select({ id: bookings.id, ref: bookings.ref, status: bookings.status, total: bookings.total, checkedInAt: bookings.checkedInAt, checkedInBy: bookings.checkedInBy, guestName: guests.name, guestPhone: guests.phone, tier: guests.tier })
+    .from(bookings).innerJoin(guests, eq(guests.id, bookings.guestId)).where(eq(bookings.ref, ref));
+  if (!b) return null;
+  const items = await db.select({ label: inventoryUnits.label, date: sessions.date, slot: sessions.slot, pax: unitTypes.pax, type: unitTypes.nameEn })
+    .from(bookingItems).innerJoin(sessions, eq(sessions.id, bookingItems.sessionId)).innerJoin(inventoryUnits, eq(inventoryUnits.id, bookingItems.unitId)).innerJoin(unitTypes, eq(unitTypes.id, inventoryUnits.unitTypeId))
+    .where(and(eq(bookingItems.bookingId, b.id), eq(bookingItems.active, true)));
+  return { ...b, items };
 }
 
 /* ---------- inventory ---------- */

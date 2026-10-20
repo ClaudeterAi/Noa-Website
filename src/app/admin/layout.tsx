@@ -19,6 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <Link href="/admin" className="logo">NOA</Link>
             <Link href="/admin/bookings">Bookings</Link>
             <Link href="/admin/calendar">Calendar</Link>
+            <Link href="/admin/checkin">Check-in</Link>
             <Link href="/admin/events">Events</Link>
             <Link href="/admin/media">Media</Link>
             <Link href="/admin/guests">Guests</Link>

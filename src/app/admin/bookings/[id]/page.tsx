@@ -10,7 +10,7 @@ export default async function BookingDetail({ params }: { params: Promise<{ id: 
   if (!b) notFound();
   return (
     <main className="ad-main">
-      <h1>{b.booking.ref} <span className={`pill ${b.booking.status === "confirmed" ? "ok" : "muted"}`}>{b.booking.status}</span></h1>
+      <h1>{b.booking.ref} <span className={`pill ${b.booking.status === "confirmed" ? "ok" : "muted"}`}>{b.booking.status}</span>{b.booking.checkedInAt && <span className="pill ok">checked in</span>}</h1>
       <div className="cards">
         <div className="card"><div className="l">Guest</div><div>{b.guest.name}</div><div className="note">{b.guest.email}<br />{b.guest.phone}<br />tier: {b.guest.tier}{b.guest.tierManual ? " (manual)" : ""}</div></div>
         <div className="card"><div className="l">Money</div><div>Subtotal AED {b.booking.subtotal.toLocaleString("en-US")}</div><div>VAT AED {b.booking.vat.toLocaleString("en-US")}</div><div><strong>Total AED {b.booking.total.toLocaleString("en-US")}</strong></div><div className="note">{b.booking.stripePaymentIntentId ?? "no payment intent"}</div></div>
