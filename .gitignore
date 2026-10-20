@@ -6,3 +6,9 @@ out
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# local one-off check scripts, never committed
+/e2e_*.ts
+/mk_*.ts
+/render_check.ts
+/mig_check.ts
