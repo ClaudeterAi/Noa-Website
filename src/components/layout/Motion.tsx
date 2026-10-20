@@ -77,26 +77,13 @@ export default function Motion() {
     let t = 0;
     mo.observe(document.body, { childList: true, subtree: true });
 
-    // parallax drift on framed photography (background-position, cheap and jitter free)
+    // anything already scrolled past (anchor jumps, fast flicks) shows without waiting for an intersection
     let raf = 0;
-    const drift = () => {
-      raf = 0;
-      const vh = window.innerHeight;
-      // anything already scrolled past (anchor jumps, fast flicks) shows without waiting for an intersection
-      document.querySelectorAll<HTMLElement>("[data-m]:not(.in)").forEach((el) => { if (el.getBoundingClientRect().bottom < 0) el.classList.add("in"); });
-      document.querySelectorAll<HTMLElement>("[data-m='img'].in").forEach((el) => {
-        const r = el.getBoundingClientRect();
-        if (r.bottom < 0 || r.top > vh) return;
-        const p = (r.top + r.height / 2 - vh / 2) / vh;      // -0.5 .. 0.5 across the viewport
-        el.style.setProperty("--par", `${(p * -22).toFixed(1)}px`);
-      });
-    };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(drift); };
+    const settle = () => { raf = 0; document.querySelectorAll<HTMLElement>("[data-m]:not(.in)").forEach((el) => { if (el.getBoundingClientRect().bottom < 0) el.classList.add("in"); }); };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(settle); };
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    drift();
 
-    return () => { io.disconnect(); mo.disconnect(); window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); if (raf) cancelAnimationFrame(raf); };
+    return () => { io.disconnect(); mo.disconnect(); window.removeEventListener("scroll", onScroll); if (raf) cancelAnimationFrame(raf); };
   }, []);
   return null;
 }

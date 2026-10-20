@@ -74,9 +74,8 @@ export default function Scroll() {
         if (desktop) {
           const tl = gsap.timeline({ scrollTrigger: { trigger: hero, start: "top top", end: "+=140%", scrub: true, pin: true, anticipatePin: 1, invalidateOnRefresh: true } });
           tl.to(film, { scale: 0.74, borderRadius: 6, ease: "none", duration: 1 }, 0)
-            .to(hero.querySelector(".hero-fade"), { opacity: 0, ease: "none", duration: 0.4 }, 0)
-            .to(cs, { yPercent: 0, opacity: 1, stagger: 0.012, ease: "power2.out", duration: 0.5 }, 0.35)
-            .to(hero.querySelector(".hero-scroll"), { opacity: 0, duration: 0.2 }, 0);
+            .to(cs, { yPercent: 0, opacity: 1, stagger: 0.012, ease: "power2.out", duration: 0.5 }, 0.35);
+          const fade = hero.querySelector(".hero-fade"); if (fade) tl.to(fade, { opacity: 0, ease: "none", duration: 0.4 }, 0);
         } else {
           gsap.to(film, { yPercent: 18, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } });
           gsap.to(cs, { yPercent: 0, opacity: 1, stagger: 0.012, ease: "power2.out", scrollTrigger: { trigger: hero, start: "top top", end: "60% top", scrub: true } });
@@ -88,14 +87,6 @@ export default function Scroll() {
       if (intro) {
         mark([intro]);
         gsap.fromTo(intro.querySelector(".ed-intro-copy"), { yPercent: 10, y: 0, opacity: 0 }, { yPercent: 0, y: 0, opacity: 1, duration: 1, ease: "power3.out", scrollTrigger: { trigger: intro, start: "top 85%", toggleActions: "play none none reverse", fastScrollEnd: true } });
-        intro.querySelectorAll<HTMLElement>(".ed-frame").forEach((f, i) => gsap.fromTo(f, { yPercent: 10 + i * 8 }, { yPercent: -10 - i * 8, ease: "none", scrollTrigger: { trigger: intro, start: "top bottom", end: "bottom top", scrub: true } }));
-      }
-
-      /* ---------- deck tiles: the two columns drift against each other as you pass ---------- */
-      const tiles = main.querySelector<HTMLElement>(".ed-tiles");
-      if (tiles) {
-        mark([tiles]);
-        tiles.querySelectorAll<HTMLElement>(".ed-tile").forEach((t, i) => gsap.fromTo(t, { yPercent: i % 2 ? 10 : -3, y: 0, opacity: 1 }, { yPercent: i % 2 ? -8 : 4, y: 0, ease: "none", scrollTrigger: { trigger: tiles, start: "top bottom", end: "bottom top", scrub: true } }));
       }
 
       /* ---------- packages: a pinned stack, each slides up over the last; the Night brings the night ---------- */
@@ -114,9 +105,10 @@ export default function Scroll() {
           const tl = gsap.timeline({ scrollTrigger: { trigger: wrap, start: "top top", end: `+=${(pkgs.length - 1) * 100}%`, scrub: true, pin: true, anticipatePin: 1, invalidateOnRefresh: true } });
           pkgs.forEach((p, i) => {
             if (i === 0) return;
-            tl.to(p, { yPercent: 0, ease: "power2.inOut", duration: 1 }, i - 1)
-              .to(pkgs[i - 1].querySelector(".ed-pkg-media"), { opacity: 0.35, scale: 0.96, ease: "power2.inOut", duration: 1 }, i - 1)
-              .to(pkgs[i - 1].querySelector(".ed-pkg-copy"), { opacity: 0.15, yPercent: -6, ease: "power2.inOut", duration: 1 }, i - 1);
+            tl.to(p, { yPercent: 0, ease: "power2.inOut", duration: 1 }, i - 1);
+            const prevMedia = pkgs[i - 1].querySelector(".ed-pkg-media"), prevCopy = pkgs[i - 1].querySelector(".ed-pkg-copy");
+            if (prevMedia) tl.to(prevMedia, { opacity: 0.35, scale: 0.96, ease: "power2.inOut", duration: 1 }, i - 1);
+            if (prevCopy) tl.to(prevCopy, { opacity: 0.15, yPercent: -6, ease: "power2.inOut", duration: 1 }, i - 1);
             if (i === nightIdx) tl.to(root, { ...NIGHT, ease: "none", duration: 1 }, i - 1);
           });
         } else {
@@ -125,20 +117,10 @@ export default function Scroll() {
         }
       }
 
-      /* ---------- gallery: enters through an arch, the strip slides against the scroll ---------- */
-      const gallery = main.querySelector<HTMLElement>(".ed-gallery");
-      if (gallery) {
-        mark([gallery]);
-        gsap.fromTo(gallery, { clipPath: "ellipse(150% 100% at 50% 100%)" }, { clipPath: "ellipse(60% 100% at 50% 100%)", ease: "power2.out", scrollTrigger: { trigger: gallery, start: "top bottom", end: "top 30%", scrub: true } });
-        const track = gallery.querySelector<HTMLElement>(".car-track");
-        if (track && desktop) gsap.fromTo(track, { xPercent: 4 }, { xPercent: -6, ease: "none", scrollTrigger: { trigger: gallery, start: "top bottom", end: "bottom top", scrub: true } });
-      }
-
       /* ---------- portrait: image at depth, copy rises ---------- */
       q(".ed-portrait").forEach((sec) => {
         mark([sec]);
-        const media = sec.querySelector(".ed-portrait-media"); const copy = sec.querySelector(".ed-portrait-copy");
-        if (media) gsap.fromTo(media, { yPercent: 12 }, { yPercent: -12, ease: "none", scrollTrigger: { trigger: sec, start: "top bottom", end: "bottom top", scrub: true } });
+        const copy = sec.querySelector(".ed-portrait-copy");
         if (copy) gsap.fromTo(copy, { yPercent: 12, y: 0, opacity: 0 }, { yPercent: 0, y: 0, opacity: 1, duration: 1, ease: "power3.out", scrollTrigger: { trigger: sec, start: "top 80%", toggleActions: "play none none reverse", fastScrollEnd: true } });
       });
 
@@ -154,15 +136,12 @@ export default function Scroll() {
       /* ---------- inner page heroes: the photograph settles, the heading writes in ---------- */
       q(".subhero").forEach((sh) => {
         mark([sh]);
-        const bg = sh.querySelector(".subhero-bg");
-        if (bg) gsap.fromTo(bg, { scale: 1.12 }, { scale: 1, ease: "none", scrollTrigger: { trigger: sh, start: "top top", end: "bottom top", scrub: true } });
         const h = sh.querySelector<HTMLElement>("h1");
-        if (h) { const cs = chars(h); gsap.from(cs, { yPercent: 110, opacity: 0, stagger: 0.015, duration: 0.9, ease: "power3.out", delay: 0.15 }); }
+        if (h) { const cs = chars(h); gsap.from(cs, { yPercent: 110, opacity: 0, stagger: 0.015, duration: 0.9, ease: "power3.out", delay: 0.15, clearProps: "transform,opacity" }); }
       });
 
       /* ---------- split sections: images at depth, headings write in ---------- */
-      q(".split-img, .split-media").forEach((m) => gsap.fromTo(m, { yPercent: 8, scale: 1.06 }, { yPercent: -8, scale: 1, ease: "none", scrollTrigger: { trigger: m, start: "top bottom", end: "bottom top", scrub: true } }));
-      q("h2").forEach((h) => { if (h.closest("[data-scrub]")) return; mark([h]); const cs = chars(h); gsap.fromTo(cs, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.012, duration: 0.8, ease: "power3.out", scrollTrigger: { trigger: h, start: "top 92%", toggleActions: "play none none reverse", fastScrollEnd: true } }); });
+      q("h2").forEach((h) => { if (h.closest("[data-scrub]")) return; mark([h]); const cs = chars(h); gsap.fromTo(cs, { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.012, duration: 0.8, ease: "power3.out", clearProps: "transform,opacity", scrollTrigger: { trigger: h, start: "top 92%", toggleActions: "play none none none", fastScrollEnd: true } }); });
 
       /* ---------- ticker: moves on its own, faster and in the direction of your scroll ---------- */
       const firstPosters = main.querySelector<HTMLElement>(".ed-posters");
@@ -177,17 +156,17 @@ export default function Scroll() {
       const ticker = main.querySelector<HTMLElement>(".ed-ticker-track");
       if (ticker) {
         mark([ticker.parentElement as HTMLElement]);
-        let x = 0, dir = 1;
-        const w = () => ticker.scrollWidth / 2;
-        gsap.ticker.add(() => { const v = lenis.velocity; dir = v < -0.1 ? -1 : v > 0.1 ? 1 : dir; x -= (0.6 + Math.min(Math.abs(v), 40) * 0.12) * dir; const half = w(); if (x <= -half) x += half; if (x > 0) x -= half; ticker.style.transform = `translate3d(${x}px,0,0)`; });
+        let x = 0, dir = 1, half = ticker.scrollWidth / 2;
+        const measure = () => { half = ticker.scrollWidth / 2; }; window.addEventListener("resize", measure);
+        gsap.ticker.add(() => { const v = lenis.velocity; dir = v < -0.1 ? -1 : v > 0.1 ? 1 : dir; x -= (0.6 + Math.min(Math.abs(v), 40) * 0.12) * dir; if (x <= -half) x += half; if (x > 0) x -= half; ticker.style.transform = `translate3d(${x}px,0,0)`; });
       }
 
       /* ---------- footer: lifts into place like a curtain ---------- */
       const footer = document.querySelector<HTMLElement>("footer");
-      if (footer && desktop) gsap.fromTo(footer.firstElementChild, { yPercent: 18, opacity: 0.4 }, { yPercent: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: footer, start: "top bottom", end: "top 55%", scrub: true } });
+      if (footer && desktop && footer.firstElementChild) gsap.fromTo(footer.firstElementChild, { yPercent: 18, opacity: 0.4 }, { yPercent: 0, opacity: 1, ease: "none", scrollTrigger: { trigger: footer, start: "top bottom", end: "top 55%", scrub: true } });
 
       /* page load: header settles */
-      gsap.fromTo(".site-header, header", { yPercent: -30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "power3.out", delay: 0.2 });
+      const nav = document.querySelector("#nav"); if (nav) gsap.fromTo(nav, { yPercent: -30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "power3.out", delay: 0.2, clearProps: "transform,opacity" });
       // day tokens whenever we land
       gsap.set(root, { ...DAY });
     }, main);
