@@ -501,9 +501,11 @@ body.booking-page { padding-top: 96px; }
 }
 .bk-day-ev {
   margin-top: auto; aspect-ratio: 1.15/1; background-size: cover; background-position: center;
-  filter: grayscale(1); transition: filter .4s;
+  transition: filter .4s, transform .4s;
 }
-.bk-day:hover .bk-day-ev { filter: grayscale(0); }
+/* days ahead are in colour; days gone are grey and faded */
+.bk-day.disabled .bk-day-ev { filter: grayscale(1); }
+.bk-day:not(.disabled):hover .bk-day-ev { transform: scale(1.03); }
 .bk-day-ev-label {
   margin-top: 8px; font-size: .55rem; letter-spacing: .26em; text-transform: uppercase;
   color: #555; text-align: center;
