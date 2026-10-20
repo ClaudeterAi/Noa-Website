@@ -163,7 +163,7 @@ export type Section =
       type: "tariff";
       heading: L;
       sub: L;
-      cards: { name: L; price: string; desc: L; cap: L }[];
+      cards: { name: L; price: string; desc: L; cap: L; media?: string }[];
       note?: { before: L; linkLabel: L; after: L; href: Href };
     })
   | (Base & { type: "contactStrip"; cells: { label: L; value: L; href?: string }[] })

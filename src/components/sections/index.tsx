@@ -10,6 +10,7 @@ import ContactForm from "./ContactForm";
 import { publishedEvents } from "@/server/events/public";
 import { getMediaMap } from "@/server/media";
 import Carousel from "@/components/ui/Carousel";
+import PerspectiveSlider from "@/components/ui/PerspectiveSlider";
 import ElasticDecks from "@/components/ui/ElasticDecks";
 import NewsletterForm from "@/components/sections/NewsletterForm";
 import type { EventItem } from "@/content/types";
@@ -501,15 +502,20 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
         <section className="tariff" id={s.id}>
           <div className="tariff-h rv">{pick(s.heading, locale)}</div>
           <div className="tariff-sub rv d1">{pick(s.sub, locale)}</div>
-          <div className="tariff-grid rv d2">
-            {s.cards.map((c) => (
-              <div className="tariff-card" key={c.name.en}>
-                <div className="tariff-name">{pick(c.name, locale)}</div>
-                <div className="tariff-price"><small>AED</small>{c.price}</div>
-                <div className="tariff-desc">{pick(c.desc, locale)}</div>
-                <div className="tariff-cap">{pick(c.cap, locale)}</div>
-              </div>
-            ))}
+          <div className="rv d2">
+            <PerspectiveSlider
+              rtl={locale === "ar"}
+              label={pick(s.heading, locale)}
+              hint={locale === "ar" ? "اسحب للاستكشاف" : "Drag to explore"}
+              cards={s.cards.map((c) => ({
+                name: pick(c.name, locale),
+                price: c.price,
+                desc: pick(c.desc, locale),
+                cap: pick(c.cap, locale),
+                src: mUrl(c.media) ?? mUrl("hero-still") ?? "",
+                alt: (c.media && media[c.media]?.alt?.[locale]) || pick(c.name, locale),
+              }))}
+            />
           </div>
           {s.note && (
             <div className="form-meta" style={{ marginTop: 36 }}>
