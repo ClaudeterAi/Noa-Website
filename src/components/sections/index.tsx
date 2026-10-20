@@ -11,6 +11,7 @@ import { publishedEvents } from "@/server/events/public";
 import { getMediaMap } from "@/server/media";
 import Carousel from "@/components/ui/Carousel";
 import PerspectiveSlider from "@/components/ui/PerspectiveSlider";
+import MovingBorder from "@/components/ui/MovingBorder";
 import ElasticDecks from "@/components/ui/ElasticDecks";
 import NewsletterForm from "@/components/sections/NewsletterForm";
 import type { EventItem } from "@/content/types";
@@ -30,8 +31,9 @@ const bgFrom = (lookup: (id: string | undefined) => string | null) => (mediaId: 
 function CtaA({ link, locale, className }: { link: CtaLink; locale: Locale; className?: string }) {
   return <Link href={hrefPath(link.href)} className={className}>{pick(link.label, locale)}</Link>;
 }
+/** Every primary button on the content pages is the moving-border pill (Aceternity port, NOA colours). */
 function CtaButton({ link, locale, className = "pkg-btn" }: { link: CtaLink; locale: Locale; className?: string }) {
-  return <Link href={hrefPath(link.href)}><button type="button" className={className}>{pick(link.label, locale)}</button></Link>;
+  return <Link href={hrefPath(link.href)}><MovingBorder><button type="button" className={`${className} mb-btn`}>{pick(link.label, locale)}</button></MovingBorder></Link>;
 }
 
 export async function SectionRenderer({ section: s, locale }: { section: Section; locale: Locale }) {

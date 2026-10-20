@@ -1856,3 +1856,27 @@ html.lg-refract .bwf-inner.lg{-webkit-backdrop-filter:url(#lg-foot);backdrop-fil
 .ps.is-live .ps-hint{display:flex;}
 html[dir="rtl"] .ps-name{letter-spacing:0;}
 html[dir="rtl"] .ps-cap,html[dir="rtl"] .ps-hint{letter-spacing:0;}
+/* ── BUTTONS: moving-border pill (Aceternity port, NOA colours) ───────────────────────────────────────────────────────
+   Primary buttons on the content pages: 1.75rem radius, 64px tall, 160px minimum, 1px gutter, 80px sea green glow on a 2 s lap,
+   sea blue glass inner at 0.96x radius, sand label. Wrapped buttons carry .mb-btn so these two-class rules outrank the older
+   .ed-actions .pkg-btn / .ed-news-form .ed-btn rules above. The booking flow is not wrapped and keeps its own buttons. */
+.mb{position:relative;display:inline-flex;height:64px;min-width:160px;padding:1px;overflow:hidden;border-radius:1.75rem;background:transparent;vertical-align:middle;flex:none;}
+.mb-path{position:absolute;inset:0;pointer-events:none;}
+.mb-dot{position:absolute;top:0;left:0;width:80px;height:80px;pointer-events:none;opacity:.8;will-change:transform;background:radial-gradient(var(--c-sea-green,#27A0A1) 40%,transparent 60%);}
+.mb-paused .mb-dot{opacity:0;}
+.mb > .mb-btn{position:relative;z-index:1;width:100%;height:100%;margin:0;padding:0 28px;border-radius:calc(1.75rem * .96);border:1px solid var(--c-sea-blue,#156A89);background:rgba(16,56,74,.8);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);color:var(--c-sand,#EDE6DA);font-family:var(--font-sans);font-size:.875rem;font-weight:400;letter-spacing:.02em;text-transform:none;line-height:1.2;white-space:nowrap;-webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.mb > .mb-btn:hover{background:var(--c-sea-blue-ink,#10384A);color:var(--c-sand,#EDE6DA);border-color:var(--c-sea-blue,#156A89);}
+.mb > .mb-btn:disabled{cursor:default;opacity:.7;}
+@media(prefers-reduced-motion:reduce){.mb-dot{display:none;}}
+/* The pill clips its contents, so the focus ring goes on the pill itself. */
+.mb:has(.mb-btn:focus-visible){box-shadow:0 0 0 2px var(--c-sand,#EDE6DA),0 0 0 4px var(--c-sea-green,#27A0A1);}
+.mb > .mb-btn:focus-visible{outline:none;}
+/* Secondary buttons on the content pages: the same pill shape, a static sea blue outline, no glow.
+   Scoped to their containers because .pkg-more is also used inside the booking flow, which keeps its own style. */
+:is(.cta-row,.pkg-actions,.faq) a.pkg-more{display:inline-flex;align-items:center;justify-content:center;height:64px;min-width:160px;padding:0 28px;border:1px solid var(--c-sea-blue,#156A89);border-radius:1.75rem;background:transparent;color:var(--c-sea-blue,#156A89);font-family:var(--font-sans);font-size:.875rem;font-weight:400;letter-spacing:.02em;text-transform:none;line-height:1.2;white-space:nowrap;transition:background .2s,color .2s,border-color .2s;}
+:is(.cta-row,.pkg-actions,.faq) a.pkg-more:hover{background:rgba(21,106,137,.08);color:var(--c-sea-blue-ink,#10384A);border-color:var(--c-sea-blue-ink,#10384A);}
+.cta-row,.pkg-actions{align-items:center;}
+/* Newsletter: the input keeps its underline, the pill sits beside it. */
+.ed-news-form{align-items:center;gap:16px;border-bottom:0;}
+.ed-news-form input{border-bottom:1px solid var(--ed-ink);}
+@media(max-width:680px){ .ed-news-form{align-items:stretch;} .ed-news-form .mb{align-self:center;} .cta-row{gap:14px;} }
