@@ -1686,3 +1686,48 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
   .ed-elastic-panel,.ed-elastic-panel.open{flex:none;aspect-ratio:4/3;filter:none;will-change:auto;}
   .ed-elastic-spine{display:none;} .ed-elastic-shade,.ed-elastic-copy{opacity:1;transform:none;} .ed-elastic-img{transform:none;}
 }
+/* ── RESIZABLE NAV (Aceternity port, NOA colours) ─────────────────────────────
+   #nav is now a transparent fixed frame; the visible bar is .nav-body, which turns into a floating pill
+   past 100px. Earlier #nav rules above set background/padding on #nav itself; they are neutralised here.
+   Spring in the original (stiffness 200, damping 50) is overdamped, no overshoot: an ease-out curve matches. */
+#nav,#nav.stuck,body.booking-page #nav{position:fixed;top:0;left:0;right:0;z-index:500;display:block;padding:0;background:transparent;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none;}
+.nav-body{--nav-ease:cubic-bezier(.22,1,.36,1);pointer-events:auto;position:relative;margin:0 auto;width:100%;max-width:1280px;display:flex;align-items:center;justify-content:space-between;padding:22px 48px;border-radius:9999px;background:transparent;transition:width .7s var(--nav-ease),transform .7s var(--nav-ease),padding .7s var(--nav-ease),background .35s,box-shadow .35s,border-radius .7s var(--nav-ease);}
+#nav.stuck .nav-body{max-width:none;border-radius:0;padding:14px 48px;background:var(--bar);}
+#nav.floating .nav-body{max-width:1280px;width:40%;min-width:800px;transform:translateY(20px);padding:8px 8px 8px 24px;border-radius:9999px;background:rgba(24,122,128,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 0 24px rgba(16,56,74,.10),0 1px 1px rgba(0,0,0,.05),0 0 0 1px rgba(16,56,74,.06),0 0 4px rgba(16,56,74,.10),0 16px 68px rgba(16,56,74,.12),0 1px 0 rgba(255,255,255,.1) inset;}
+.nav-body .logo{position:relative;z-index:2;}
+#nav.stuck .logo{color:var(--on-bar);}
+/* links centred over the bar, as in the original */
+.nav-links{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:4px;pointer-events:none;}
+.nav-links a{position:relative;z-index:1;pointer-events:auto;padding:8px 16px;border-radius:9999px;font-size:.875rem;font-weight:500;letter-spacing:0;text-transform:none;color:#fff;opacity:1;transition:color .2s;}
+.nav-links a:hover{opacity:1;}
+#nav.stuck .nav-links a{color:var(--on-bar);}
+.nav-hl{position:absolute;top:50%;left:0;height:36px;margin-top:-18px;border-radius:9999px;background:rgba(237,230,218,.18);pointer-events:none;transition:transform .45s var(--nav-ease,ease),width .45s var(--nav-ease,ease),opacity .2s;}
+.nav-actions{position:relative;z-index:2;display:flex;align-items:center;gap:16px;}
+.nav-actions .nav-lang{font-size:.875rem;font-weight:500;color:#fff;padding:8px 4px;}
+#nav.stuck .nav-actions .nav-lang{color:var(--on-bar);}
+.nav-actions .nav-book,.nav-actions a.nav-book{border-radius:9999px;padding:10px 20px;min-height:0;text-indent:0;font-size:.875rem;font-weight:600;letter-spacing:0;text-transform:none;border:1px solid currentColor;transition:background .2s,color .2s,transform .2s;}
+.nav-actions .nav-book:hover{transform:translateY(-2px);}
+#nav.stuck .nav-actions .nav-book{background:var(--c-sand,#EDE6DA);color:var(--c-sea-blue-ink,#10384A);border-color:var(--c-sand,#EDE6DA);}
+#nav.stuck .nav-actions .nav-book:hover{background:var(--c-sand-tint,#F6F2EA);color:var(--c-sea-blue-ink,#10384A);}
+/* mobile toggle + drop-down card */
+.nav-ham{display:none;position:relative;z-index:2;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;background:none;color:#fff;cursor:pointer;}
+#nav.stuck .nav-ham,#nav.menu-open .nav-ham{color:var(--on-bar);}
+.nav-drop{display:none;}
+/* Arabic labels run wider: at 800px the links touch the language switch and Book (measured: -3px). 860px gives clear air. */
+@media(min-width:1024px){html[lang="ar"] #nav.floating .nav-body{min-width:860px;}}
+@media(max-width:1023px){
+  .nav-body{max-width:calc(100vw - 2rem);padding:12px 0;border-radius:2rem;}
+  #nav.stuck .nav-body{max-width:none;padding:10px 20px;border-radius:0;}
+  #nav.floating .nav-body{width:90%;min-width:0;max-width:calc(100vw - 2rem);padding:8px 12px;border-radius:4px;}
+  #nav.menu-open:not(.stuck) .nav-body{background:var(--bar);}
+  .nav-links,.nav-actions{display:none;}
+  .nav-ham{display:flex;}
+  .nav-drop{position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:50;flex-direction:column;align-items:flex-start;gap:16px;padding:32px 16px;border-radius:8px;background:var(--c-sand,#EDE6DA);box-shadow:0 0 24px rgba(16,56,74,.08),0 1px 1px rgba(0,0,0,.05),0 0 0 1px rgba(16,56,74,.06),0 16px 68px rgba(16,56,74,.12);max-height:calc(100vh - 120px);overflow-y:auto;opacity:0;transition:opacity .25s;}
+  .nav-drop.open{display:flex;opacity:1;animation:navDropIn .25s ease both;}
+  .nav-drop a{display:block;font-size:1rem;font-weight:500;color:var(--head);padding:4px 0;}
+  .nav-drop a.nav-drop-book{width:100%;text-align:center;margin-top:8px;padding:12px 16px;border-radius:6px;background:var(--bar);color:var(--on-bar);font-weight:600;}
+}
+@media(max-width:680px){ .nav-body{padding:12px 4px;} }
+@keyframes navDropIn{from{opacity:0}to{opacity:1}}
+html[dir="rtl"] .nav-hl{left:0;right:auto;}
+@media(prefers-reduced-motion:reduce){.nav-body,.nav-hl{transition:none;}.nav-drop.open{animation:none;}}
