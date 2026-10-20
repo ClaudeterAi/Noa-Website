@@ -18,13 +18,22 @@ const set = (patch: Partial<State>) => { state = { ...state, ...patch }; emit();
 let loading: Promise<void> | null = null;
 export function loadMe(force = false): Promise<void> {
   if (loading && !force) return loading;
-  loading = fetch("/api/guest/me", { cache: "no-store" }).then((r) => r.json()).then((me: GuestMe) => set({ me })).catch(() => set({ me: { signedIn: false, authEnabled: false } }));
+  // only an explicit answer from the server changes who we think is signed in; a network blip or a 5xx keeps the current state
+  loading = fetch("/api/guest/me", { cache: "no-store" })
+    .then(async (r) => { if (!r.ok) throw new Error(`me ${r.status}`); return (await r.json()) as GuestMe; })
+    .then((me) => set({ me }))
+    .catch(() => { if (!state.me) set({ me: { signedIn: false, authEnabled: false } }); });   // first probe failed: no sign-in offered on this page load
   return loading;
 }
 export const setMe = (me: GuestMe) => set({ me });
 export const openSignIn = (how: "manual" | "auto" = "manual") => set({ dialog: how });
 export const closeSignIn = () => set({ dialog: null });
-export async function signOut() { await fetch("/api/guest/signout", { method: "POST" }).catch(() => undefined); set({ me: { signedIn: false, authEnabled: state.me?.authEnabled } }); }
+/** Clears the signed-in state only once the server has cleared the cookie; throws otherwise so callers can say so. */
+export async function signOut() {
+  const r = await fetch("/api/guest/signout", { method: "POST" });
+  if (!r.ok) throw new Error(`signout ${r.status}`);
+  set({ me: { signedIn: false, authEnabled: state.me?.authEnabled } });
+}
 
 const subscribe = (l: () => void) => { listeners.add(l); return () => { listeners.delete(l); }; };
 const SERVER: State = { me: null, dialog: null };

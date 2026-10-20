@@ -1999,7 +1999,7 @@ html[dir="rtl"] .hub-pass-stub{-webkit-mask-position:top right,bottom right;mask
 /* body: section rail + content */
 .hub-body{display:grid;grid-template-columns:190px 1fr;gap:48px;margin-top:44px;}
 .hub-rail{position:sticky;top:110px;align-self:start;display:flex;flex-direction:column;gap:2px;}
-.hub-rail a,.hub-rail-out{display:block;padding:9px 12px;border-radius:10px;color:var(--soft);font-size:.95rem;text-decoration:none;border:0;background:none;font:inherit;text-align:start;cursor:pointer;transition:background .15s,color .15s;}
+.hub-rail a,.hub-rail-out{font:inherit;display:block;padding:9px 12px;border-radius:10px;color:var(--soft);font-size:.95rem;text-decoration:none;border:0;background:none;text-align:start;cursor:pointer;transition:background .15s,color .15s;}
 .hub-rail a:hover,.hub-rail-out:hover{background:rgba(16,56,74,.06);color:var(--ink);}
 .hub-rail-out{margin-top:16px;color:var(--sea);}
 .hub .hub-out-mobile{display:none;}
@@ -2156,3 +2156,4 @@ html[dir="rtl"] .hub-chev{transform:scaleX(-1);}
 @media(min-width:1024px){ #nav.floating .nav-body:has(.nav-me) .nav-links{padding-inline-end:116px;} }
 /* hub headings stay in ink so the pass is the only loud thing on the page */
 .hub .hub-h2,.hub .hub-h3,.hub-out-card h1{color:var(--ink,#10384A);}
+.hub-rail-err{display:block;padding:4px 12px;}

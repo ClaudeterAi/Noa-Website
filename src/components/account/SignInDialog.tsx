@@ -102,8 +102,11 @@ export default function SignInDialog() {
     try {
       const r = await fetch("/api/guest/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, code, session, marketing, source: "popup" }) });
       if (!r.ok) throw new Error(T.bad);
-      const fresh = (await (await fetch("/api/guest/me", { cache: "no-store" })).json()) as GuestMe;
-      setMe(fresh); write(KEY_DONE, "1"); setStep("done");
+      // a successful verify is the authoritative signal: the cookie is set, so the guest is signed in now
+      const d = (await r.json()) as { guest: NonNullable<GuestMe["guest"]> };
+      setMe({ signedIn: true, authEnabled: true, guest: d.guest, lastBooking: null });
+      write(KEY_DONE, "1"); setStep("done");
+      void loadMe(true);   // fills in lastBooking; a failure here keeps the signed-in state
     } catch (e) { setErr(e instanceof Error ? e.message : "failed"); } finally { setBusy(false); }
   };
 

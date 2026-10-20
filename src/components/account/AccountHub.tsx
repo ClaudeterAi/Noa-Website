@@ -23,7 +23,7 @@ type Channel = "email" | "whatsapp" | "sms";
 type Field = "name" | "phone";
 
 const EN = {
-  loading: "Loading your account…", signedOutTitle: "Your NOA account", signedOut: "Sign in to see your sailings, wristbands and preferences.", signIn: "Sign in",
+  loading: "Loading your account…", loadFailed: "Your account didn't load. Check your connection and try again.", retry: "Try again", outFailed: "Sign-out didn't complete. Try again.", signedOutTitle: "Your NOA account", signedOut: "Sign in to see your sailings, wristbands and preferences.", signIn: "Sign in",
   pass: "Pier pass", level: "Level", since: "Member since", visits: "Visits", next: "Next sailing", noNext: "No sailing booked", reserve: "Reserve a seat", arrive: "Arrive", seat: "Seat", scan: "Show this at the pier",
   nav: { sailings: "Sailings", profile: "Profile", messages: "Messages", prefs: "Your preferences", privacy: "Privacy" },
   upcoming: "Upcoming", past: "Past sailings", nonePast: "Your past visits will appear here.", noneUp: "Nothing booked yet. Pick a date and a seat and it shows up here with its wristband.",
@@ -46,7 +46,7 @@ const EN = {
   delReason: "Anything we should know? (optional)", delGo: "Request deletion", out: "Sign out", or: "or",
 };
 const AR: typeof EN = {
-  loading: "جارٍ تحميل حسابك…", signedOutTitle: "حسابك في نوا", signedOut: "سجّل الدخول لرؤية رحلاتك وأساورك وتفضيلاتك.", signIn: "تسجيل الدخول",
+  loading: "جارٍ تحميل حسابك…", loadFailed: "لم يُحمَّل حسابك. تحقّق من الاتصال وحاول مجدداً.", retry: "حاول مجدداً", outFailed: "لم يكتمل تسجيل الخروج. حاول مجدداً.", signedOutTitle: "حسابك في نوا", signedOut: "سجّل الدخول لرؤية رحلاتك وأساورك وتفضيلاتك.", signIn: "تسجيل الدخول",
   pass: "تصريح الرصيف", level: "المستوى", since: "عضو منذ", visits: "الزيارات", next: "الرحلة القادمة", noNext: "لا رحلة محجوزة", reserve: "احجز مقعداً", arrive: "الوصول", seat: "المقعد", scan: "أظهر هذا عند الرصيف",
   nav: { sailings: "الرحلات", profile: "الملف الشخصي", messages: "الرسائل", prefs: "تفضيلاتك", privacy: "الخصوصية" },
   upcoming: "القادمة", past: "الرحلات السابقة", nonePast: "ستظهر زياراتك السابقة هنا.", noneUp: "لا حجوزات بعد. اختر تاريخاً ومقعداً وسيظهر هنا مع سوارك.",
@@ -91,13 +91,23 @@ export default function AccountHub() {
   const money = (n: number, c: string) => `${c} ${n.toLocaleString(ar ? "ar-AE" : "en-AE")}`;
   const MONTHS = Array.from({ length: 12 }, (_, i) => dt({ month: "short" }).format(new Date(Date.UTC(2026, i, 15))));
 
+  const [loadErr, setLoadErr] = useState(false);
   const load = useCallback(async () => {
-    const r = await fetch("/api/guest/account", { cache: "no-store" });
-    setAcc(r.ok ? ((await r.json()) as Account) : null);
+    setLoadErr(false);
+    try {
+      const r = await fetch("/api/guest/account", { cache: "no-store" });
+      if (r.status === 401) { void loadMe(true); return; }   // the session ended: let the shared state say so
+      if (!r.ok) throw new Error(`account ${r.status}`);
+      setAcc((await r.json()) as Account);
+    } catch { setLoadErr(true); }
   }, []);
   useEffect(() => { void loadMe(); }, []);
   useEffect(() => { if (me?.signedIn) void load(); }, [me?.signedIn, load]);
   useEffect(() => () => window.clearTimeout(flashT.current), []);
+
+  const doSignOut = async () => {
+    try { await signOut(); router.push("/"); } catch { setError("out"); }
+  };
 
   /** Save one change. Optimistic: the page updates first, then the server confirms (or the change is undone). */
   const save = async (key: string, fields: Record<string, unknown>, optimistic: (a: Account) => Account) => {
@@ -112,6 +122,11 @@ export default function AccountHub() {
     } catch { setAcc(before); setError(key); return false; } finally { setBusy(null); }
   };
 
+  if (me?.signedIn && !acc && loadErr) return (
+    <main className="hub hub-wait" data-no-motion>
+      <div className="hub-out-card"><p>{T.loadFailed}</p><button type="button" className="hub-btn" onClick={() => void load()}>{T.retry}</button></div>
+    </main>
+  );
   if (!me || (me.signedIn && !acc)) return <main className="hub hub-wait" data-no-motion><p>{T.loading}</p></main>;
   if (!me.signedIn) return (
     <main className="hub hub-out" data-no-motion>
@@ -234,7 +249,8 @@ export default function AccountHub() {
       <div className="hub-body">
         <nav className="hub-rail" aria-label={ar ? "أقسام الحساب" : "Account sections"}>
           {(["sailings", "profile", "messages", "prefs", "privacy"] as const).map((k) => <a key={k} href={`#${k}`}>{T.nav[k]}</a>)}
-          <button type="button" className="hub-rail-out" onClick={async () => { await signOut(); router.push("/"); }}>{T.out}</button>
+          <button type="button" className="hub-rail-out" onClick={() => void doSignOut()}>{T.out}</button>
+          {error === "out" && <span className="hub-failed hub-rail-err" role="alert">{T.outFailed}</span>}
         </nav>
 
         <div className="hub-main">
@@ -283,11 +299,12 @@ export default function AccountHub() {
             <ul className="hub-list">
               {(["email", "whatsapp", "sms"] as const).map((c) => {
                 const needs = c !== "email" && !p.phone, on = acc.consents[c];
+                // without a phone a channel can't be switched ON, but a guest can always switch it OFF
                 return (
-                  <li key={c} className={`hub-row hub-toggle${needs ? " is-off" : ""}`}>
+                  <li key={c} className={`hub-row hub-toggle${needs && !on ? " is-off" : ""}`}>
                     <span className="hub-row-label">{T.ch[c][0]}<small>{needs ? T.needPhone : T.ch[c][1]}</small></span>
                     <span className="hub-row-end">{saved(c)}
-                      <button type="button" role="switch" aria-checked={on} aria-label={T.ch[c][0]} className="hub-switch" disabled={needs || busy === c}
+                      <button type="button" role="switch" aria-checked={on} aria-label={T.ch[c][0]} className="hub-switch" disabled={(needs && !on) || busy === c}
                         onClick={() => void save(c, { consents: { [c]: !on } }, (a) => ({ ...a, consents: { ...a.consents, [c]: !on } }))}><i /></button>
                     </span>
                   </li>
@@ -349,7 +366,7 @@ export default function AccountHub() {
                       <button type="button" className="hub-btn danger" disabled={busy === "del"} onClick={async () => {
                         setBusy("del");
                         const r = await fetch("/api/guest/account/delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reason: reason || undefined }) });
-                        setBusy(null); if (r.ok) { await signOut(); router.push("/"); } else setError("del");
+                        setBusy(null); if (r.ok) { try { await signOut(); } catch { /* the delete route already cleared the cookie */ } router.push("/"); } else setError("del");
                       }}>{T.delGo}</button>
                       <button type="button" className="hub-link" onClick={() => setDelOpen(false)}>{T.cancel}</button>
                     </span>
@@ -358,7 +375,8 @@ export default function AccountHub() {
                 )}
               </li>
             </ul>
-            <button type="button" className="hub-btn ghost hub-out-mobile" onClick={async () => { await signOut(); router.push("/"); }}>{T.out}</button>
+            <button type="button" className="hub-btn ghost hub-out-mobile" onClick={() => void doSignOut()}>{T.out}</button>
+            {error === "out" && <p className="hub-failed" role="alert">{T.outFailed}</p>}
           </>))}
         </div>
       </div>

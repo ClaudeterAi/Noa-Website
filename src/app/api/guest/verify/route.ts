@@ -16,9 +16,19 @@ const Body = z.object({
 export async function POST(req: Request) {
   try {
     const { email, code, session, marketing, source } = await parseBody(req, Body);
-    const guest = await verifyEmailCode(email, code, session);
-    if (marketing) await recordConsent(guest.id, "email", true, source, req);
+    let guest: Awaited<ReturnType<typeof verifyEmailCode>>;
+    try { guest = await verifyEmailCode(email, code, session); }
+    catch (e) {
+      const rejected = e instanceof Error && /Code not accepted|NotAuthorized|CodeMismatch|Expired/i.test(e.message);
+      if (!rejected) console.error("guest verify failed", e);
+      return error(401, "CODE_REJECTED", rejected ? "That code was not accepted. Request a new one." : "Sign-in failed. Request a new code.");
+    }
+    // the code is spent once Cognito accepts it: establish the session first, so nothing after this can undo the sign-in
     await setGuestSessionCookie(guest.id, new URL(req.url).protocol === "https:");
+    if (marketing) {
+      try { await recordConsent(guest.id, "email", true, source, req); }
+      catch (e) { console.error("consent not recorded at sign-in", { guestId: guest.id, source }, e); }   // logged so the opt-in is not lost silently
+    }
     return json({ ok: true, guest: { name: guest.name, email: guest.email, phone: guest.phone, tier: guest.tier } });
-  } catch (e) { return error(401, "CODE_REJECTED", e instanceof Error && /Code not accepted|NotAuthorized|CodeMismatch|Expired/i.test(e.message) ? "That code was not accepted. Request a new one." : e instanceof Error ? e.message : "Sign-in failed"); }
+  } catch (e) { return error(422, "VALIDATION_ERROR", e instanceof Error && e.name === "ZodError" ? "Check the email and the 6-digit code." : "Invalid request"); }
 }

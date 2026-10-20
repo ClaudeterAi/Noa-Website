@@ -56,7 +56,7 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
       if (e.key === "Escape") { setOpen(false); return; }
       if (e.key !== "Tab") return;
       // keep focus inside the open menu: the menu button plus every link in the sheet, wrapping at both ends
-      const items = [hamRef.current, ...Array.from(sheetRef.current?.querySelectorAll<HTMLElement>("a[href]") ?? [])].filter(Boolean) as HTMLElement[];
+      const items = [hamRef.current, ...Array.from(sheetRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? [])].filter(Boolean) as HTMLElement[];
       if (!items.length) return;
       const first = items[0], last = items[items.length - 1], at = document.activeElement as HTMLElement | null;
       if (e.shiftKey && (at === first || !items.includes(at as HTMLElement))) { e.preventDefault(); last.focus(); }
@@ -67,7 +67,7 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
     const desktop = window.matchMedia("(min-width: 1024px)");
     const onBreak = () => { if (desktop.matches) setOpen(false); };
     desktop.addEventListener("change", onBreak);
-    const t = window.setTimeout(() => sheetRef.current?.querySelector<HTMLElement>("a")?.focus({ preventScroll: true }), 60);
+    const t = window.setTimeout(() => sheetRef.current?.querySelector<HTMLElement>("a[href], button:not([disabled])")?.focus({ preventScroll: true }), 60);
     const ham = hamRef.current;
     return () => { root.style.overflow = prev; window.removeEventListener("keydown", onKey); desktop.removeEventListener("change", onBreak); clearTimeout(t); ham?.focus({ preventScroll: true }); };
   }, [open]);
