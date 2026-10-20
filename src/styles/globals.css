@@ -425,11 +425,12 @@ footer{background:#f8f7f5;border-top:1px solid rgba(0,0,0,.07);padding:60px 56px
 body.booking-page { padding-top: 96px; }
 
 .bk-progress {
-  display: flex; justify-content: space-between; align-items: center;
+  display: grid; grid-template-columns: repeat(3, 1fr); align-items: start;
   max-width: 1100px; margin: 70px auto 50px; padding: 0 60px; position: relative;
 }
+/* the rail runs through the dot centres: dot is 24px, so the line sits at 12px */
 .bk-progress::before {
-  content: ''; position: absolute; top: 12px; left: 80px; right: 80px;
+  content: ''; position: absolute; top: 12px; left: calc(40px + 100% / 6); right: calc(40px + 100% / 6);
   height: 1px; background: #e5e0d6; z-index: 0;
 }
 .bk-step-dot {
@@ -446,7 +447,7 @@ body.booking-page { padding-top: 96px; }
 }
 .bk-step-dot .lbl {
   font-size: .65rem; letter-spacing: .26em; text-transform: uppercase;
-  color: #777; text-align: center; max-width: 140px;
+  color: #777; text-align: center; max-width: 170px; line-height: 1.5;
 }
 .bk-step-dot.active .lbl { color: #1a1a1a; }
 
@@ -582,7 +583,7 @@ body.booking-page { padding-top: 96px; }
 /* Step 2 — Floor plan */
 .bk-floor-head {
   display: flex; justify-content: space-between; align-items: center;
-  max-width: 1400px; margin: 0 auto 30px; flex-wrap: wrap; gap: 16px;
+  width: 100%; margin: 0 auto 30px; flex-wrap: wrap; gap: 16px;
 }
 .bk-floor-h {
   font-family: var(--font-sans); font-weight: 300;
@@ -946,6 +947,7 @@ input,select,textarea{font-size:16px;}
 
   /* Progress stepper compresses */
   .bk-progress{padding:0 20px;margin:36px auto 32px;}
+  .bk-progress::before{left:calc(20px * 2 / 3 + 100% / 6);right:calc(20px * 2 / 3 + 100% / 6);}
   .bk-step-dot .lbl{font-size:.58rem;letter-spacing:.18em;max-width:90px;}
 
   /* Step sections: less side padding */
@@ -969,7 +971,9 @@ input,select,textarea{font-size:16px;}
   .bk-day-ev-label{font-size:.5rem;}
 
   /* Floor plan: rotate the yacht 90° left so it reads as a long portrait
-     boat on phones (bow points down). Aspect is now 1400×1000 = 1.4:1. */
+     boat on phones (bow points down). The SVG viewBox is 1100 × 395
+     (hull 52 m × 16.74 m at 1:50 plus a 30-unit margin); keep this ratio in
+     step with HULL in boat.ts or the rotated boat gets clipped. */
   .bk-map-wrap{
     --bkw: min(86vw, 360px);
     margin: 24px auto 12px;
@@ -977,13 +981,13 @@ input,select,textarea{font-size:16px;}
     overflow: visible;
     position: relative;
     width: var(--bkw);
-    height: calc(var(--bkw) * 1092 / 352);
+    height: calc(var(--bkw) * 1100 / 395);
   }
   .yacht-map{
     position: absolute;
     top: 50%;
     left: 50%;
-    width: calc(var(--bkw) * 1092 / 352);
+    width: calc(var(--bkw) * 1100 / 395);
     height: var(--bkw);
     min-width: 0;
     max-width: none;
@@ -1062,9 +1066,10 @@ html[lang="ar"] .pkg-h,html[lang="ar"] .rest-h,html[lang="ar"] .events-h,html[la
 .split-prose-link{border-bottom:1px solid #1a1a1a;color:#1a1a1a;font-style:normal;font-family:var(--font-sans);font-size:.55rem;letter-spacing:.26em;text-transform:uppercase;padding-bottom:2px;}
 .nav-ham{background:none;border:none;}
 section.prose[data-placeholder="legal"]{padding-top:160px;}
-.bk-legend{max-width:1400px;margin:24px auto 0;display:flex;gap:20px 24px;flex-wrap:wrap;justify-content:center;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#555;}
-.bk-legend>span{display:flex;align-items:center;gap:8px;}
-.bk-legend-swatch{width:14px;height:14px;border:1px solid #1a1a1a;display:inline-block;}
+.bk-legend{width:100%;margin:24px auto 0;display:flex;gap:16px 28px;flex-wrap:wrap;justify-content:center;font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;color:#555;}
+.bk-legend>span{display:flex;align-items:center;gap:9px;}
+.bk-legend-swatch{width:16px;height:16px;display:inline-block;flex:none;box-shadow:0 1px 1.5px rgba(74,58,36,.35);}
+.bk-legend-swatch.is-outline{box-shadow:none;}
 /* Fix carried from the static site: .nav-mob button (0,1,1) out-specified .nav-mob-close (0,1,0), drawing a bordered box around the × */
 .nav-mob button.nav-mob-close{border:none;padding:0;}
 /* Day 2 — live booking states */
@@ -1377,10 +1382,13 @@ footer a:hover{color:#fff;}
 .yacht-map .seat-g.mine .seat{stroke:var(--bar,#187A80);stroke-width:1.6;}
 .yacht-map .seat-g:not(.taken):not(.closed) .seat{cursor:pointer;}
 .yacht-map .seat-g:not(.taken):not(.closed):hover .seat{filter:brightness(.95);}
-/* bigger boat on desktop: full width of the step, scrolls sideways on narrower laptops instead of shrinking */
+/* desktop: the whole boat fits the viewport (no stern cut off). Below 1100px the map keeps a 1040px floor and scrolls sideways. */
 @media(min-width:681px){
   .bk-map-wrap{max-width:none;width:100%;overflow-x:auto;padding-bottom:10px;}
-  .yacht-map{width:100%;min-width:1500px;}
+  .yacht-map{width:100%;min-width:1040px;}
+}
+@media(min-width:1100px){
+  .yacht-map{min-width:0;}
 }
 /* seat states over the EPJ linework */
 .yacht-map .seat{cursor:pointer;transition:fill .15s;}

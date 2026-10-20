@@ -241,23 +241,27 @@ export default function BookingApp() {
 
   const onTipMove = (id: string, e: MouseEvent) => setTip({ id, x: Math.min(e.clientX + 18, window.innerWidth - 300), y: Math.min(e.clientY + 18, window.innerHeight - 250) });
   const slotLabel = (s: Slot) => `${t(s)} · ${t(`${s}Time`)}`;
-  const legend: [string, React.CSSProperties][] = [
-    ["vipBooth", { background: "linear-gradient(#c9a26e,#a67e4e)", borderRadius: "50%" }],
-    ["upperCabana", { background: "linear-gradient(#dcb07c,#c99a66)" }],
-    ["lounge", { background: "linear-gradient(#d2a776,#bb8f5c)", borderRadius: "8px 8px 2px 2px" }],
-    ["cabana", { background: "linear-gradient(#dcb07c,#c99a66)" }],
-    ["alfresco", { background: "#f1e8d8", border: "1px solid #5a4a36", borderRadius: "50%" }],
-    ["daybed", { background: "linear-gradient(#efe4cf,#e4d5b9)", border: "1px solid #5a4a36" }],
-    ["table", { background: "#f1e8d8", border: "1px solid #5a4a36", borderRadius: "50%" }],
-    ["sunbed", { background: "linear-gradient(#efe4cf,#e4d5b9)", border: "1px solid #5a4a36", width: 22 }],
-    ["entry", { background: "transparent", border: "1px dashed #5a4a36", borderRadius: "50%" }],
-    ["sold", { background: "#d8d8d8", border: "1px solid #999", opacity: 0.55 }],
-    ["reserved", { background: "#fff", border: "1px solid #5a4a36", backgroundImage: "repeating-linear-gradient(135deg,#5a4a36 0,#5a4a36 1px,#fff 1px,#fff 5px)", opacity: 0.6 }],
+  /* Legend swatches mirror the YachtMap paints (cabFabric, loungeFabric, vipFabric, linen, table disc) and the
+     CSS seat states, so a key matches what is drawn. Only the types present on the selected deck are listed. */
+  const [deck, setDeck] = useState<"main" | "upper">("main");
+  const linen = "linear-gradient(#efe4cf,#e4d5b9)", cabFabric = "linear-gradient(#dcb07c,#c99a66)";
+  const legendAll: [string, "main" | "upper" | "both", React.CSSProperties, boolean?][] = [
+    ["lounge", "main", { background: "radial-gradient(circle at 30% 35%, #fffdf9 0 2px, transparent 2.6px), radial-gradient(circle at 70% 35%, #fffdf9 0 2px, transparent 2.6px), radial-gradient(circle at 50% 70%, #fffdf9 0 2px, transparent 2.6px), linear-gradient(#d2a776,#bb8f5c)", borderRadius: 3 }],
+    ["cabana", "main", { background: cabFabric, borderRadius: 1.5 }],
+    ["daybed", "main", { background: linen, borderRadius: 2 }],
+    ["sunbed", "main", { background: linen, borderRadius: 2, width: 9 }],
+    ["vipBooth", "upper", { background: "linear-gradient(#c9a26e,#a67e4e)", borderRadius: 4 }],
+    ["upperCabana", "upper", { background: cabFabric, borderRadius: 1.5 }],
+    ["alfresco", "upper", { background: linen, borderRadius: 2 }],
+    ["table", "both", { background: "radial-gradient(circle, #efe6d3 0 55%, #b2a286 55% 58%, #efe6d3 58%)", border: "1px solid #9c8a6c", borderRadius: "50%" }],
+    ["entry", "main", { background: "transparent", border: "1px dashed #5a4a36", borderRadius: "50%" }, true],
+    ["sold", "both", { background: "#bfb4a1", borderRadius: 2, opacity: 0.85 }],
+    ["reserved", "both", { background: "rgba(255,255,255,.5)", border: "1px dashed rgba(90,74,54,.7)", borderRadius: 2 }, true],
   ];
+  const legend = legendAll.filter(([, d]) => d === "both" || d === deck);
   const yachtLabels = locale === "ar"
     ? { bow: "المقدمة", stern: "المؤخرة", port: "الجانب الأيسر", starboard: "الجانب الأيمن", main: "السطح الرئيسي", upper: "السطح العلوي", locale: "ar" as const }
     : { bow: "BOW", stern: "STERN", port: "PORT", starboard: "STARBOARD", main: "MAIN DECK", upper: "UPPER DECK", locale: "en" as const };
-  const [deck, setDeck] = useState<"main" | "upper">("main");
 
   return (
     <main>
@@ -317,7 +321,7 @@ export default function BookingApp() {
           <YachtMap deck={deck} labels={yachtLabels} taken={taken} mine={inCart} reserved={reserved} closed={closed} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
         </div>
         <div className="bk-legend">
-          {legend.map(([k, style]) => <span key={k}><span className="bk-legend-swatch" style={style} />{t(`legend.${k}`)}</span>)}
+          {legend.map(([k, , style, outline]) => <span key={k}><span className={`bk-legend-swatch${outline ? " is-outline" : ""}`} style={style} />{t(`legend.${k}`)}</span>)}
         </div>
         <p className="form-meta" style={{ textAlign: "center", marginTop: 18 }}>{t("holdNote", { minutes: holdMinutes })}</p>
         <div style={{ textAlign: "center", marginTop: 24 }}>
