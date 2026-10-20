@@ -1,3 +1,4 @@
+import { basePrice } from "@/server/events/ticketing";
 import { registry } from "@/content/registry";
 import type { L, Locale, Section } from "@/content/types";
 import { getSetting, listUnitTypes } from "@/server/booking";
@@ -34,6 +35,7 @@ function sectionText(s: Section, locale: Locale): string[] {
 }
 
 export async function buildKnowledge(locale: Locale): Promise<string> {
+  const nightFactor = await getSetting("night_price_factor");
   const ar = locale === "ar";
   const types = await listUnitTypes();
   const holdMinutes = await getSetting("hold_minutes");
@@ -71,7 +73,7 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
 
   lines.push(ar ? "## أنواع المقاعد والأسعار (بالدرهم، قبل الضريبة)" : "## Seat types and prices (AED, before VAT)");
   for (const t of Object.values(types).sort((a, b) => b.tier - a.tier)) {
-    lines.push(`- ${ar ? t.nameAr : t.nameEn}: ${ar ? "الصباح" : "morning"} AED ${t.priceMorning}, ${ar ? "بعد الظهر" : "afternoon"} AED ${t.priceAfternoon}${t.perPerson ? (ar ? " للشخص" : " per person") : ` (${ar ? "حتى" : "up to"} ${t.pax} ${ar ? "ضيوف" : "guests"})`} — ${ar ? t.descAr : t.descEn}`);
+    lines.push(`- ${ar ? t.nameAr : t.nameEn}: ${ar ? "بعد الظهر" : "afternoon"} AED ${t.priceAfternoon}, ${ar ? "الليل" : "night"} AED ${basePrice("night", t.priceMorning, t.priceAfternoon, nightFactor)}${t.perPerson ? (ar ? " للشخص" : " per person") : ` (${ar ? "حتى" : "up to"} ${t.pax} ${ar ? "ضيوف" : "guests"})`} — ${ar ? t.descAr : t.descEn}`);
   }
 
   lines.push(ar ? "## صفحات الموقع" : "## Site pages");

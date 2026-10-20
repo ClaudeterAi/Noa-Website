@@ -13,9 +13,11 @@ export async function eventForSession(date: string, slot: SessionSlot, conn: DbO
 }
 export type SessionEvent = NonNullable<Awaited<ReturnType<typeof eventForSession>>>;
 
-/** Base price for a unit type in a session: night/full fall back to the afternoon rate unless the event prices them. */
-export function basePrice(slot: SessionSlot, priceMorning: number, priceAfternoon: number) {
-  return slot === "morning" ? priceMorning : priceAfternoon;
+/** Base price for a unit type in a session. Night (and full-day events) = afternoon × night_price_factor, rounded to AED 10, until NOA sets real night rates. */
+export function basePrice(slot: SessionSlot, priceMorning: number, priceAfternoon: number, nightFactor = 1) {
+  if (slot === "morning") return priceMorning;
+  if (slot === "afternoon") return priceAfternoon;
+  return Math.round((priceAfternoon * nightFactor) / 10) * 10;
 }
 
 /** Event price for a unit type: explicit event price → base + surcharge → base. */

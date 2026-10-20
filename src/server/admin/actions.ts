@@ -23,9 +23,11 @@ export async function listBookings(opts: { from?: string; to?: string; status?: 
   if (opts.status) where.push(eq(bookings.status, opts.status as typeof bookings.status.enumValues[number]));
   if (opts.q) where.push(sql`(${bookings.ref} ILIKE ${"%" + opts.q + "%"} OR ${guests.email} ILIKE ${"%" + opts.q + "%"} OR ${guests.name} ILIKE ${"%" + opts.q + "%"})`);
   const rows = await db.select({
-    id: bookings.id, ref: bookings.ref, status: bookings.status, total: bookings.total, createdAt: bookings.createdAt, source: bookings.source,
+    id: bookings.id, ref: bookings.ref, status: bookings.status, total: bookings.total, subtotal: bookings.subtotal, vat: bookings.vat, createdAt: bookings.createdAt, confirmedAt: bookings.confirmedAt, source: bookings.source,
     guestName: guests.name, guestEmail: guests.email, guestPhone: guests.phone, tier: guests.tier,
     firstDate: sql<string>`(SELECT MIN(s.date) FROM booking_items bi JOIN sessions s ON s.id = bi.session_id WHERE bi.booking_id = ${bookings.id})`,
+    firstSlot: sql<string>`(SELECT s.slot FROM booking_items bi JOIN sessions s ON s.id = bi.session_id WHERE bi.booking_id = ${bookings.id} ORDER BY s.date LIMIT 1)`,
+    seatList: sql<string>`(SELECT string_agg(u.label, ' | ' ORDER BY u.label) FROM booking_items bi JOIN inventory_units u ON u.id = bi.unit_id WHERE bi.booking_id = ${bookings.id})`,
     units: sql<number>`(SELECT COUNT(*) FROM booking_items bi WHERE bi.booking_id = ${bookings.id})`,
   }).from(bookings).innerJoin(guests, eq(guests.id, bookings.guestId))
     .where(where.length ? and(...where) : undefined).orderBy(desc(bookings.createdAt)).limit(opts.limit ?? 100);
@@ -93,6 +95,32 @@ export function guestsCsv(rows: Awaited<ReturnType<typeof listGuests>>): string 
   return [head.join(","), ...rows.map((r) => [r.email, r.name, r.phone, r.tier, r.tierManual, r.locale, r.bookings, r.spend, r.lastBookingAt?.toISOString(), r.createdAt.toISOString()].map(esc).join(","))].join("\n");
 }
 
+/** Bookings export with the same filters as the list. Personal data: NOA staff only (editor+), audit by session. */
+export function bookingsCsv(rows: Awaited<ReturnType<typeof listBookings>>): string {
+  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const head = ["ref", "status", "session_date", "slot", "seats", "units", "guest_name", "guest_email", "guest_phone", "tier", "subtotal_aed", "vat_aed", "total_aed", "source", "created_at", "confirmed_at"];
+  return [head.join(","), ...rows.map((r) => [r.ref, r.status, r.firstDate, r.firstSlot, r.seatList, r.units, r.guestName, r.guestEmail, r.guestPhone, r.tier, r.subtotal, r.vat, r.total, r.source, r.createdAt?.toISOString(), r.confirmedAt?.toISOString()].map(esc).join(","))].join("\n");
+}
+
+/** Month calendar: per date and slot, confirmed and pending bookings, seats sold, live holds. For the admin calendar view. */
+export async function calendarMonth(year: number, month: number) {
+  const from = `${year}-${String(month).padStart(2, "0")}-01`;
+  const to = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
+  const rows = await db.execute<{ date: string; slot: string; confirmed: number; pending: number; seats: number; holds: number; revenue: number }>(sql`
+    SELECT s.date::text AS date, s.slot,
+      COUNT(DISTINCT b.id) FILTER (WHERE b.status = 'confirmed')::int AS confirmed,
+      COUNT(DISTINCT b.id) FILTER (WHERE b.status = 'pending')::int AS pending,
+      COUNT(bi.id) FILTER (WHERE bi.active AND b.status = 'confirmed')::int AS seats,
+      (SELECT COUNT(*) FROM holds h WHERE h.session_id = s.id AND h.released_at IS NULL AND h.expires_at > now() AND h.booking_id IS NULL)::int AS holds,
+      COALESCE(SUM(DISTINCT CASE WHEN b.status = 'confirmed' THEN b.total ELSE 0 END), 0)::int AS revenue
+    FROM sessions s
+    LEFT JOIN booking_items bi ON bi.session_id = s.id
+    LEFT JOIN bookings b ON b.id = bi.booking_id
+    WHERE s.date BETWEEN ${from} AND ${to}
+    GROUP BY s.id, s.date, s.slot ORDER BY s.date, s.slot`);
+  return rows.rows;
+}
+
 /* ---------- inventory ---------- */
 
 export async function listInventory() {
@@ -139,7 +167,7 @@ export async function listSessions(from: string, to: string) {
 
 /* ---------- settings ---------- */
 
-const SETTING_KEYS = ["hold_minutes", "hold_extension_minutes", "vat_rate", "vip_release_hours", "tier_rules", "max_holds_per_cart"] as const;
+const SETTING_KEYS = ["night_price_factor", "hold_minutes", "hold_extension_minutes", "vat_rate", "vip_release_hours", "tier_rules", "max_holds_per_cart"] as const;
 export type SettingKey = (typeof SETTING_KEYS)[number];
 
 export async function listSettings() {
@@ -150,6 +178,7 @@ export async function listSettings() {
 export async function updateSetting(actor: Actor, key: SettingKey, value: unknown) {
   if (!SETTING_KEYS.includes(key)) throw new Error("Unknown setting");
   if (["hold_minutes", "hold_extension_minutes", "vip_release_hours", "max_holds_per_cart"].includes(key) && (!Number.isInteger(value) || (value as number) < 1 || (value as number) > 1440)) throw new Error(`${key} must be 1–1440`);
+  if (key === "night_price_factor" && (typeof value !== "number" || value < 0.5 || value > 3)) throw new Error("night_price_factor must be between 0.5 and 3");
   if (key === "vat_rate" && (typeof value !== "number" || value < 0 || value > 1)) throw new Error("vat_rate must be between 0 and 1");
   const [before] = await db.select().from(settings).where(eq(settings.key, key));
   const [after] = await db.insert(settings).values({ key, value: value as Record<string, unknown> }).onConflictDoUpdate({ target: settings.key, set: { value: value as Record<string, unknown>, updatedAt: sql`now()` } }).returning();

@@ -61,3 +61,15 @@ body.ad button:disabled{cursor:not-allowed;}
   /* event editor line-up rows stack */
   .ad .cards[style*="grid-template-columns: 2fr"]{grid-template-columns:1fr!important;}
 }
+
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--ad-hair,#e3e3e3);border:1px solid var(--ad-hair,#e3e3e3);margin-top:12px;}
+.cal-dow{background:#fafafa;padding:8px 10px;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#777;}
+.cal-cell{background:#fff;min-height:96px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;font-size:.78rem;}
+.cal-cell.empty{background:#fafafa;}
+.cal-cell.has:hover{background:#f3f8f8;}
+.cal-cell.today .cal-day{color:#156A89;font-weight:600;}
+.cal-day{font-size:.82rem;color:#555;}
+.cal-slot{display:flex;flex-direction:column;border-top:1px solid #eee;padding-top:4px;color:#333;}
+.cal-slot-name{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:#777;}
+.cal-rev{color:#156A89;}
