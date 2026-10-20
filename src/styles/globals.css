@@ -1187,7 +1187,7 @@ body{font-weight:300;}
 .ed-frame-bleed{aspect-ratio:4/3;height:100%;min-height:600px;}
 
 /* intro: text column + framed landscape carousel */
-.ed-intro{display:grid;grid-template-columns:minmax(300px,34%) 1fr;gap:clamp(40px,6vw,96px);padding:var(--ed-gap) var(--gutter) 0;align-items:start;}
+.ed-intro{display:grid;grid-template-columns:minmax(300px,34%) 1fr;gap:clamp(40px,6vw,96px);padding:var(--ed-gap) var(--gutter) 0;align-items:center;}
 .ed-intro-copy{padding-top:12px;}
 .ed-intro-copy .ed-h{text-align:center;}
 .ed-intro-copy .ed-eyebrow{text-align:center;}
@@ -1551,3 +1551,14 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
 .hero-film .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
 
 .hero-film video::-webkit-media-controls,.hero-film video::-webkit-media-controls-start-playback-button,.hero-film video::-webkit-media-controls-panel{display:none!important;-webkit-appearance:none!important;opacity:0!important;}
+
+/* intro: the copy never runs past the photograph */
+.ed-intro .ed-h{font-size:clamp(1.6rem,2.6vw,2.4rem);}
+/* intro: the photograph stretches to the height of the copy on desktop, so nothing runs past it */
+@media(min-width:981px){
+  .ed-intro{align-items:stretch;}
+  .ed-intro-media,.ed-intro-media .car,.ed-intro-media .car-track{height:100%;}
+  .ed-intro-media .car-slide{height:100%;flex:0 0 100%;width:100%;}
+  .ed-intro-media .ed-frame.ed-frame-landscape{aspect-ratio:auto;height:100%;min-height:460px;}
+  .ed-intro .ed-p{font-size:1.02rem;line-height:1.65;}
+}
