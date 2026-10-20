@@ -23,7 +23,7 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
 
   useEffect(() => {
     // pages without a full-bleed hero (booking, confirmation…) start with the solid bar, so the logo never sits white on sand
-    const hasHero = () => !!document.querySelector(".hero, .subhero");
+    const hasHero = () => !!document.querySelector(".hero");   // sub-page heroes are framed on sand now, so the bar starts solid there
     const onScroll = () => setStuck(window.scrollY > 40 || !hasHero());
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });

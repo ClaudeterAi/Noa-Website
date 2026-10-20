@@ -10,6 +10,7 @@ import ContactForm from "./ContactForm";
 import { publishedEvents } from "@/server/events/public";
 import { getMediaMap } from "@/server/media";
 import Carousel from "@/components/ui/Carousel";
+import ElasticDecks from "@/components/ui/ElasticDecks";
 import NewsletterForm from "@/components/sections/NewsletterForm";
 import type { EventItem } from "@/content/types";
 
@@ -155,21 +156,19 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
       );
     }
     case "tileCarousels": {
+      const panels = s.tiles.map((tile, i) => ({
+        id: `${s.id}-${i}`,
+        img: mUrl(tile.media[0]) ?? "",
+        alt: media[tile.media[0]]?.alt?.[locale] ?? pick(tile.heading, locale),
+        heading: pick(tile.heading, locale),
+        sub: pick(tile.sub, locale),
+        caption: tile.caption ? pick(tile.caption, locale) : undefined,
+        href: tile.href ? hrefPath(tile.href) : undefined,
+        cta: locale === "ar" ? "اكتشف" : "Discover",
+      }));
       return (
-        <section className="ed-tiles" id={s.id}>
-          {s.tiles.map((tile, i) => (
-            <div key={i} className="ed-tile rv">
-              <Carousel arrows="inside" ariaLabel={pick(tile.heading, locale)}>
-                {tile.media.map((m) => <div key={m} className="ed-frame ed-frame-portrait" style={bg(m)} role="img" aria-label={media[m]?.alt?.[locale] ?? ""} />)}
-              </Carousel>
-              <div className="ed-tile-label">
-                <div className="ed-tile-h">{pick(tile.heading, locale)}</div>
-                <div className="ed-tile-sub">{pick(tile.sub, locale)}</div>
-              </div>
-              {tile.caption && <div className="ed-tile-cap">{pick(tile.caption, locale)}</div>}
-              {tile.href && <Link href={hrefPath(tile.href)} className="ed-tile-link" aria-label={pick(tile.heading, locale)} />}
-            </div>
-          ))}
+        <section className="ed-tiles ed-tiles-elastic" id={s.id}>
+          <ElasticDecks panels={panels} rtl={locale === "ar"} />
         </section>
       );
     }
