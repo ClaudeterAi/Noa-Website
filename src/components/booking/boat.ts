@@ -13,7 +13,9 @@ export type Deck = "main" | "upper";
 export interface BoatUnit { id: string; type: string; deck: Deck; x: number; y: number; w: number; h: number; label: string; r?: number }
 export interface Amenity { id: string; deck: Deck; kind: "pool" | "stage" | "bar" | "label" | "restroom" | "stairs" | "arrival" | "boh" | "salon" | "canopy" | "dj"; x: number; y: number; w: number; h: number; name: { en: string; ar: string }; r?: number }
 
-export const HULL = { length: 52000, beam: 16740, top: -1270, corner: 1400 };  // hull edges sit 1270 mm outside the furniture frame (y = 0 at the cabana block): 270 mm of rail from the EPJ frame plus 1 m of drawn deck per side so the hull reads as a boat, not a strip. Furniture positions are untouched.
+/** Hull outline. `bow` is the stem overhang forward of x = 0 (the sun deck starts at 673); `bowFull` is where the bow
+ *  curve reaches full beam. The planform clears every forward unit by ≥ 730 mm. Furniture positions are untouched. */
+export const HULL = { length: 52000, beam: 16740, top: -1270, corner: 1400, bow: 3000, bowFull: 9000 };  // hull edges sit 1270 mm outside the furniture frame (y = 0 at the cabana block): 270 mm of rail from the EPJ frame plus 1 m of drawn deck per side
 export const SCALE = 50;
 
 const units: BoatUnit[] = [];

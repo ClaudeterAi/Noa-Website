@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } fr
 import { useLocale, useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
 import { pick, registry } from "@/content/registry";
-import YachtMap from "./YachtMap";
+import YachtMap, { MAP_INSET } from "./YachtMap";
 import PaymentPanel, { paymentsConfigured } from "./PaymentPanel";
 import { api, isApiError, type CalendarEvent, type UnitAvailability, type UnitTypeInfo } from "./api";
 import { useLiveSeats } from "./useLiveSeats";
@@ -259,6 +259,7 @@ export default function BookingApp() {
     ["reserved", "both", { background: "rgba(255,255,255,.5)", border: "1px dashed rgba(90,74,54,.7)", borderRadius: 2 }, true],
   ];
   const legend = legendAll.filter(([, d]) => d === "both" || d === deck);
+  const mapInset = { "--map-inset": `${(MAP_INSET * 100).toFixed(3)}%` } as React.CSSProperties;
   const yachtLabels = locale === "ar"
     ? { bow: "المقدمة", stern: "المؤخرة", port: "الجانب الأيسر", starboard: "الجانب الأيمن", main: "السطح الرئيسي", upper: "السطح العلوي", locale: "ar" as const }
     : { bow: "BOW", stern: "STERN", port: "PORT", starboard: "STARBOARD", main: "MAIN DECK", upper: "UPPER DECK", locale: "en" as const };
@@ -308,19 +309,20 @@ export default function BookingApp() {
 
       {/* STEP 2 — seat map */}
       <section id="bkStep2" className={`bk-step-section${step === 2 ? " active" : ""}`}>
-        <div className="bk-floor-head">
+        {/* one toolbar row, exactly as wide as the hull below it: back · deck tabs · hint · session */}
+        <div className="bk-floor-head" style={mapInset}>
           <button type="button" className="bk-floor-back" onClick={() => goStep(1)}>{t("changeDate")}</button>
+          <div className="bk-decks" role="tablist" aria-label={yachtLabels.main + " / " + yachtLabels.upper}>
+            {(["main", "upper"] as const).map((d) => <button key={d} type="button" role="tab" aria-selected={deck === d} className={`bk-deck${deck === d ? " on" : ""}`} onClick={() => setDeck(d)}>{d === "main" ? yachtLabels.main : yachtLabels.upper}</button>)}
+          </div>
           <h2 className="bk-floor-h">{t("hoverMap")}</h2>
           <div className="bk-floor-date">{date && slot ? `${shortDate(date).toUpperCase()} · ${slotLabel(slot).toUpperCase()}` : ""}</div>
         </div>
         {notice && step === 2 && <p className="form-meta bk-notice" role="alert">{notice}</p>}
         <div className={`bk-map-wrap${holding ? " is-holding" : ""}`}>
-          <div className="bk-decks" role="tablist" aria-label={yachtLabels.main + " / " + yachtLabels.upper}>
-            {(["main", "upper"] as const).map((d) => <button key={d} type="button" role="tab" aria-selected={deck === d} className={`bk-deck${deck === d ? " on" : ""}`} onClick={() => setDeck(d)}>{d === "main" ? yachtLabels.main : yachtLabels.upper}</button>)}
-          </div>
           <YachtMap deck={deck} labels={yachtLabels} taken={taken} mine={inCart} reserved={reserved} closed={closed} onSeatClick={(id) => void onSeat(id)} onSeatMove={onTipMove} onSeatLeave={() => setTip(null)} />
         </div>
-        <div className="bk-legend">
+        <div className="bk-legend" style={mapInset}>
           {legend.map(([k, , style, outline]) => <span key={k}><span className={`bk-legend-swatch${outline ? " is-outline" : ""}`} style={style} />{t(`legend.${k}`)}</span>)}
         </div>
         <p className="form-meta" style={{ textAlign: "center", marginTop: 18 }}>{t("holdNote", { minutes: holdMinutes })}</p>

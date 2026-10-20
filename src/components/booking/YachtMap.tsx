@@ -21,6 +21,11 @@ interface Props {
   onSeatLeave?: () => void;
 }
 
+const PAD = 30;
+/** viewBox size and the fraction of its width outside the hull on each side; the toolbar and legend use it to line up with the hull */
+export const MAP_VIEW_W = (HULL.length + HULL.bow) / SCALE + PAD * 2;
+export const MAP_VIEW_H = HULL.beam / SCALE + PAD * 2;
+export const MAP_INSET = PAD / MAP_VIEW_W;
 const sx = (mm: number) => mm / SCALE;
 const isCircle = (bw: number, bh: number) => bw >= 4.5 && bw < 24 && Math.abs(bw - bh) < Math.max(bw, bh) * 0.12;
 const sy = (mm: number) => (mm - HULL.top) / SCALE;
@@ -72,16 +77,18 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
   const seatOf = (e: MouseEvent): string | null => (e.target as Element).closest?.("[data-seat]")?.getAttribute("data-seat") ?? null;
   const onClick = (e: MouseEvent) => { const id = seatOf(e); if (id && !taken.has(id)) onSeatClick(id); };
   const onMove = (e: MouseEvent) => { const id = seatOf(e); if (id && !taken.has(id)) onSeatMove?.(id, e); else onSeatLeave?.(); };
-  const W = HULL.length / SCALE, H = HULL.beam / SCALE, PAD = 30, L = labels.locale, R = HULL.corner / SCALE;
+  const W = HULL.length / SCALE, H = HULL.beam / SCALE, L = labels.locale, R = HULL.corner / SCALE, BOW = HULL.bow / SCALE, XF = HULL.bowFull / SCALE;
   const units = BOAT_UNITS.filter((u) => u.deck === deck && u.w > 0);
   const amen = BOAT_AMENITIES.filter((a) => a.deck === deck);
-  const hull = `M${R},0 H${W - R} a${R},${R} 0 0 1 ${R},${R} V${H - R} a${R},${R} 0 0 1 -${R},${R} H${R} a${R},${R} 0 0 1 -${R},-${R} V${R} a${R},${R} 0 0 1 ${R},-${R} Z`;
+  // planform: squared transom with rounded corners aft, a stem that flares to full beam over the first 12 m forward
+  const c = H / 2, hw = H / 2, BL = XF + BOW, p1x = -BOW + 0.18 * BL, p2x = -BOW + 0.5 * BL;
+  const hull = `M${XF},0 H${W - R} a${R},${R} 0 0 1 ${R},${R} V${H - R} a${R},${R} 0 0 1 -${R},${R} H${XF} C${p2x},${H} ${p1x},${c + 0.72 * hw} ${-BOW},${c} C${p1x},${c - 0.72 * hw} ${p2x},0 ${XF},0 Z`;
   const slabX = sx(31400);
   const Rs = sx(400);
   const slab = `M${slabX},0 H${W - Rs} a${Rs},${Rs} 0 0 1 ${Rs},${Rs} V${H - Rs} a${Rs},${Rs} 0 0 1 -${Rs},${Rs} H${slabX} Z`;
   
   return (
-    <svg className="yacht-map" onClick={onClick} onMouseMove={onMove} onMouseLeave={() => onSeatLeave?.()} viewBox={`${-PAD} ${-PAD} ${W + PAD * 2} ${H + PAD * 2}`} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={deck === "main" ? labels.main : labels.upper}>
+    <svg className="yacht-map" onClick={onClick} onMouseMove={onMove} onMouseLeave={() => onSeatLeave?.()} viewBox={`${-PAD - BOW} ${-PAD} ${W + BOW + PAD * 2} ${H + PAD * 2}`} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={deck === "main" ? labels.main : labels.upper}>
       <defs>
         <linearGradient id="poolGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#a8d1d8" /><stop offset="1" stopColor="#cfe5ea" /></linearGradient>
         <linearGradient id="hullGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#f3ede1" /><stop offset="1" stopColor="#ebe2d0" /></linearGradient>
@@ -116,10 +123,10 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         <radialGradient id="poolDepth" cx="50%" cy="50%" r="70%"><stop offset="0" stopColor="#d4e9ec" /><stop offset=".7" stopColor="#a9d0d7" /><stop offset="1" stopColor="#8fbfc8" /></radialGradient>
       </defs>
 
-      <text x={-PAD + 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(-90 ${-PAD + 7} ${H / 2})`}>{labels.bow}</text>
+      <text x={-PAD - BOW + 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(-90 ${-PAD - BOW + 7} ${H / 2})`}>{labels.bow}</text>
       <text x={W + PAD - 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(90 ${W + PAD - 7} ${H / 2})`}>{labels.stern}</text>
-      <text x={W / 2} y={-14} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.port}</text>
-      <text x={W / 2} y={H + 21} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.starboard}</text>
+      <text x={(W - BOW) / 2} y={-14} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.port}</text>
+      <text x={(W - BOW) / 2} y={H + 21} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.starboard}</text>
 
       {/* 1 · deck */}
       {deck === "main"
