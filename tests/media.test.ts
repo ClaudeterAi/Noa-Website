@@ -1,4 +1,5 @@
 /** Media manager against the REAL S3 bucket (presign → PUT → register → assign → served map) with the local Postgres. */
+import { registry } from "@/content/registry";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { sql } from "drizzle-orm";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
@@ -17,7 +18,7 @@ afterAll(async () => { await pool.end(); });
 describe("media", () => {
   it("lists every registry slot with its placeholder; the map equals placeholders when nothing is assigned", async () => {
     const slots = siteSlots(); expect(slots.find((s) => s.id === "hero-video")?.kind).toBe("video"); expect(slots.length).toBeGreaterThan(10);
-    const m = await getMediaMap(); expect(m["hero-video"].url).toBe("/media/hero-placeholder.mp4");
+    const m = await getMediaMap(); expect(m["hero-video"].url).toBe(registry.media["hero-video"].url);   // nothing assigned: the film shipped in the code
   });
   it("refuses unsupported types and oversized files before any upload", async () => {
     await expect(presignUpload({ filename: "x.gif", mime: "image/gif", bytes: 10 }, "t@noa")).rejects.toThrow(/Unsupported/);
