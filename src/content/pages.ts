@@ -25,12 +25,12 @@ export const pages: Page[] = [
         eyebrow: t("Dubai's first floating club", "أول نادٍ عائم في دبي"),
         heading: t("The afternoon is slow. The night is not.", "بعد الظهر هادئ. أما الليل فلا."),
         paragraphs: [
-          t("NOA is a floating beach club anchored two kilometres off Dubai Marina. The afternoon is for the water: the infinity pool, daybeds on its edge, the DJ from two, lunch that runs into the longest sunset in Dubai.", "نوا نادٍ شاطئي عائم راسٍ على بُعد كيلومترين من مرسى دبي. بعد الظهر للماء: المسبح اللامتناهي، وأسرّة نهارية على حافته، والدي جيه من الثانية، وغداء يمتد إلى أطول غروب في دبي."),
-          t("After dark the deck becomes a club on the open Gulf, with a stage, a dance floor and the skyline across the water, until two in the morning. Residents on Thursdays and Fridays, guest DJs on Saturdays.", "بعد الغروب يتحول السطح إلى نادٍ في عرض الخليج، بمنصة وحلبة رقص وأفق المدينة عبر الماء، حتى الثانية فجراً. المقيمون أيام الخميس والجمعة، والدي جيه الضيوف أيام السبت."),
+          t("A floating beach club two kilometres off Dubai Marina. Afternoons are for the water: the infinity pool, daybeds on its edge, the DJ from two and the longest sunset in Dubai.", "نادٍ شاطئي عائم على بُعد كيلومترين من مرسى دبي. بعد الظهر للماء: المسبح اللامتناهي، وأسرّة على حافته، والدي جيه من الثانية، وأطول غروب في دبي."),
+          t("After dark, a club on the open Gulf until two. Residents Thursday and Friday, guest DJs Saturday.", "بعد الغروب، نادٍ في عرض الخليج حتى الثانية. المقيمون الخميس والجمعة، والدي جيه الضيوف السبت."),
         ],
         facts: [
           { label: t("Sessions", "الجلسات"), lines: [t("Afternoon 2 PM to 9:30 PM", "بعد الظهر 2 إلى 9:30 مساءً"), t("Night 9:30 PM to 2 AM", "الليل 9:30 مساءً إلى 2 فجراً")] },
-          { label: t("Departure", "الانطلاق"), lines: [t("Dubai Marina Pier, Berth 7", "رصيف مرسى دبي، المرسى 7"), t("Shuttle boat every 30 minutes, 11 minutes across", "قارب مكوكي كل 30 دقيقة، 11 دقيقة للعبور")] },
+          { label: t("Departure", "الانطلاق"), lines: [t("Dubai Marina Pier, Berth 7 · boats every 30 minutes", "رصيف مرسى دبي، المرسى 7 · قوارب كل 30 دقيقة")] },
         ],
         link: { label: t("See map", "عرض الخريطة"), href: P("location") },
         media: ["aerial-1", "aerial-2"],
