@@ -51,11 +51,24 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
     if (!open) return;
     const root = document.documentElement, prev = root.style.overflow;
     root.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(false); return; }
+      if (e.key !== "Tab") return;
+      // keep focus inside the open menu: the menu button plus every link in the sheet, wrapping at both ends
+      const items = [hamRef.current, ...Array.from(sheetRef.current?.querySelectorAll<HTMLElement>("a[href]") ?? [])].filter(Boolean) as HTMLElement[];
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1], at = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && (at === first || !items.includes(at as HTMLElement))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (at === last || !items.includes(at as HTMLElement))) { e.preventDefault(); first.focus(); }
+    };
     window.addEventListener("keydown", onKey);
+    // the sheet only exists below 1024px; if the window grows past that while open, close it so scrolling comes back
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const onBreak = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener("change", onBreak);
     const t = window.setTimeout(() => sheetRef.current?.querySelector<HTMLElement>("a")?.focus({ preventScroll: true }), 60);
     const ham = hamRef.current;
-    return () => { root.style.overflow = prev; window.removeEventListener("keydown", onKey); clearTimeout(t); ham?.focus({ preventScroll: true }); };
+    return () => { root.style.overflow = prev; window.removeEventListener("keydown", onKey); desktop.removeEventListener("change", onBreak); clearTimeout(t); ham?.focus({ preventScroll: true }); };
   }, [open]);
 
   const onEnter = (e: MouseEvent<HTMLAnchorElement>) => {
