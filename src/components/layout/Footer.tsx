@@ -46,6 +46,7 @@ export default function Footer({ locale }: { locale: Locale }) {
       }))}
       LinkComponent={Link}
       dir={locale === "ar" ? "rtl" : "ltr"}
+      glass
     />
   );
 }

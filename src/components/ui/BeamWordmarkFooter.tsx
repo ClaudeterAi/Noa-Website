@@ -120,6 +120,8 @@ export type BeamWordmarkFooterProps = {
   /** Rendered for internal (non-http) link-column hrefs, so a router Link can carry the locale prefix. */
   LinkComponent?: LinkLike;
   dir?: "ltr" | "rtl";
+  /** Set the link block in a glass panel floating over the beam (rim and gloss from the site's .lg rules). */
+  glass?: boolean;
   className?: string;
 };
 
@@ -228,6 +230,9 @@ const CSS =
   // Layout.
   ".bwf-inner{position:relative;z-index:2;box-sizing:border-box;max-width:1120px;margin:0 auto;padding:clamp(48px,8.5cqw,104px) clamp(20px,6cqw,88px) 0;display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,.86fr) minmax(0,.86fr);column-gap:clamp(24px,4cqw,48px);row-gap:44px}" +
   ".bwf-inner.has-4{grid-template-columns:minmax(0,1.62fr) minmax(0,.86fr) minmax(0,.86fr) minmax(0,.86fr)}" +
+  // glass panel: the same grid, boxed, lifted off the beam with a margin so the light shows around it
+  ".bwf-inner.lg{margin-top:clamp(40px,6cqw,72px);padding:clamp(28px,4cqw,44px) clamp(24px,4cqw,48px);width:calc(100% - 2 * clamp(20px,6cqw,88px));border-radius:28px;background:rgba(var(--bwf-ink-rgb),.06)}" +
+  "@container (max-width: 760px){.bwf-inner.lg{width:calc(100% - 32px);border-radius:20px}}" +
   ".bwf-label{font-size:13px;line-height:1.35;letter-spacing:.02em;color:var(--bwf-label);padding-bottom:13px;position:relative;display:block}" +
   ".bwf-label::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,rgba(var(--bwf-acc),.55),rgba(var(--bwf-acc),.28));transform-origin:0 50%;transform:scaleX(var(--bwf-line,1));transition:transform 1.1s cubic-bezier(.2,.7,.1,1) var(--bwf-d,0ms)}" +
   ".bwf[data-in='false'] .bwf-label::after{--bwf-line:0}" +
@@ -322,6 +327,7 @@ export default function BeamWordmarkFooter({
   animate = true,
   LinkComponent = "a",
   dir,
+  glass = false,
   className = "",
 }: BeamWordmarkFooterProps) {
   const word = (wordmark ?? brand).trim() || brand;
@@ -544,7 +550,7 @@ export default function BeamWordmarkFooter({
         <div className="bwf-grain" />
       </div>
 
-      <div className={"bwf-inner" + (columns.length >= 3 ? " has-4" : "")}>
+      <div className={"bwf-inner" + (columns.length >= 3 ? " has-4" : "") + (glass ? " lg" : "")}>
         <div className="bwf-col">
           <p className="bwf-label" style={delay()}>
             {copy}
