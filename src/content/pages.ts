@@ -61,6 +61,7 @@ export const pages: Page[] = [
         media: "bar-1",
         link: { label: t("Our cocktails", "كوكتيلاتنا"), href: P("about", "restaurant") },
       },
+      { id: "ticker", type: "ticker", items: [t("Residents Thursday and Friday", "المقيمون الخميس والجمعة"), t("Guest DJs Saturday", "الدي جيه الضيوف السبت"), t("Sushi bar from 7 PM", "بار السوشي من 7 مساءً"), t("Last boat 2:30 AM", "آخر قارب 2:30 فجراً"), t("Dubai Marina Pier, Berth 7", "رصيف مرسى دبي، المرسى 7")] },
       { id: "events", type: "posterCarousel", heading: t("This Week on the Water", "هذا الأسبوع على الماء"), sub: t("Residents, guest DJs and themed nights", "مقيمون ودي جيه ضيوف وليالٍ بطابع خاص"), source: "upcoming", aspect: "2/3", href: P("events"), fallbackMedia: ["party-1", "party-2", "party-4"] },
       { id: "past", type: "posterCarousel", heading: t("Nights We Remember", "ليالٍ نتذكرها"), source: "highlights", aspect: "1/1", href: P("events"), fallbackMedia: ["party-3", "deck-dj-1", "party-1", "party-2"] },
       { id: "newsletter", type: "newsletter", kicker: t("Newsletter", "النشرة"), heading: t("Join the crew", "انضم إلى الطاقم"), body: t("First on the list for event tickets, new residents, private nights and the opening date.", "أول من يعرف عن تذاكر الفعاليات والمقيمين الجدد والليالي الخاصة وموعد الافتتاح.") },

@@ -1483,21 +1483,18 @@ footer a:hover{color:#fff;}
 .no-motion [data-m="img"]::after{display:none;}
 @media(prefers-reduced-motion:reduce){[data-m],.mwi{transition:none!important;animation:none!important;opacity:1!important;transform:none!important;}[data-m="img"]::after{display:none!important;}}
 
-/* ---------- scroll choreography (GSAP + Lenis) ---------- */
-html.lenis,html.lenis body{height:auto;}
-.lenis.lenis-smooth{scroll-behavior:auto!important;}
-.lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain;}
-.lenis.lenis-stopped{overflow:hidden;}
+/* ---------- entrance motion ---------- */
+@keyframes tickerRun{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.ed-ticker:hover .ed-ticker-track{animation-play-state:paused;}
+@media(prefers-reduced-motion:reduce){.ed-ticker-track{animation:none;}}
 .hero-line{position:absolute;left:var(--gutter);right:var(--gutter);bottom:3.2%;text-align:center;color:#fff;font-size:clamp(1.25rem,2.8vw,2.4rem);font-weight:600;letter-spacing:.02em;line-height:1.1;text-shadow:0 2px 24px rgba(0,0,0,.35);pointer-events:none;z-index:3;}
 .chw{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.1em;margin-bottom:-.1em;}
 .ch{display:inline-block;}
 .ed-stack{position:relative;}
-.ed-stack.pinned{height:100vh;height:100svh;overflow:hidden;background:var(--bg);}
-.ed-stack.pinned .ed-pkg.stacked{position:absolute;inset:0;height:100vh;height:100svh;align-items:center;padding-top:0;padding-bottom:0;background:var(--bg);}
 .ed-stack.pinned .ed-pkg.stacked .ed-frame-bleed{min-height:0;height:100%;}
 .ed-stack.pinned .ed-pkg-media{transform-origin:50% 50%;}
 .ed-ticker{overflow:hidden;padding:clamp(28px,4vw,54px) 0 0;border-top:1px solid var(--ed-hair);border-bottom:1px solid var(--ed-hair);margin:var(--ed-gap) 0 0;background:var(--bg);}
-.ed-ticker-track{display:flex;white-space:nowrap;padding-bottom:clamp(28px,4vw,54px);}
+.ed-ticker-track{display:flex;white-space:nowrap;padding-bottom:clamp(28px,4vw,54px);animation:tickerRun 48s linear infinite;}
 .ed-ticker-item{display:inline-flex;align-items:center;font-size:clamp(1.1rem,2.4vw,2rem);letter-spacing:.14em;text-transform:uppercase;color:var(--head);font-weight:600;padding-inline-end:1.2em;}
 .ed-ticker-item i{display:inline-block;width:.42em;height:.42em;border-radius:50%;background:var(--accent);margin-inline-start:1.2em;}
 
