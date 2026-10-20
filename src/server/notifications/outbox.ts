@@ -1,4 +1,4 @@
-import { ticketUrl } from "@/server/ticket";
+import { ticketToken, ticketUrl } from "@/server/ticket";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db, type Db, type Tx } from "@/db/client";
 import { bookingItems, bookings, guests, inventoryUnits, notificationLog, sessions, unitTypes } from "@/db/schema";
@@ -110,5 +110,7 @@ async function loadContext(bookingId: string, conn: DbOrTx = db): Promise<Bookin
     items: items.map((i) => ({ unitName: locale === "ar" ? i.nameAr : i.nameEn, date: i.date, slot: i.slot, guests: i.guests, arrivalTime: i.arrivalTime })),
     manageUrl: `${base}/${locale}/booking/manage?ref=${b.booking.ref}`,
     ticketUrl: ticketUrl(base, locale, b.booking.ref),
+    qrImageUrl: `${base}/api/bookings/qr/${ticketToken(b.booking.ref)}.png`,
+    ticketToken: ticketToken(b.booking.ref),
   };
 }

@@ -21,10 +21,22 @@ function itemLines(ctx: BookingContext) {
     : `• ${i.unitName} — ${fmtDate(i.date, "en")} — ${SLOT[i.slot].en} — ${i.guests} guest${i.guests > 1 ? "s" : ""} — arrive ${i.arrivalTime}`);
 }
 
-function wrapHtml(locale: Locale, title: string, lines: string[]) {
+/** The wristband block: QR image the pier desk scans, and a button to the wristband page. */
+function qrBlock(ctx: BookingContext) {
+  if (!ctx.qrImageUrl || !ctx.ticketUrl) return "";
+  const ar = ctx.locale === "ar";
+  return `<div style="margin:28px 0;padding:24px;border:1px solid #e5ded2;text-align:center">
+<div style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#777;margin-bottom:12px">${ar ? "سوار الدخول" : "Your wristband code"}</div>
+<img src="${ctx.qrImageUrl}" width="220" height="220" alt="${ar ? "رمز الدخول" : "Entry code"} ${ctx.ref}" style="display:block;margin:0 auto 12px;border:0" />
+<div style="font-size:13px;color:#555;margin-bottom:16px">${ar ? "اعرض هذا الرمز عند مكتب الرصيف، المرسى 7." : "Show this code at the pier desk, Berth 7."}</div>
+<a href="${ctx.ticketUrl}" style="display:inline-block;padding:10px 22px;background:#156A89;color:#fff;text-decoration:none;border-radius:28px;font-size:13px;letter-spacing:.08em">${ar ? "افتح سوار الدخول" : "Open wristband"}</a>
+</div>`;
+}
+
+function wrapHtml(locale: Locale, title: string, lines: string[], extra = "") {
   const body = lines.map((l) => `<p style="margin:0 0 12px;line-height:1.6">${l.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>`).join("");
   return `<!doctype html><html lang="${locale}" dir="${dir(locale)}"><body style="font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:32px;max-width:560px;margin:auto">
-<div style="letter-spacing:.45em;font-size:20px;margin-bottom:28px">NOA</div><h1 style="font-weight:300;font-size:26px;margin:0 0 20px">${title}</h1>${body}
+<div style="letter-spacing:.45em;font-size:20px;margin-bottom:28px">NOA</div><h1 style="font-weight:300;font-size:26px;margin:0 0 20px">${title}</h1>${body}${extra}
 <p style="margin-top:32px;font-size:12px;color:#777">${PIER[locale]} · +971 4 840 0000 · hello@noa-dubai.com</p></body></html>`;
 }
 
@@ -39,14 +51,15 @@ export function renderEmail(template: Template, ctx: BookingContext): RenderedEm
         ? [`مرحباً ${ctx.guestName}،`, "تم تأكيد مقاعدك في نوا:", ...items, `الإجمالي المدفوع: ${aed(ctx.total)}`, CHECKIN.ar, `الرقم المرجعي: ${ctx.ref}`, ...(ctx.ticketUrl ? [`رمز سوار الدخول: ${ctx.ticketUrl}`] : []), "دعوة التقويم مرفقة."]
         : [`Dear ${ctx.guestName},`, "Your seats at NOA are confirmed:", ...items, `Total paid: ${aed(ctx.total)}`, CHECKIN.en, `Reference: ${ctx.ref}`, ...(ctx.ticketUrl ? [`Your wristband code: ${ctx.ticketUrl}`] : []), "A calendar invite is attached."];
       const ics = first ? buildIcs({ uid: ctx.ref, date: first.date, slot: first.slot, summary: `NOA — ${ctx.ref}`, description: items.join("\n"), location: PIER.en, url: ctx.manageUrl }) : undefined;
-      return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, lines), ics: ics ? { filename: `NOA-${ctx.ref}.ics`, content: ics } : undefined };
+      return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, lines, qrBlock(ctx)), ics: ics ? { filename: `NOA-${ctx.ref}.ics`, content: ics } : undefined };
     }
     case "booking_reminder_24h": {
       const title = L === "ar" ? `نراك غداً في نوا — ${ctx.ref}` : `See you tomorrow at NOA — ${ctx.ref}`;
-      const lines = L === "ar"
+      let lines = L === "ar"
         ? [`مرحباً ${ctx.guestName}،`, "تذكير بحجزك غداً:", ...items, CHECKIN.ar, "تنطلق القوارب كل 30 دقيقة. أحضر هوية سارية؛ جلسة بعد الظهر للبالغين فقط (+18)."]
         : [`Dear ${ctx.guestName},`, "A reminder of your reservation tomorrow:", ...items, CHECKIN.en, "Shuttles run every 30 minutes. Bring valid ID; the afternoon session is 18+."];
-      return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, lines) };
+      if (ctx.ticketUrl) lines.push(L === "ar" ? `رمز سوار الدخول: ${ctx.ticketUrl}` : `Your wristband code: ${ctx.ticketUrl}`);
+      return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, lines, qrBlock(ctx)) };
     }
     case "booking_late_refunded": {
       const title = L === "ar" ? `تم استرداد دفعتك — ${ctx.ref}` : `Your payment has been refunded — ${ctx.ref}`;
@@ -77,6 +90,7 @@ export function renderWhatsApp(template: Template, ctx: BookingContext): Rendere
   const first = ctx.items[0];
   const when = first ? `${fmtDate(first.date, ctx.locale)} · ${SLOT[first.slot][ctx.locale]}` : "";
   const email = renderEmail(template, ctx);
-  // Variables are positional in Meta templates: {{1}} name, {{2}} reference, {{3}} date/slot, {{4}} total
-  return { contentSid: sid, variables: { "1": ctx.guestName, "2": ctx.ref, "3": when, "4": aed(ctx.total) }, fallbackText: email.text };
+  // Positional Meta variables: {{1}} name, {{2}} reference, {{3}} date/slot, {{4}} total,
+  // {{5}} signed ticket token = dynamic suffix of the "Show wristband" URL button (…/booking/ticket?t={{5}}). See docs/whatsapp-templates.md.
+  return { contentSid: sid, variables: { "1": ctx.guestName, "2": ctx.ref, "3": when, "4": aed(ctx.total), ...(ctx.ticketToken ? { "5": ctx.ticketToken } : {}) }, fallbackText: email.text };
 }

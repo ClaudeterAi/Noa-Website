@@ -13,6 +13,8 @@ export interface BookingContext {
   items: { unitName: string; date: string; slot: "morning" | "afternoon" | "night" | "full"; guests: number; arrivalTime: string }[];
   manageUrl: string;
   ticketUrl?: string;   // wristband page with the QR (confirmed bookings)
+  qrImageUrl?: string;  // PNG of the QR, embedded in the email
+  ticketToken?: string; // signed token, the dynamic suffix of the WhatsApp "Show wristband" button
 }
 
 export interface RenderedEmail { subject: string; text: string; html: string; ics?: { filename: string; content: string } }
