@@ -1526,3 +1526,7 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
 .hero-play{position:absolute;inset-inline-end:var(--gutter);bottom:4%;z-index:4;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.7);background:rgba(0,0,0,.25);color:#fff;display:none;place-items:center;cursor:pointer;backdrop-filter:blur(6px);}
 .hero-play svg{width:18px;height:18px;margin-inline-start:2px;}
 .hero.film-blocked .hero-play{display:grid;}
+
+/* the film wrapper is the hero layer; the <video> inside fills it */
+.hero-film{overflow:hidden;}
+.hero-film .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
