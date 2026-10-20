@@ -1,4 +1,5 @@
 import { ticketToken, ticketUrl } from "@/server/ticket";
+import { loadTicketView } from "@/server/ticket-view";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db, type Db, type Tx } from "@/db/client";
 import { bookingItems, bookings, guests, inventoryUnits, notificationLog, sessions, unitTypes } from "@/db/schema";
@@ -112,5 +113,6 @@ async function loadContext(bookingId: string, conn: DbOrTx = db): Promise<Bookin
     ticketUrl: ticketUrl(base, locale, b.booking.ref),
     qrImageUrl: `${base}/api/bookings/qr/${ticketToken(b.booking.ref)}.png`,
     ticketToken: ticketToken(b.booking.ref),
+    ticket: b.booking.status === "confirmed" ? await loadTicketView(b.booking.ref, base, locale).catch(() => null) : null,
   };
 }
