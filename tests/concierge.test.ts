@@ -21,11 +21,11 @@ afterAll(async () => { await pool.end(); });
 describe("knowledge", () => {
   it("renders prices from the database, booking rules from settings, and every page path, in EN and AR", async () => {
     const en = await buildKnowledge("en"); const ar = await buildKnowledge("ar");
-    expect(en).toContain("Pool Cabana: morning AED 6500, afternoon AED 8500");
+    expect(en).toContain("Pool Cabana: afternoon AED 8500, night AED 10200");
     expect(en).toContain("held for 7 minutes");
     expect(en).toContain("→ /en/location");
     expect(en).toContain("Q: Can I cancel or change my reservation?");
-    expect(ar).toContain("كابانا المسبح: الصباح AED 6500");
+    expect(ar).toContain("كابانا المسبح: بعد الظهر AED 8500");
     expect(ar).toContain("→ /ar/location");
     expect(en.length).toBeGreaterThan(8000);
   });

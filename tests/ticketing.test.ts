@@ -25,14 +25,14 @@ describe("event night", () => {
     const s = await getOrCreateSession(D, "night"); expect(s.vipReleaseAt?.toISOString()).toBe("2027-08-13T17:30:00.000Z");  // 21:30 Dubai − 24 h
     const av = await getAvailability(D, "night");
     expect(av.find((u) => u.unitId === "cabana-1")?.price).toBe(12000);            // explicit event price
-    expect(av.find((u) => u.unitId === "daybed-1")?.price).toBe(2200 + 300);    // base afternoon + surcharge
+    expect(av.find((u) => u.unitId === "daybed-1")?.price).toBe(Math.round((2200 * 1.2) / 10) * 10 + 300);    // night base (afternoon × night_price_factor 1.2) + surcharge
     expect(av.find((u) => u.unitId === "sunbed-1")?.state).toBe("closed");         // not on sale tonight
     await expect(createHold({ date: D, slot: "night", unitId: "sunbed-1", cartToken: "c1" })).rejects.toBeInstanceOf(TypeNotOnSaleError);
   });
   it("the booking is priced at the event rate", async () => {
     const h = await createHold({ date: D, slot: "night", unitId: "entry-1", cartToken: "c2" });
     const p = await createPendingBooking("c2", [{ holdId: h.holdId, guests: 2, arrivalTime: "22:00" }], { name: "Night Guest", email: "n@example.com", phone: "+971500000050" });
-    expect(p.subtotal).toBe(900 + 300); // General Entry is one seat per person (pax 1)
+    expect(p.subtotal).toBe(Math.round((900 * 1.2) / 10) * 10 + 300); // General Entry, pax 1: night base (afternoon × 1.2) + surcharge
     expect(p.vat).toBe(Math.round(p.subtotal * 0.05));
   });
   it("members presale: guests wait, members book; sales close is enforced", async () => {

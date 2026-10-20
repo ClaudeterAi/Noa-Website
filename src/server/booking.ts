@@ -12,7 +12,7 @@ type DbOrTx = Db | Tx;
 
 /* ------------------------------------------------------------------ settings */
 
-const DEFAULTS = { hold_minutes: 7, hold_extension_minutes: 3, vat_rate: 0.05, max_holds_per_cart: 6 } as const;
+const DEFAULTS = { hold_minutes: 7, hold_extension_minutes: 3, vat_rate: 0.05, max_holds_per_cart: 6, night_price_factor: 1.2 } as const;   // night = afternoon × factor until NOA sets real night rates
 type SettingKey = keyof typeof DEFAULTS;
 
 export async function getSetting<K extends SettingKey>(key: K, conn: DbOrTx = db): Promise<(typeof DEFAULTS)[K]> {
@@ -65,6 +65,7 @@ export interface UnitAvailability {
  * Expired holds count as free even before the sweeper runs.
  */
 export async function getAvailability(date: string, slot: Slot, cartToken?: string, tier: Tier = "guest"): Promise<UnitAvailability[]> {
+  const nightFactor = await getSetting("night_price_factor");
   const session = await getOrCreateSession(date, slot);
   const reservedNow = !!session.vipReleaseAt && session.vipReleaseAt.getTime() > Date.now() && !canBookPriority(tier);
   const ev = await eventForSession(date, slot);
@@ -86,7 +87,7 @@ export async function getAvailability(date: string, slot: Slot, cartToken?: stri
     unitId: r.unit_id,
     unitTypeId: r.unit_type_id,
     pax: r.pax,
-    price: eventPrice(ev, r.unit_type_id, basePrice(slot, r.price_morning, r.price_afternoon)),
+    price: eventPrice(ev, r.unit_type_id, basePrice(slot, r.price_morning, r.price_afternoon, nightFactor)),
     vipPriority: r.vip_priority,
     state: r.booked ? "booked" : r.hold_token ? (cartToken && r.hold_token === cartToken ? "yours" : "held")
       : !typeOnSale(ev, r.unit_type_id) || sale === "closed" ? "closed"
@@ -226,6 +227,7 @@ export interface PendingBooking {
  * The caller then creates the Stripe PaymentIntent and stores its id with attachPaymentIntent().
  */
 export async function createPendingBooking(cartToken: string, lines: CartLine[], guest: GuestDetails, source = "web"): Promise<PendingBooking> {
+  const nightFactor = await getSetting("night_price_factor");
   if (!lines.length) throw new Error("Cart is empty");
   const vatRate = await getSetting("vat_rate");
   const extension = await getSetting("hold_extension_minutes");
@@ -251,7 +253,7 @@ export async function createPendingBooking(cartToken: string, lines: CartLine[],
     for (const h of holdRows) { const k = `${h.date}#${h.slot}`; if (!evCache.has(k)) evCache.set(k, await eventForSession(h.date, h.slot, tx)); }
     const items = lines.map((l) => {
       const h = holdRows.find((r) => r.hold.id === l.holdId)!;
-      const unit = eventPrice(evCache.get(`${h.date}#${h.slot}`) ?? null, h.unitTypeId, basePrice(h.slot, h.priceMorning, h.priceAfternoon));
+      const unit = eventPrice(evCache.get(`${h.date}#${h.slot}`) ?? null, h.unitTypeId, basePrice(h.slot, h.priceMorning, h.priceAfternoon, nightFactor));
       const guestsN = Math.min(Math.max(1, l.guests), h.pax);
       return { h, guests: guestsN, arrivalTime: l.arrivalTime, price: h.perPerson ? unit * guestsN : unit };
     });

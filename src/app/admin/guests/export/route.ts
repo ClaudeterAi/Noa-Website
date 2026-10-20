@@ -10,6 +10,8 @@ export async function GET() {
     const csv = guestsCsv(await listGuests(undefined, 10_000));
     return new Response(csv, { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="noa-guests-${new Date().toISOString().slice(0, 10)}.csv"`, "Cache-Control": "no-store" } });
   } catch (e) {
-    return new Response(e instanceof ForbiddenError ? "Forbidden" : "Error", { status: e instanceof ForbiddenError ? 403 : 500 });
+    if (e instanceof ForbiddenError) return new Response("Forbidden", { status: 403 });
+    console.error("export failed", e);
+    return new Response("Error", { status: 500 });
   }
 }

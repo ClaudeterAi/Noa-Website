@@ -14,6 +14,7 @@ export default async function Bookings({ searchParams }: { searchParams: Promise
         <select name="status" defaultValue={sp.status ?? ""}><option value="">All statuses</option>{["pending", "confirmed", "cancelled", "refunded", "expired"].map((s) => <option key={s}>{s}</option>)}</select>
         <input type="date" name="from" defaultValue={sp.from} /> <input type="date" name="to" defaultValue={sp.to} />
         <button type="submit" className="ghost">Filter</button>
+        <a className="ghost" href={`/admin/bookings/export?${new URLSearchParams({ ...(sp.q ? { q: sp.q } : {}), ...(sp.status ? { status: sp.status } : {}), ...(sp.from ? { from: sp.from } : {}), ...(sp.to ? { to: sp.to } : {}) }).toString()}`}>Download CSV</a>
       </form>
       <table><thead><tr><th>Ref</th><th>Guest</th><th>Tier</th><th>Session date</th><th>Units</th><th>Total</th><th>Source</th><th>Status</th><th>Created</th></tr></thead>
         <tbody>{rows.map((b) => (

@@ -13,6 +13,7 @@ export default async function Settings() {
         <SettingField k="hold_minutes" value={s.hold_minutes ?? 5} kind="int" />
         <SettingField k="hold_extension_minutes" value={s.hold_extension_minutes ?? 3} kind="int" />
         <SettingField k="vat_rate" value={s.vat_rate ?? 0.05} kind="rate" />
+        <SettingField k="night_price_factor" value={s.night_price_factor ?? 1.2} kind="factor" />
         <SettingField k="vip_release_hours" value={s.vip_release_hours ?? 24} kind="int" />
         <SettingField k="max_holds_per_cart" value={s.max_holds_per_cart ?? 6} kind="int" />
       </div>
