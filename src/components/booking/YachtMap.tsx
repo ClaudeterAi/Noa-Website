@@ -55,11 +55,13 @@ const Badge = ({ kind, x, y, r = 9 }: { kind: string; x: number; y: number; r?: 
   <g pointerEvents="none"><g filter="url(#bevel)"><circle cx={x} cy={y} r={r} fill="url(#disc)" /></g><circle cx={x} cy={y} r={r} fill="none" stroke="#b9a98d" strokeWidth=".4" opacity=".8" /><Icon kind={kind} x={x} y={y} scale={r / 11} /></g>
 );
 /** Caption pill: one line per " · " segment, text forced to fit its line */
-const Caption = ({ x, y, text, dark = false, max = 48 }: { x: number; y: number; text: string; dark?: boolean; max?: number }) => {
+/** `y` is the pill centre; pass `bottom` instead to pin the pill's lower edge (captions inside a panel use the panel's bottom minus a margin, so a 3-line caption grows upward, not out of the box) */
+const Caption = ({ x, y: yc, bottom, text, dark = false, max = 48 }: { x: number; y?: number; bottom?: number; text: string; dark?: boolean; max?: number }) => {
   const fs = 5.2, cw = fs * 0.63, lh = fs * 1.3;   // Barlow SemiBold caps run about 0.63 em wide
   const fit = max * 0.85;   // wrap before a line fills the pill, so a wider fallback font still fits
   const parts = text.split(" · ").flatMap((t) => (t.length * cw > fit ? t.split(" ").reduce<string[]>((acc, wd) => { const last = acc[acc.length - 1]; if (last !== undefined && (last + " " + wd).length * cw <= fit) acc[acc.length - 1] = last + " " + wd; else acc.push(wd); return acc; }, []) : [t]));
   const pw = Math.min(max, Math.max(...parts.map((t) => t.length * cw)) + 6), ph = parts.length * lh + 1.8;
+  const y = bottom !== undefined ? bottom - ph / 2 : (yc ?? 0);
   return (
     <g pointerEvents="none">
       <rect x={x - pw / 2} y={y - ph / 2} width={pw} height={ph} rx="3.2" fill={dark ? "#5f5040" : "#fff"} fillOpacity={dark ? 1 : 0.94} />
@@ -152,7 +154,7 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
           </g>;
           case "stairs": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panel)" />{Array.from({ length: 8 }).map((_, i) => { const yy = y + 1.5 + (i * (h - 3)) / 7; return <g key={i}><line x1={x + 1.5} y1={yy} x2={x + w - 1.5} y2={yy} stroke="#fff" strokeOpacity=".8" strokeWidth=".5" /><line x1={x + 1.5} y1={yy + 0.7} x2={x + w - 1.5} y2={yy + 0.7} stroke="#8d7c64" strokeOpacity=".35" strokeWidth=".6" /></g>; })}</g>;
           case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} max={70} />}</g>;
-          case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" filter="url(#lift)" /><Badge kind="dj" x={cx} y={cy - 7} r={8} />{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
+          case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" filter="url(#lift)" /><Badge kind="dj" x={cx} y={cy - 7} r={8} />{nm && <Caption x={cx} bottom={y + h - 3} text={nm} max={w - 4} />}</g>;
           case "bar": {
             const vertical = h > w, rr = sx(a.r ?? 500), n = vertical ? 4 : 5, stools: [number, number][] = [];
             for (let i = 0; i < n; i++) { const t = (i + 0.5) / n; if (vertical) { stools.push([x - 4.2, y + h * t], [x + w + 4.2, y + h * t]); } else { stools.push([x + w * t, y - 4.2], [x + w * t, y + h + 4.2]); } }
@@ -169,12 +171,12 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
               {nm && <Caption x={cx} y={cy + 8} text={nm} dark max={w - 2} />}
             </g>;
           }
-          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Badges cy2={cy - 8} />{nm && <Caption x={cx} y={y + h - 9} text={nm} max={w - 4} />}</g>;
+          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Badges cy2={cy - 8} />{nm && <Caption x={cx} bottom={y + h - 3.5} text={nm} max={w - 4} />}</g>;
           case "boh": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panelDark)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth=".7" />{badges.length > 0 && <Badges cy2={cy - (nm ? 8 : 0)} />}{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
           case "label": return <g key={a.id} pointerEvents="none">
             {a.id === "void" && <rect x={x} y={y} width={w} height={h} rx="4" fill="#e7dfcf" stroke="#c9bda6" strokeWidth=".6" />}
             {a.id === "reception" && <><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><Badge kind="reception" x={cx} y={cy - 8} /></>}
-            {nm && <Caption x={cx} y={a.id === "reception" ? y + h - 9 : cy} text={nm} max={a.id === "reception" ? w - 4 : 120} />}
+            {nm && (a.id === "reception" ? <Caption x={cx} bottom={y + h - 3.5} text={nm} max={w - 4} /> : <Caption x={cx} y={cy} text={nm} max={120} />)}
           </g>;
           default: return null;
         }
