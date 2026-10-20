@@ -4,6 +4,8 @@ import { bookings, bookingItems, guests, inventoryUnits, sessions, unitTypes } f
 import { eventForSession } from "@/server/events/ticketing";
 import { events as registryEvents, media as registryMedia } from "@/content/entities";
 import { ticketToken, ticketUrl } from "@/server/ticket";
+import { loadVenue } from "@/server/venue";
+import { clock, span, venueText, type Venue } from "@/lib/venue";
 
 type Loc = "en" | "ar";
 type Slot = "morning" | "afternoon" | "night" | "full";
@@ -19,32 +21,20 @@ export interface TicketView {
   ticketUrl: string; qrSvg: string; qrPng: string;
 }
 
-const T = {
-  slot: { en: { morning: "Morning", afternoon: "Afternoon", night: "Night", full: "Event" }, ar: { morning: "الصباح", afternoon: "بعد الظهر", night: "الليل", full: "فعالية" } },
-  time: { en: { morning: "9:30 AM to 2 PM", afternoon: "2 PM to 9:30 PM", night: "9:30 PM to 2 AM", full: "" }, ar: { morning: "9:30 صباحاً إلى 2 ظهراً", afternoon: "2 ظهراً إلى 9:30 مساءً", night: "9:30 مساءً إلى 2 فجراً", full: "" } },
-  boarding: { en: { morning: "Boats every 30 minutes from 9 AM", afternoon: "Boats every 30 minutes from 1:30 PM", night: "Boats every 30 minutes through the night", full: "Boats every 30 minutes" }, ar: { morning: "قوارب كل 30 دقيقة من 9 صباحاً", afternoon: "قوارب كل 30 دقيقة من 1:30 ظهراً", night: "قوارب كل 30 دقيقة طوال الليل", full: "قوارب كل 30 دقيقة" } },
-  lastBoat: { en: { morning: "Last boat back 2:30 PM", afternoon: "Last boat back 10 PM", night: "Last boat back 2:30 AM", full: "Last boat back 2:30 AM" }, ar: { morning: "آخر قارب للعودة 2:30 ظهراً", afternoon: "آخر قارب للعودة 10 مساءً", night: "آخر قارب للعودة 2:30 فجراً", full: "آخر قارب للعودة 2:30 فجراً" } },
-  age: { en: { morning: "All ages", afternoon: "Over 18", night: "Over 21", full: "Over 21" }, ar: { morning: "جميع الأعمار", afternoon: "فوق 18 عاماً", night: "فوق 21 عاماً", full: "فوق 21 عاماً" } },
-  venue: { en: { name: "Dubai Marina Pier, Berth 7", line: "Check in at the NOA desk on the pier. The crossing is eleven minutes." }, ar: { name: "رصيف مرسى دبي، المرسى 7", line: "سجّل وصولك عند مكتب نوا على الرصيف. العبور إحدى عشرة دقيقة." } },
-} as const;
+const SLOT_NAME = { en: { morning: "Morning", afternoon: "Afternoon", night: "Night", full: "Event" }, ar: { morning: "الصباح", afternoon: "بعد الظهر", night: "الليل", full: "فعالية" } } as const;
 
-function rules(L: Loc, slot: Slot, age: string, dress: string): string[] {
-  return L === "ar" ? [
-    "اصل إلى الرصيف قبل جلستك بعشرين دقيقة. يُغلق الصعود قبل انطلاق القارب بعشر دقائق.",
-    "سوار لكل ضيف، يُسلَّم عند المكتب مقابل هذا الرمز. أبقِه على معصمك طوال الجلسة.",
-    `أحضر هوية سارية. ${age}.`,
-    `قواعد اللباس: ${dress}.`,
-    "لا يُسمح بإحضار طعام أو شراب من الخارج.",
-    slot === "night" ? "المسبح مغلق ليلاً." : "المناشف متوفرة على المتن.",
-    "الإلغاء قبل 72 ساعة: استرداد كامل ناقص 10%. خلال 72 ساعة: غير قابل للاسترداد.",
-  ] : [
-    "Arrive at the pier twenty minutes before your session. Boarding closes ten minutes before each boat leaves.",
-    "One wristband per guest, issued at the desk against this code. Keep it on for the whole session.",
-    `Bring valid photo ID. ${age}.`,
-    `Dress code: ${dress}.`,
-    "No outside food or drink.",
-    slot === "night" ? "The pool is closed at night." : "Towels are on board.",
-    "Cancel more than 72 hours ahead for a full refund less 10%. Within 72 hours the booking is non-refundable.",
+/** Rules on the ticket, built from the venue settings and the event's own overrides; nothing here is fixed text about times or places. */
+function rules(L: Loc, slot: Slot, v: ReturnType<typeof venueText>, venue: Venue, age: string, dress: string, eventNotes: string[]): string[] {
+  const ar = L === "ar";
+  return [
+    ar ? `اصل إلى الرصيف قبل جلستك بـ ${v.arriveBefore} دقيقة. يُغلق الصعود قبل انطلاق القارب بـ ${v.boardingCloses} دقائق.` : `Arrive at the pier ${v.arriveBefore} minutes before your session. Boarding closes ${v.boardingCloses} minutes before each boat leaves.`,
+    ar ? "سوار لكل ضيف، يُسلَّم عند المكتب مقابل هذا الرمز. أبقِه على معصمك طوال الجلسة." : "One wristband per guest, issued at the desk against this code. Keep it on for the whole session.",
+    ar ? `أحضر هوية سارية. ${age}.` : `Bring valid photo ID. ${age}.`,
+    ar ? `قواعد اللباس: ${dress}.` : `Dress code: ${dress}.`,
+    ...(slot === "night" ? [ar ? "المسبح مغلق ليلاً." : "The pool is closed at night."] : []),
+    ...venue.extraRules[L],
+    ...eventNotes,
+    v.cancellation,
   ];
 }
 
@@ -70,22 +60,30 @@ export async function loadTicketView(ref: string, base: string, localeOverride?:
   const demo = !dbEvent ? Object.values(registryEvents).find((e) => e.date === date && (e as { session?: string }).session === slot) : undefined;
   const title = dbEvent ? (L === "ar" ? dbEvent.titleAr || dbEvent.titleEn : dbEvent.titleEn)
     : demo ? (L === "ar" ? demo.name.ar : demo.name.en).replace(/\n/g, " ")
-    : `NOA ${T.slot[L][slot]}`;
+    : `NOA ${SLOT_NAME[L][slot]}`;
   const head = dbEvent?.lineup?.find((a) => a.role === "headliner") ?? dbEvent?.lineup?.[0];
   const subtitle = dbEvent ? (head?.name ?? (L === "ar" ? dbEvent.pitchAr : dbEvent.pitchEn) ?? null) : demo ? (L === "ar" ? demo.artist.ar : demo.artist.en) : null;
   const poster = dbEvent?.media?.poster ?? demo?.media ?? null;
   const image = abs(base, (poster && (poster.startsWith("/") || poster.startsWith("http")) ? poster : regImg(poster)) ?? regImg(slot === "night" ? "pkg-night" : "pkg-afternoon") ?? "/media/hero-placeholder.jpg");
-  const time = dbEvent?.startsAt && dbEvent?.endsAt ? `${dbEvent.startsAt} to ${dbEvent.endsAt}` : T.time[L][slot];
-  const age = dbEvent?.ageRuleOverride ?? T.age[L][slot];
-  const dress = dbEvent?.dressCodeOverride ?? (L === "ar" ? "أنيق شاطئي" : "smart beach casual");
+  const venue = await loadVenue();
+  const v = venueText(venue, L);
+  const vs: "morning" | "afternoon" | "night" = slot === "full" ? "night" : slot;
+  // the event's own times win; otherwise the session hours from Admin → Settings → Venue
+  const time = dbEvent?.startsAt ? (dbEvent.endsAt ? span(dbEvent.startsAt, dbEvent.endsAt, L) : clock(dbEvent.startsAt, L)) : v.session(vs);
+  const doors = dbEvent?.doorsAt ? (L === "ar" ? `الأبواب ${clock(dbEvent.doorsAt, L)}` : `Doors ${clock(dbEvent.doorsAt, L)}`) : null;
+  const age = dbEvent?.ageRuleOverride || v.age(vs);
+  const dress = dbEvent?.dressCodeOverride || v.dressCode;
+  const eventNotes = [dbEvent?.ops?.checkinNotes, dbEvent?.ops?.shuttleNotes].filter((x): x is string => !!x && !!x.trim());
   const token = ticketToken(b.ref);
   return {
     ref: b.ref, status: b.status, checkedInAt: b.checkedInAt, locale: L, guestName: b.guestName ?? (L === "ar" ? "ضيف" : "Guest"),
-    date, dateLabel: date ? fmt(date, L) : "", slot, slotLabel: T.slot[L][slot], timeLabel: time, boarding: T.boarding[L][slot], lastBoat: T.lastBoat[L][slot],
+    date, dateLabel: date ? fmt(date, L) : "", slot, slotLabel: SLOT_NAME[L][slot], timeLabel: doors ? `${time} · ${doors}` : time,
+    boarding: L === "ar" ? `قوارب كل ${v.boatEvery} دقيقة من ${v.firstBoatOf(vs)}` : `Boats every ${v.boatEvery} minutes from ${v.firstBoatOf(vs)}`,
+    lastBoat: L === "ar" ? `آخر قارب للعودة ${v.lastBoat(vs)}` : `Last boat back ${v.lastBoat(vs)}`,
     seats: items.map((i) => ({ name: L === "ar" ? i.nameAr : i.nameEn, label: i.label, guests: i.guests })), totalGuests: items.reduce((n, i) => n + (i.guests ?? 0), 0),
     title, subtitle, image,
-    venue: { ...T.venue[L], mapUrl: "https://www.google.com/maps/search/?api=1&query=Dubai+Marina+Yacht+Club" },
-    rules: rules(L, slot, age, dress),
+    venue: { name: v.pier, line: L === "ar" ? `${v.landmark} العبور ${v.crossing} دقيقة.` : `${v.landmark} The crossing is ${v.crossing} minutes.`, mapUrl: v.mapUrl },
+    rules: rules(L, slot, v, venue, age, dress, eventNotes),
     ticketUrl: ticketUrl(base, L, b.ref), qrSvg: `${base}/api/bookings/qr/${token}.svg`, qrPng: `${base}/api/bookings/qr/${token}.png`,
   };
 }

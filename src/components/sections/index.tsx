@@ -1,3 +1,4 @@
+import { resolveVenueTokens, venueSnapshot } from "@/lib/venue";
 import HeroVideo from "@/components/media/HeroVideo";
 import type { CSSProperties } from "react";
 import type { CtaLink, L, Locale, Section } from "@/content/types";
@@ -475,7 +476,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
           <div className="specs-grid rv d2">
             {s.items.map((it) => (
               <div className="spec" key={it.n + it.label.en}>
-                <div className="spec-n">{it.n}{it.small && <small>{it.small}</small>}</div>
+                <div className="spec-n">{resolveVenueTokens(it.n, venueSnapshot(), locale === "ar" ? "ar" : "en")}{it.small && <small>{it.small}</small>}</div>
                 <div className="spec-lbl"><Rich l={it.label} locale={locale} /></div>
               </div>
             ))}
@@ -536,7 +537,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
             {s.cells.map((c) => (
               <div className="contact-cell" key={c.label.en}>
                 <h6>{pick(c.label, locale)}</h6>
-                {c.href ? <a href={c.href}>{pick(c.value, locale)}</a> : <p><Rich l={c.value} locale={locale} /></p>}
+                {c.href ? <a href={resolveVenueTokens(c.href, venueSnapshot(), locale === "ar" ? "ar" : "en")}>{pick(c.value, locale)}</a> : <p><Rich l={c.value} locale={locale} /></p>}
               </div>
             ))}
           </div>

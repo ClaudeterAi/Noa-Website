@@ -29,8 +29,8 @@ export const pages: Page[] = [
           t("After dark, a club on the open Gulf until two. Residents Thursday and Friday, guest DJs Saturday.", "بعد الغروب، نادٍ في عرض الخليج حتى الثانية. المقيمون الخميس والجمعة، والدي جيه الضيوف السبت."),
         ],
         facts: [
-          { label: t("Sessions", "الجلسات"), lines: [t("Afternoon 2 PM to 9:30 PM", "بعد الظهر 2 إلى 9:30 مساءً"), t("Night 9:30 PM to 2 AM", "الليل 9:30 مساءً إلى 2 فجراً")] },
-          { label: t("Departure", "الانطلاق"), lines: [t("Dubai Marina Pier, Berth 7 · boats every 30 minutes", "رصيف مرسى دبي، المرسى 7 · قوارب كل 30 دقيقة")] },
+          { label: t("Sessions", "الجلسات"), lines: [t("Afternoon {{afternoon.time}}", "بعد الظهر {{afternoon.time}}"), t("Night {{night.time}}", "الليل {{night.time}}")] },
+          { label: t("Departure", "الانطلاق"), lines: [t("{{pier}} · boats every {{boatEvery}} minutes", "{{pier}} · قوارب كل {{boatEvery}} دقيقة")] },
         ],
         link: { label: t("See map", "عرض الخريطة"), href: P("location") },
         media: ["aerial-1", "aerial-2"],
@@ -61,7 +61,7 @@ export const pages: Page[] = [
         media: "bar-1",
         link: { label: t("Our cocktails", "كوكتيلاتنا"), href: P("about", "restaurant") },
       },
-      { id: "ticker", type: "ticker", items: [t("Residents Thursday and Friday", "المقيمون الخميس والجمعة"), t("Guest DJs Saturday", "الدي جيه الضيوف السبت"), t("Sushi bar from 7 PM", "بار السوشي من 7 مساءً"), t("Last boat 2:30 AM", "آخر قارب 2:30 فجراً"), t("Dubai Marina Pier, Berth 7", "رصيف مرسى دبي، المرسى 7")] },
+      { id: "ticker", type: "ticker", items: [t("Residents Thursday and Friday", "المقيمون الخميس والجمعة"), t("Guest DJs Saturday", "الدي جيه الضيوف السبت"), t("Sushi bar from 7 PM", "بار السوشي من 7 مساءً"), t("Last boat {{night.lastBoat}}", "آخر قارب {{night.lastBoat}}"), t("{{pier}}", "{{pier}}")] },
       { id: "events", type: "posterCarousel", heading: t("This Week on the Water", "هذا الأسبوع على الماء"), sub: t("Residents, guest DJs and themed nights", "مقيمون ودي جيه ضيوف وليالٍ بطابع خاص"), source: "upcoming", aspect: "2/3", href: P("events"), fallbackMedia: ["party-1", "party-2", "party-4"] },
       { id: "past", type: "posterCarousel", heading: t("Nights We Remember", "ليالٍ نتذكرها"), source: "highlights", aspect: "1/1", href: P("events"), fallbackMedia: ["party-3", "deck-dj-1", "party-1", "party-2"] },
       { id: "newsletter", type: "newsletter", kicker: t("Newsletter", "النشرة"), heading: t("Join the crew", "انضم إلى الطاقم"), body: t("First on the list for event tickets, new residents, private nights and the opening date.", "أول من يعرف عن تذاكر الفعاليات والمقيمين الجدد والليالي الخاصة وموعد الافتتاح.") },
@@ -112,10 +112,10 @@ export const pages: Page[] = [
     inNav: true,
     navLabel: t("Packages", "الباقات"),
     menuLabel: t("The Afternoon", "بعد الظهر"),
-    metaDescription: t("The afternoon at NOA, 2 PM to 9:30 PM: the DJ comes on, the pool fills, lunch runs into dinner and the sun sets twice, once behind the skyline and once on the water.", "بعد الظهر في نوا، 2 ظهراً إلى 9:30 مساءً: يبدأ الدي جيه، ويمتلئ المسبح، ويمتد الغداء إلى العشاء، وتغرب الشمس مرتين، مرة خلف الأفق ومرة على الماء."),
+    metaDescription: t("The afternoon at NOA, {{afternoon.time}}: the DJ comes on, the pool fills, lunch runs into dinner and the sun sets twice, once behind the skyline and once on the water.", "بعد الظهر في نوا، {{afternoon.time}}: يبدأ الدي جيه، ويمتلئ المسبح، ويمتد الغداء إلى العشاء، وتغرب الشمس مرتين، مرة خلف الأفق ومرة على الماء."),
     voiceAliases: [t("afternoon package", "باقة بعد الظهر"), t("afternoon session", "جلسة بعد الظهر"), t("sunset", "الغروب")],
     sections: [
-      { id: "subhero", type: "subhero", media: "pkg-afternoon", kicker: t("01 · The Sun", "01 · الشمس"), heading: t("The *Afternoon*", "*بعد الظهر*"), sub: t("2 PM to 9:30 PM. The DJ comes on, the pool fills, lunch runs into sunset.", "2 ظهراً إلى 9:30 مساءً. يبدأ الدي جيه، ويمتلئ المسبح، ويمتد الغداء إلى الغروب.") },
+      { id: "subhero", type: "subhero", media: "pkg-afternoon", kicker: t("01 · The Sun", "01 · الشمس"), heading: t("The *Afternoon*", "*بعد الظهر*"), sub: t("{{afternoon.time}}. The DJ comes on, the pool fills, lunch runs into sunset.", "{{afternoon.time}}. يبدأ الدي جيه، ويمتلئ المسبح، ويمتد الغداء إلى الغروب.") },
       { id: "session", type: "prose", kicker: t("· The Session", "· الجلسة"), heading: t("The Pool, the\nSound, the Sun", "المسبح،\nالصوت، الشمس"), paragraphs: [
         t("The first boat leaves the pier at half past one. The DJ booth comes on at two and the pool fills. The kitchen moves to lunch, then to dinner as the sky behind the Burj Al Arab goes pink. Lounge cabanas face the stage, high tables stand around the floor, and the bar has a service station on each side.", "تبدأ كابينة الدي جيه في الثانية ويمتلئ المسبح. ينتقل المطبخ إلى الغداء ثم إلى العشاء حين تتورّد السماء خلف برج العرب. كبائن الصالة تواجه المنصة، والطاولات العالية حول الحلبة، وللبار محطة خدمة على كل جانب."),
         t("By nine the lights come up on the stage. The deck does not go dark. It changes shift. Ask your host before half past eight and you can keep your seat into the night.", "بحلول التاسعة تضاء المنصة. لا يظلم السطح، بل يبدّل نوبته. اطلب من مضيفك قبل الثامنة والنصف ويمكنك الاحتفاظ بمقعدك حتى الليل."),
@@ -141,7 +141,7 @@ export const pages: Page[] = [
         { name: t("Lounge Cabana", "كابينة الصالة"), media: "seat-lounge-cabana", price: "4,500", desc: t("Scalloped sofa facing the stage, a round table, poufs.", "أريكة متموجة تواجه المنصة وطاولة مستديرة ومقاعد."), cap: t("Per cabana · 8 guests", "للكابينة · 8 ضيوف") },
       ], note: { before: t("Prices in AED before 5% VAT.", "الأسعار بالدرهم قبل ضريبة القيمة المضافة 5%."), linkLabel: t("See the cabanas", "اطّلع على الكبائن"), after: t(" for a seat with a host.", " لمقعد مع مضيف."), href: P("cabana") } },
       { id: "faq", type: "faq", heading: goodToKnow, faqIds: ["a-arrive", "a-18", "stay-night", "sushi-hours"], openFirst: true, more: faqMore },
-      { id: "cta", type: "cta", pre: t("The Afternoon · 2 PM to 9:30 PM", "بعد الظهر · 2 ظهراً إلى 9:30 مساءً"), heading: t("Reserve the\nAfternoon", "احجز\nبعد الظهر"), body: t("The pool, the DJ and the longest sunset in Dubai. Pick your seat and we will see you on the pier.", "المسبح والدي جيه وأطول غروب في دبي. اختر مقعدك ونراك على الرصيف."), primary: { label: t("Reserve a Seat", "احجز مقعداً"), href: P("booking") }, secondary: { label: t("See the Night", "اطّلع على الليل"), href: P("night-package") } },
+      { id: "cta", type: "cta", pre: t("The Afternoon · {{afternoon.time}}", "بعد الظهر · {{afternoon.time}}"), heading: t("Reserve the\nAfternoon", "احجز\nبعد الظهر"), body: t("The pool, the DJ and the longest sunset in Dubai. Pick your seat and we will see you on the pier.", "المسبح والدي جيه وأطول غروب في دبي. اختر مقعدك ونراك على الرصيف."), primary: { label: t("Reserve a Seat", "احجز مقعداً"), href: P("booking") }, secondary: { label: t("See the Night", "اطّلع على الليل"), href: P("night-package") } },
     ],
   },
   {
@@ -149,10 +149,10 @@ export const pages: Page[] = [
     slug: "night-package",
     title: t("The Night · NOA", "الليل · نوا"),
     menuLabel: t("The Night", "الليل"),
-    metaDescription: t("The night at NOA, 9:30 PM to 2 AM: residents and guest DJs on the stage, fifteen metres of dance floor under the roof, lounge cabanas, the booth above the floor and the sushi bar on the upper deck.", "الليل في نوا، 9:30 مساءً إلى 2 فجراً: المقيمون والدي جيه الضيوف على المنصة، وخمسة عشر متراً من حلبة الرقص تحت السقف، وكبائن الصالة، والمقصورة فوق الحلبة، وبار السوشي على السطح العلوي."),
+    metaDescription: t("The night at NOA, {{night.time}}: residents and guest DJs on the stage, fifteen metres of dance floor under the roof, lounge cabanas, the booth above the floor and the sushi bar on the upper deck.", "الليل في نوا، {{night.time}}: المقيمون والدي جيه الضيوف على المنصة، وخمسة عشر متراً من حلبة الرقص تحت السقف، وكبائن الصالة، والمقصورة فوق الحلبة، وبار السوشي على السطح العلوي."),
     voiceAliases: [t("night package", "باقة الليل"), t("night session", "جلسة الليل"), t("party", "الحفلة"), t("dance floor", "حلبة الرقص")],
     sections: [
-      { id: "subhero", type: "subhero", media: "pkg-night", kicker: t("02 · The Floor", "02 · الحلبة"), heading: t("The *Night*", "*الليل*"), sub: t("9:30 PM to 2 AM. The stage, the floor, the lounge cabanas and the skyline across the water.", "9:30 مساءً إلى 2 فجراً. المنصة والحلبة وكبائن الصالة وأفق المدينة عبر الماء.") },
+      { id: "subhero", type: "subhero", media: "pkg-night", kicker: t("02 · The Floor", "02 · الحلبة"), heading: t("The *Night*", "*الليل*"), sub: t("{{night.time}}. The stage, the floor, the lounge cabanas and the skyline across the water.", "{{night.time}}. المنصة والحلبة وكبائن الصالة وأفق المدينة عبر الماء.") },
       { id: "session", type: "prose", kicker: t("· The Session", "· الجلسة"), heading: t("Why NOA\nFloats", "لماذا\nتطفو نوا"), paragraphs: [
         t("The night is the reason the club is on the water. At half past nine the residents take the stage, the lounge cabanas light low and the floor opens under the roof, fifteen metres of it, open to the sea on both sides. The main bar faces the stage. The pool closes at dusk and the daybeds around it become seating.", "الليل هو سبب وجود النادي على الماء. في التاسعة والنصف يعتلي المقيمون المنصة، وتُضاء كبائن الصالة بخفوت، وتُفتح الحلبة تحت السقف، خمسة عشر متراً مفتوحة على البحر من الجانبين. البار الرئيسي يواجه المنصة. يُغلق المسبح عند الغسق وتتحول الأسرّة النهارية حوله إلى جلسات."),
         t("The upper deck is the quieter one. Eight cabanas look down on the floor through the opening in the roof, the alfresco lounge runs along the rail, the sushi bar serves until one, and the booth sits above the stage with its own balustrade.", "السطح العلوي أهدأ. ثماني كبائن تطل على الحلبة عبر فتحة السقف، وصالة الهواء الطلق تمتد على طول السياج، وبار السوشي يقدم حتى الواحدة، والمقصورة فوق المنصة بسياجها الخاص."),
@@ -164,10 +164,10 @@ export const pages: Page[] = [
         t("General entry is sold per person. Lounge cabanas, high tables, the alfresco lounge, the upper cabanas and the booth are booked on the deck plan and include entry for everyone at the seat. The salon and tattoo station are open until midnight on Thursday, Friday and Saturday.", "يُباع الدخول العام للشخص. تُحجز كبائن الصالة والطاولات العالية وصالة الهواء الطلق والكبائن العلوية والمقصورة على مخطط السطح وتشمل الدخول لكل من في المقعد. الصالون ومحطة الوشم مفتوحان حتى منتصف الليل أيام الخميس والجمعة والسبت."),
       ], flip: true },
       { id: "included", type: "included", heading: t("What's Included", "ما الذي يشمله"), sub: t("Every night reservation includes the following.", "كل حجز ليلي يشمل ما يلي."), rows: [
-        { label: t("Shuttle", "القارب المكوكي"), value: t("Both ways, last boat back 2:30 AM", "ذهاباً وإياباً، آخر قارب للعودة 2:30 فجراً") },
+        { label: t("Shuttle", "القارب المكوكي"), value: t("Both ways, last boat back {{night.lastBoat}}", "ذهاباً وإياباً، آخر قارب للعودة {{night.lastBoat}}") },
         { label: t("Welcome Drink", "مشروب ترحيبي"), value: t("On arrival", "عند الوصول") },
         { label: t("Food and Drink Credit", "رصيد الطعام والشراب"), value: t("On your wristband, both bars and the sushi bar", "على سوارك، في البارين وبار السوشي") },
-        { label: t("Age", "العمر"), value: t("Over 21", "فوق 21") },
+        { label: t("Age", "العمر"), value: t("{{night.age}}", "{{night.age}}") },
         { label: t("Pool", "المسبح"), value: t("Closed after dusk", "مغلق بعد الغسق") },
       ] },
       { id: "tariff", type: "tariff", heading: t("Choose Your Seat", "اختر مقعدك"), sub: t("Five ways to spend the night at NOA.", "خمس طرق لقضاء الليل في نوا."), cards: [
@@ -178,7 +178,7 @@ export const pages: Page[] = [
         { name: t("The Booth", "المقصورة"), media: "seat-booth", price: "12,000", desc: t("Above the stage, with its own balustrade over the floor. Members first until 24 hours before.", "فوق المنصة بسياجها الخاص على الحلبة. الأعضاء أولاً حتى 24 ساعة قبل الموعد."), cap: t("Per night · 10 guests", "لليلة · 10 ضيوف") },
       ], note: { before: t("Prices in AED before 5% VAT. Guest DJ nights may carry an event price.", "الأسعار بالدرهم قبل ضريبة القيمة المضافة 5%. قد تحمل ليالي الدي جيه الضيوف سعر فعالية."), linkLabel: t("See the programme", "اطّلع على البرنامج"), after: t(" for this month's nights.", " لليالي هذا الشهر."), href: P("events") } },
       { id: "faq", type: "faq", heading: goodToKnow, faqIds: ["night-ticket", "last-shuttle", "pool-night", "dress-code"], openFirst: true, more: faqMore },
-      { id: "cta", type: "cta", pre: t("The Night · 9:30 PM to 2 AM", "الليل · 9:30 مساءً إلى 2 فجراً"), heading: t("Reserve the\nNight", "احجز\nالليل"), body: t("The stage, the floor and the skyline across the water. Pick your seat, or pick a night from the programme.", "المنصة والحلبة وأفق المدينة عبر الماء. اختر مقعدك، أو اختر ليلة من البرنامج."), primary: { label: t("Reserve a Seat", "احجز مقعداً"), href: P("booking") }, secondary: { label: t("This Week's Events", "فعاليات هذا الأسبوع"), href: P("events") } },
+      { id: "cta", type: "cta", pre: t("The Night · {{night.time}}", "الليل · {{night.time}}"), heading: t("Reserve the\nNight", "احجز\nالليل"), body: t("The stage, the floor and the skyline across the water. Pick your seat, or pick a night from the programme.", "المنصة والحلبة وأفق المدينة عبر الماء. اختر مقعدك، أو اختر ليلة من البرنامج."), primary: { label: t("Reserve a Seat", "احجز مقعداً"), href: P("booking") }, secondary: { label: t("This Week's Events", "فعاليات هذا الأسبوع"), href: P("events") } },
     ],
   },
   {
@@ -241,7 +241,7 @@ export const pages: Page[] = [
       { id: "subhero", type: "subhero", media: "aerial-1", kicker: t("· The Idea", "· الفكرة"), heading: t("A Club *on the Sea*", "نادٍ *على البحر*"), sub: t("Dubai's first floating beach club. Anchored two kilometres off the Marina. Opening 2026.", "أول نادٍ شاطئي عائم في دبي. راسٍ على بُعد كيلومترين من المرسى. يفتتح في 2026.") },
       { id: "idea", type: "prose", kicker: t("· Why", "· لماذا"), heading: t("Why a\nFloating Club", "لماذا نادٍ\nعائم"), paragraphs: [
         t("Dubai had every kind of beach club on the sand. It did not have one on the water: open Gulf on every side, the skyline at a distance, and a night without neighbours.", "كان في دبي كل أنواع النوادي الشاطئية على الرمل. لم يكن فيها نادٍ على الماء: خليج مفتوح من كل جهة، وأفق المدينة من بعيد، وليل بلا جيران."),
-        t("NOA is a 52 metre barge with two guest decks, anchored two kilometres off Dubai Marina. You arrive by shuttle boat, eleven minutes from the pier. The day belongs to the pool. The night belongs to the floor.", "نوا بارجة بطول 52 متراً بسطحين للضيوف، راسية على بُعد كيلومترين من مرسى دبي. تصل بقارب مكوكي، إحدى عشرة دقيقة من الرصيف. النهار للمسبح. والليل للحلبة."),
+        t("NOA is a 52 metre barge with two guest decks, anchored two kilometres off Dubai Marina. You arrive by shuttle boat, {{crossing}} minutes from the pier. The day belongs to the pool. The night belongs to the floor.", "نوا بارجة بطول 52 متراً بسطحين للضيوف، راسية على بُعد كيلومترين من مرسى دبي. تصل بقارب مكوكي، {{crossing}} دقيقة من الرصيف. النهار للمسبح. والليل للحلبة."),
         t("We open in 2026. The deck is in final fit out, the bars are being staffed and the kitchen is being assembled. The opening programme is on the events page as soon as it is confirmed.", "نفتتح في 2026. السطح في مرحلة التجهيز النهائية، والبارات يجري توظيف طاقمها، والمطبخ يجري تركيبه. برنامج الافتتاح على صفحة الفعاليات فور تأكيده."),
       ] },
       { id: "vessel", type: "specs", heading: t("The Vessel", "السفينة"), sub: t("Numbers from the drawings.", "أرقام من المخططات."), items: [
@@ -251,7 +251,7 @@ export const pages: Page[] = [
         { n: "2", label: t("Guest Decks", "سطحان للضيوف") },
         { n: "20", label: t("Cabanas", "كابينة") },
         { n: "15", small: "m", label: t("Dance Floor", "حلبة الرقص") },
-        { n: "11", small: "min", label: t("From the Pier", "من الرصيف") },
+        { n: "{{crossing}}", small: "min", label: t("From the Pier", "من الرصيف") },
       ] },
       { id: "main-deck", type: "splitProse", media: "deck-pool-2", num: t("· Main Deck", "· السطح الرئيسي"), heading: t("The Water\nand the Floor", "الماء\nوالحلبة"), paragraphs: [
         t("Ten loungers on the bow at the water line. The pool, a bay and a channel, with fourteen daybeds set on its edge and eight cabanas along it. Midships, the treatment room for manicures, pedicures and massage, and the hair salon with its tattoo station. Then the floor: fifteen metres under the roof, open to the sea on both sides, with four lounge cabanas facing the stage, ten high tables and the main bar.", "عشرة أسرّة شمسية على المقدمة عند خط الماء. المسبح، خليج وقناة، وأربعة عشر سريراً نهارياً على حافته وثماني كبائن على طوله. في المنتصف غرفة العلاج للمانيكير والباديكير والمساج، وصالون الشعر بمحطة الوشم. ثم الحلبة: خمسة عشر متراً تحت السقف، مفتوحة على البحر من الجانبين، وأربع كبائن صالة تواجه المنصة وعشر طاولات عالية والبار الرئيسي."),
@@ -269,22 +269,22 @@ export const pages: Page[] = [
     id: "location",
     slug: "location",
     title: t("Location · NOA", "الموقع · نوا"),
-    metaDescription: t("How to get to NOA: Dubai Marina Pier, Berth 7. Shuttle boats every 30 minutes from 1:30 PM, eleven minutes across, last boat back at 2:30 AM after the night session.", "كيف تصل إلى نوا: رصيف مرسى دبي، المرسى 7. قوارب مكوكية كل 30 دقيقة من 9:00 صباحاً، إحدى عشرة دقيقة للعبور، وآخر قارب للعودة في 2:30 فجراً بعد جلسة الليل."),
+    metaDescription: t("How to get to NOA: {{pier}}. Shuttle boats every {{boatEvery}} minutes from {{firstBoat}}, {{crossing}} minutes across, last boat back at {{night.lastBoat}} after the night session.", "كيف تصل إلى نوا: {{pier}}. قوارب مكوكية كل {{boatEvery}} دقيقة من {{firstBoat}}، {{crossing}} دقيقة للعبور، وآخر قارب للعودة في {{night.lastBoat}} بعد جلسة الليل."),
     inNav: true,
     navLabel: t("Location", "الموقع"),
     voiceAliases: [t("location", "الموقع"), t("how to get there", "كيف أصل"), t("directions", "الاتجاهات"), t("shuttle", "القارب المكوكي"), t("pier", "الرصيف"), t("last boat", "آخر قارب")],
     sections: [
-      { id: "subhero", type: "subhero", media: "loc-hero", kicker: t("· How to Arrive", "· كيف تصل"), heading: t("Find *NOA*", "اعثر على *نوا*"), sub: t("Dubai Marina Pier, Berth 7. Boats every 30 minutes from 1:30 PM. Last boat back 2:30 AM on night sessions.", "رصيف مرسى دبي، المرسى 7. قوارب كل 30 دقيقة من 1:30 ظهراً. آخر قارب للعودة 2:30 فجراً في جلسات الليل.") },
+      { id: "subhero", type: "subhero", media: "loc-hero", kicker: t("· How to Arrive", "· كيف تصل"), heading: t("Find *NOA*", "اعثر على *نوا*"), sub: t("{{pier}}. Boats every {{boatEvery}} minutes from {{firstBoat}}. Last boat back {{night.lastBoat}} on night sessions.", "{{pier}}. قوارب كل {{boatEvery}} دقيقة من {{firstBoat}}. آخر قارب للعودة {{night.lastBoat}} في جلسات الليل.") },
       { id: "strip", type: "contactStrip", cells: [
-        { label: t("Departure", "الانطلاق"), value: t("Dubai Marina Pier\nBerth 7", "رصيف مرسى دبي\nالمرسى 7") },
+        { label: t("Departure", "الانطلاق"), value: t("{{pier}}", "{{pier}}") },
         { label: t("Hours", "الساعات"), value: t("Daily\n2:00 PM to 2:00 AM", "يومياً\n2:00 ظهراً إلى 2:00 فجراً") },
-        { label: t("Phone", "الهاتف"), value: t("+971 4 840 0000", "+971 4 840 0000"), href: "tel:+97148400000" },
-        { label: t("Email", "البريد"), value: t("hello@noa-dubai.com", "hello@noa-dubai.com"), href: "mailto:hello@noa-dubai.com" },
+        { label: t("Phone", "الهاتف"), value: t("{{phone}}", "{{phone}}"), href: "{{phoneHref}}" },
+        { label: t("Email", "البريد"), value: t("{{email}}", "{{email}}"), href: "mailto:{{email}}" },
       ] },
-      { id: "map", type: "map", kicker: t("· On the map", "· على الخريطة"), heading: t("Dubai Marina Pier, *Berth 7*", "رصيف مرسى دبي، *المرسى 7*"), query: "Dubai Marina Yacht Club, Dubai", address: t("Dubai Marina Walk, beside the Marina Yacht Club. Look for the NOA desk at Berth 7.", "ممشى مرسى دبي، بجانب نادي اليخوت. ابحث عن مكتب نوا عند المرسى 7."), note: t("Valet parking at the pier · Metro: DMCC, 12 minutes on foot · Tram: Marina Towers, 6 minutes on foot", "صف السيارات عند الرصيف · المترو: محطة DMCC، 12 دقيقة سيراً · الترام: مارينا تاورز، 6 دقائق سيراً") },
-      { id: "crossing", type: "prose", kicker: t("· The Crossing", "· العبور"), heading: t("Eleven Minutes\nfrom the Pier", "إحدى عشرة دقيقة\nمن الرصيف"), paragraphs: [
-        t("NOA is anchored two kilometres off the coast, beyond the Marina breakwater. The only way on board is our shuttle boat from Dubai Marina Pier, Berth 7. Boats leave every 30 minutes and the crossing takes eleven minutes. Every reservation includes the boat both ways.", "نوا راسية على بُعد كيلومترين من الساحل، خلف كاسر أمواج المرسى. الطريق الوحيد إلى المتن هو قاربنا المكوكي من رصيف مرسى دبي، المرسى 7. تنطلق القوارب كل 30 دقيقة ويستغرق العبور إحدى عشرة دقيقة. كل حجز يشمل القارب ذهاباً وإياباً."),
-        t("The first boat of the day leaves at 1:30 PM. Last boats back: 10:00 PM after the afternoon and 2:30 AM after the night. Arrive at the pier 20 minutes before your session. Boarding closes 10 minutes before departure.", "ينطلق أول قارب في 1:30 ظهراً. آخر قوارب العودة: 10:00 مساءً بعد جلسة بعد الظهر، و2:30 فجراً بعد جلسة الليل. اصل إلى الرصيف قبل جلستك بعشرين دقيقة. يُغلق الصعود قبل الانطلاق بعشر دقائق."),
+      { id: "map", type: "map", kicker: t("· On the map", "· على الخريطة"), heading: t("{{pier}}", "{{pier}}"), query: "Dubai Marina Yacht Club, Dubai", address: t("{{landmark}}", "{{landmark}}"), note: t("Valet parking at the pier · Metro: DMCC, 12 minutes on foot · Tram: Marina Towers, 6 minutes on foot", "صف السيارات عند الرصيف · المترو: محطة DMCC، 12 دقيقة سيراً · الترام: مارينا تاورز، 6 دقائق سيراً") },
+      { id: "crossing", type: "prose", kicker: t("· The Crossing", "· العبور"), heading: t("{{crossing}} Minutes\nfrom the Pier", "{{crossing}} دقيقة\nمن الرصيف"), paragraphs: [
+        t("NOA is anchored two kilometres off the coast, beyond the Marina breakwater. The only way on board is our shuttle boat from {{pier}}. Boats leave every {{boatEvery}} minutes and the crossing takes {{crossing}} minutes. Every reservation includes the boat both ways.", "نوا راسية على بُعد كيلومترين من الساحل، خلف كاسر أمواج المرسى. الطريق الوحيد إلى المتن هو قاربنا المكوكي من {{pier}}. تنطلق القوارب كل {{boatEvery}} دقيقة ويستغرق العبور {{crossing}} دقيقة. كل حجز يشمل القارب ذهاباً وإياباً."),
+        t("The first boat of the day leaves at {{firstBoat}}. Last boats back: {{afternoon.lastBoat}} after the afternoon and {{night.lastBoat}} after the night. Arrive at the pier {{arriveBefore}} minutes before your session. Boarding closes {{boardingCloses}} minutes before departure.", "ينطلق أول قارب في {{firstBoat}}. آخر قوارب العودة: {{afternoon.lastBoat}} بعد جلسة بعد الظهر، و{{night.lastBoat}} بعد جلسة الليل. اصل إلى الرصيف قبل جلستك بـ {{arriveBefore}} دقيقة. يُغلق الصعود قبل الانطلاق بـ {{boardingCloses}} دقائق."),
       ] },
       { id: "arrival", type: "splitProse", media: "marina", num: t("· The Arrival", "· الوصول"), heading: t("Check In\non the Pier", "تسجيل الدخول\nعلى الرصيف"), paragraphs: [
         t("Check in is at the pier desk, not on the boat. Your ID is matched to the reservation, the wristband is loaded with your food and drink credit, and you board. On the boat you arrive at one of the four berths at the corners of the deck; reception is at the stern and your host meets you there.", "تسجيل الدخول في مكتب الرصيف وليس على القارب. تُطابَق هويتك مع الحجز، ويُحمَّل سوارك برصيد الطعام والشراب، ثم تصعد. على المتن تصل إلى أحد المراسي الأربعة في زوايا السطح؛ الاستقبال عند المؤخرة ومضيفك بانتظارك هناك."),
@@ -293,10 +293,10 @@ export const pages: Page[] = [
       { id: "steps", type: "specs", heading: t("Your Arrival, Step by Step", "وصولك خطوة بخطوة"), sub: t("From the car to the first drink on board.", "من السيارة إلى أول مشروب على المتن."), items: [
         { n: "01", label: t("Marina Pier\nDrop Off", "رصيف المرسى\nنقطة النزول") },
         { n: "02", label: t("Check In\nat the Desk", "تسجيل الدخول\nعند المكتب") },
-        { n: "03", label: t("Eleven Minutes\nAcross", "إحدى عشرة\nدقيقة عبوراً") },
+        { n: "03", label: t("{{crossing}} Minutes\nAcross", "{{crossing}} دقيقة\nعبوراً") },
         { n: "04", label: t("Your Host at\nReception", "مضيفك في\nالاستقبال") },
       ] },
-      { id: "cta", type: "cta", pre: t("NOA · Dubai Marina · Berth 7", "نوا · مرسى دبي · المرسى 7"), heading: t("We'll See You\non the Pier", "نراك\nعلى الرصيف"), body: t("Reservations include the boat both ways. Turn up at Berth 7 with your booking on your phone.", "الحجوزات تشمل القارب ذهاباً وإياباً. احضر إلى المرسى 7 وحجزك على هاتفك."), primary: { label: t("Reserve a Seat", "احجز مقعداً"), href: P("booking") }, secondary: { label: t("More Questions", "مزيد من الأسئلة"), href: P("faq") } },
+      { id: "cta", type: "cta", pre: t("NOA · {{pier}}", "نوا · {{pier}}"), heading: t("We'll See You\non the Pier", "نراك\nعلى الرصيف"), body: t("Reservations include the boat both ways. Turn up at {{pier}} with your booking on your phone.", "الحجوزات تشمل القارب ذهاباً وإياباً. احضر إلى {{pier}} وحجزك على هاتفك."), primary: { label: t("Reserve a Seat", "احجز مقعداً"), href: P("booking") }, secondary: { label: t("More Questions", "مزيد من الأسئلة"), href: P("faq") } },
     ],
   },
   {
@@ -328,9 +328,9 @@ export const pages: Page[] = [
     sections: [
       { id: "subhero", type: "subhero", media: "contact-hero", kicker: t("· Get in Touch", "— تواصل معنا"), heading: t("Write to *Us*", "راسل*نا*"), sub: t("Reservations, private events, partnerships, careers. The right person on our team will reply within one business day.", "الحجوزات والفعاليات الخاصة والشراكات والوظائف. سيرد عليك الشخص المناسب من فريقنا خلال يوم عمل واحد.") },
       { id: "strip", type: "contactStrip", cells: [
-        { label: t("Address", "العنوان"), value: t("Dubai Marina Pier\nBerth 7, Dubai, UAE", "رصيف مرسى دبي\nالمرسى 7، دبي، الإمارات") },
-        { label: t("Phone", "الهاتف"), value: t("+971 4 840 0000", "+971 4 840 0000"), href: "tel:+97148400000" },
-        { label: t("Email", "البريد الإلكتروني"), value: t("hello@noa-dubai.com", "hello@noa-dubai.com"), href: "mailto:hello@noa-dubai.com" },
+        { label: t("Address", "العنوان"), value: t("{{pier}}, Dubai, UAE", "{{pier}}، دبي، الإمارات") },
+        { label: t("Phone", "الهاتف"), value: t("{{phone}}", "{{phone}}"), href: "{{phoneHref}}" },
+        { label: t("Email", "البريد الإلكتروني"), value: t("{{email}}", "{{email}}"), href: "mailto:{{email}}" },
         { label: t("Hours", "ساعات العمل"), value: t("Daily\n2:00 PM to 2:00 AM", "يومياً\n2:00 ظهراً إلى 2:00 فجراً") },
       ] },
       { id: "form", type: "contactForm", heading: t("Send a Message", "أرسل رسالة"), sub: t("Fill in the form below and we will route your message to the right person on our team.", "املأ النموذج أدناه وسنوجه رسالتك إلى الشخص المناسب في فريقنا."),

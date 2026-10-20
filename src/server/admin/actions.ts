@@ -1,3 +1,5 @@
+import { mergeVenue, setVenueSnapshot, validateVenue } from "@/lib/venue";
+import { enqueueKbSync } from "@/server/events/kb-sync";
 import { and, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { auditLog, bookingItems, bookings, guests, inventoryUnits, notificationLog, payments, sessions, settings, unitTypes } from "@/db/schema";
@@ -119,6 +121,22 @@ export async function calendarMonth(year: number, month: number) {
     WHERE s.date BETWEEN ${from} AND ${to}
     GROUP BY s.id, s.date, s.slot ORDER BY s.date, s.slot`);
   return rows.rows;
+}
+
+/* ---------- venue facts (address, contact, hours, boats, ages, rules) ---------- */
+
+/** Save the venue facts. Validated first; nothing is written if any field is wrong. Audited. */
+export async function saveVenue(actor: Actor, input: unknown) {
+  const v = mergeVenue(input);
+  const errors = validateVenue(v);
+  if (errors.length) return { ok: false as const, errors };
+  const [before] = await db.select().from(settings).where(eq(settings.key, "venue"));
+  await db.insert(settings).values({ key: "venue", value: v as unknown as Record<string, unknown> })
+    .onConflictDoUpdate({ target: settings.key, set: { value: v as unknown as Record<string, unknown> } });
+  await audit(actor, "settings.update", "settings", "venue", before?.value ?? null, v);
+  setVenueSnapshot(v);
+  await enqueueKbSync("site", "knowledge", "upsert");   // the voice agent's knowledge document
+  return { ok: true as const, venue: v };
 }
 
 /* ---------- pier check-in ---------- */

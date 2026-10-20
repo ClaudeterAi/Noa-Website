@@ -1,3 +1,5 @@
+import { venueSnapshot, venueText } from "@/lib/venue";
+import { loadVenue } from "@/server/venue";
 import { and, eq, gt, isNull, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import { holds, inventoryUnits, sessions, unitTypes } from "@/db/schema";
@@ -12,7 +14,11 @@ import { navTargets } from "./sitemap";
  */
 export interface AgentContext { cartToken: string; locale: "en" | "ar"; tier: Tier; guestId?: string }
 
-const SLOT = { morning: { en: "Morning (9:30 AM–2:00 PM)", ar: "الصباح (9:30 ص–2:00 م)" }, afternoon: { en: "Afternoon (2:00–9:30 PM)", ar: "بعد الظهر (2:00–9:30 م)" }, night: { en: "Night (9:30 PM–2:00 AM)", ar: "الجلسة الليلية" }, full: { en: "Full day", ar: "يوم كامل" } } as const;
+const SLOT_NAMES = { morning: { en: "Morning", ar: "الصباح" }, afternoon: { en: "Afternoon", ar: "بعد الظهر" }, night: { en: "Night", ar: "الليل" }, full: { en: "Event", ar: "فعالية" } } as const;
+/** Session label with hours from Admin → Settings → Venue, e.g. "Night (9:30 PM to 2 AM)". */
+const slotLabel = (slot: keyof typeof SLOT_NAMES, L: "en" | "ar") =>
+  slot === "full" ? SLOT_NAMES.full[L] : `${SLOT_NAMES[slot][L]} (${venueText(venueSnapshot(), L).session(slot)})`;
+const isSlot = (x: unknown): x is keyof typeof SLOT_NAMES => typeof x === "string" && Object.prototype.hasOwnProperty.call(SLOT_NAMES, x);
 const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 
 export const toolDefinitions = [
@@ -51,6 +57,7 @@ export const toolDefinitions = [
 export type ToolName = (typeof toolDefinitions)[number]["name"];
 
 export async function runTool(name: ToolName, input: Record<string, unknown>, ctx: AgentContext): Promise<unknown> {
+  await loadVenue();   // voice tool calls arrive without a page render; load the current venue facts first
   switch (name) {
     case "get_availability": return availabilitySummary(String(input.date), input.slot as Slot, ctx);
     case "hold_seat": return holdSeat(String(input.date), input.slot as Slot, String(input.unit_type), Number(input.quantity ?? 1), ctx);
@@ -62,7 +69,7 @@ export async function runTool(name: ToolName, input: Record<string, unknown>, ct
 }
 
 export async function availabilitySummary(date: string, slot: Slot, ctx: AgentContext) {
-  if (!isoDate.test(date) || !(slot in SLOT)) return { error: "date must be YYYY-MM-DD and slot afternoon|night" };
+  if (!isoDate.test(date) || !isSlot(slot)) return { error: "date must be YYYY-MM-DD and slot afternoon|night" };
   const [units, types] = await Promise.all([getAvailability(date, slot, ctx.cartToken, ctx.tier), listUnitTypes()]);
   const byType: Record<string, { type: string; name: string; free: number; reserved_for_members: number; yours: number; price_aed: number; capacity: number; per_person: boolean }> = {};
   for (const u of units) {
@@ -70,11 +77,11 @@ export async function availabilitySummary(date: string, slot: Slot, ctx: AgentCo
     const row = (byType[t.id] ??= { type: t.id, name: ctx.locale === "ar" ? t.nameAr : t.nameEn, free: 0, reserved_for_members: 0, yours: 0, price_aed: u.price, capacity: t.pax, per_person: t.perPerson });
     if (u.state === "free") row.free++; else if (u.state === "reserved") row.reserved_for_members++; else if (u.state === "yours") row.yours++;
   }
-  return { date, session: SLOT[slot][ctx.locale], seat_types: Object.values(byType).sort((a, b) => b.price_aed - a.price_aed), vat_note: "5% VAT added at checkout" };
+  return { date, session: slotLabel(slot, ctx.locale), seat_types: Object.values(byType).sort((a, b) => b.price_aed - a.price_aed), vat_note: "5% VAT added at checkout" };
 }
 
 export async function holdSeat(date: string, slot: Slot, unitType: string, quantity: number, ctx: AgentContext) {
-  if (!isoDate.test(date) || !(slot in SLOT)) return { error: "date must be YYYY-MM-DD and slot afternoon|night" };
+  if (!isoDate.test(date) || !isSlot(slot)) return { error: "date must be YYYY-MM-DD and slot afternoon|night" };
   const qty = Math.min(Math.max(1, quantity | 0), 6);
   const units = await getAvailability(date, slot, ctx.cartToken, ctx.tier);
   const candidates = units.filter((u) => u.unitTypeId === unitType && u.state === "free");
@@ -102,7 +109,7 @@ export async function cart(ctx: AgentContext) {
     .from(holds).innerJoin(sessions, eq(sessions.id, holds.sessionId)).innerJoin(inventoryUnits, eq(inventoryUnits.id, holds.unitId)).innerJoin(unitTypes, eq(unitTypes.id, inventoryUnits.unitTypeId))
     .where(and(eq(holds.cartToken, ctx.cartToken), isNull(holds.releasedAt), isNull(holds.bookingId), gt(holds.expiresAt, sql`now()`)))
     .orderBy(holds.createdAt);
-  const items = rows.map((r) => ({ hold_id: r.holdId, unit_id: r.unitId, seat: ctx.locale === "ar" ? r.nameAr : r.nameEn, date: r.date, session: SLOT[r.slot][ctx.locale], price_aed: r.slot === "morning" ? r.priceMorning : r.priceAfternoon, expires_at: r.expiresAt.toISOString() }));
+  const items = rows.map((r) => ({ hold_id: r.holdId, unit_id: r.unitId, seat: ctx.locale === "ar" ? r.nameAr : r.nameEn, date: r.date, session: slotLabel(r.slot as keyof typeof SLOT_NAMES, ctx.locale), price_aed: r.slot === "morning" ? r.priceMorning : r.priceAfternoon, expires_at: r.expiresAt.toISOString() }));
   const subtotal = items.reduce((s, i) => s + i.price_aed, 0);
   return { items, subtotal_aed: subtotal, vat_aed: Math.round(subtotal * 0.05), total_aed: subtotal + Math.round(subtotal * 0.05), expires_at: items[0]?.expires_at ?? null };
 }

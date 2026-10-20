@@ -1,3 +1,5 @@
+import { loadVenue } from "@/server/venue";
+import { venueText } from "@/lib/venue";
 import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db/client";
@@ -22,7 +24,7 @@ export async function POST(req: Request) {
       .from(bookingItems).innerJoin(sessions, eq(sessions.id, bookingItems.sessionId)).innerJoin(inventoryUnits, eq(inventoryUnits.id, bookingItems.unitId)).innerJoin(unitTypes, eq(unitTypes.id, inventoryUnits.unitTypeId))
       .where(eq(bookingItems.bookingId, row.booking.id));
     const first = items[0];
-    const ics = first && row.booking.status === "confirmed" ? buildIcs({ uid: ref, date: first.date, slot: first.slot, summary: `NOA — ${ref}`, description: items.map((i) => `${i.nameEn} · ${i.date} · ${i.arrivalTime}`).join("\n"), location: "Dubai Marina Pier, Berth 7" }) : null;
+    const ics = first && row.booking.status === "confirmed" ? buildIcs({ uid: ref, date: first.date, slot: first.slot, summary: `NOA — ${ref}`, description: items.map((i) => `${i.nameEn} · ${i.date} · ${i.arrivalTime}`).join("\n"), location: venueText(await loadVenue(), "en").pier }) : null;
     return json({ ref, status: row.booking.status, guestName: row.guest.name, subtotal: row.booking.subtotal, vat: row.booking.vat, total: row.booking.total, confirmedAt: row.booking.confirmedAt, items, ics }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) { return error(422, "VALIDATION_ERROR", e instanceof Error ? e.message : "Invalid request"); }
 }

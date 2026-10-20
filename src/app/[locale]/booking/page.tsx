@@ -5,11 +5,14 @@ import { getPage, pick } from "@/content/registry";
 import { Link } from "@/i18n/navigation";
 import BookingApp from "@/components/booking/BookingApp";
 import MovingBorder from "@/components/ui/MovingBorder";
+import { loadVenue } from "@/server/venue";
+import { venueSnapshot, venueText } from "@/lib/venue";
 
 export const dynamic = "force-dynamic"; // the "open soon" / live decision is made per request, not baked at build
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
+  await loadVenue();
   const page = getPage("booking");
   return { title: { absolute: pick(page.title, locale as Locale) }, description: pick(page.metaDescription, locale as Locale) };
 }
@@ -21,12 +24,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function BookingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await loadVenue();
   if (!process.env.DATABASE_URL) return <ReservationsSoon locale={locale as Locale} />;
   return <BookingApp />;
 }
 
 function ReservationsSoon({ locale }: { locale: Locale }) {
   const ar = locale === "ar";
+  const vt = venueText(venueSnapshot(), ar ? "ar" : "en");
   return (
     <main className="cta" style={{ paddingTop: 200, minHeight: "70vh" }}>
       <div className="cta-pre">{ar ? "الحجوزات" : "Reservations"}</div>
@@ -36,7 +41,7 @@ function ReservationsSoon({ locale }: { locale: Locale }) {
         <Link href="/contact"><MovingBorder><button type="button" className="pkg-btn mb-btn">{ar ? "تواصل مع الفريق" : "Contact the team"}</button></MovingBorder></Link>
         <Link href="/morning-package" className="pkg-more">{ar ? "اطّلع على الباقات" : "See the packages"}</Link>
       </div>
-      <p className="form-meta" style={{ marginTop: 28 }}><a href="tel:+97148400000" style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>+971 4 840 0000</a> · <a href="mailto:hello@noa-dubai.com" style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>hello@noa-dubai.com</a></p>
+      <p className="form-meta" style={{ marginTop: 28 }}><a href={vt.phoneHref} style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>{vt.phone}</a> · <a href={`mailto:${vt.email}`} style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>{vt.email}</a></p>
     </main>
   );
 }

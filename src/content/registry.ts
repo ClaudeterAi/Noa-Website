@@ -1,3 +1,4 @@
+import { resolveVenueTokens, venueSnapshot } from "@/lib/venue";
 import type { Href, L, Locale, Page, PageId, Registry } from "./types";
 import { events, faqs, media, packages, settings } from "./entities";
 import { nav, pages } from "./pages";
@@ -21,8 +22,9 @@ export function getPageBySlug(slug: string): Page | undefined {
 /** pages that resolve through /[locale]/[slug] (home and booking have their own routes) */
 export const slugPages = (): Page[] => registry.pages.filter((p) => p.slug !== "" && p.id !== "booking");
 
+/** Copy in the visitor's language, with venue facts ({{pier}}, {{afternoon.time}}, …) filled from Admin → Settings → Venue. */
 export function pick(l: L, locale: Locale): string {
-  return locale === "ar" ? l.ar : l.en;
+  return resolveVenueTokens(locale === "ar" ? l.ar : l.en, venueSnapshot(), locale === "ar" ? "ar" : "en");
 }
 
 /** locale-less path; next-intl's Link adds the /en or /ar prefix */

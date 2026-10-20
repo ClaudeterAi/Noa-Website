@@ -1,13 +1,17 @@
 import { guard, Denied } from "../_guard";
 import { listSettings } from "@/server/admin/actions";
 import { SettingField } from "../ui";
+import VenueForm from "./VenueForm";
+import { loadVenue } from "@/server/venue";
 
 export default async function Settings() {
   const g = await guard("owner"); if (g.denied) return <Denied />;
   const s = await listSettings();
+  const venue = await loadVenue();
   return (
     <main className="ad-main">
       <h1>Settings</h1>
+      <VenueForm initial={venue} />
       <p className="note">hold_minutes: how long a tapped seat is held (cinema-style) · max_holds_per_cart: seats one guest can hold at once · hold_extension_minutes: extra time granted once at the payment step · vat_rate: 0.05 = 5% · vip_release_hours: how long before a session members-priority seats open to everyone · tier_rules: thresholds for preferred / vip.</p>
       <div className="cards">
         <SettingField k="hold_minutes" value={s.hold_minutes ?? 5} kind="int" />

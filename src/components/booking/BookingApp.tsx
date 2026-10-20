@@ -1,5 +1,6 @@
 "use client";
 
+import { clock, span, venueSnapshot, venueText } from "@/lib/venue";
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
@@ -240,7 +241,10 @@ export default function BookingApp() {
   };
 
   const onTipMove = (id: string, e: MouseEvent) => setTip({ id, x: Math.min(e.clientX + 18, window.innerWidth - 300), y: Math.min(e.clientY + 18, window.innerHeight - 250) });
-  const slotLabel = (s: Slot) => `${t(s)} · ${t(`${s}Time`)}`;
+  // session hours come from Admin → Settings → Venue (via the snapshot the server handed the page), not from fixed strings
+  const vt = venueText(venueSnapshot(), locale === "ar" ? "ar" : "en");
+  const slotTime = (s: Slot) => (s === "full" ? t("fullTime") : vt.session(s));
+  const slotLabel = (s: Slot) => `${t(s)} · ${slotTime(s)}`;
   /* Legend swatches mirror the YachtMap paints (cabFabric, loungeFabric, vipFabric, linen, table disc) and the
      CSS seat states, so a key matches what is drawn. Only the types present on the selected deck are listed. */
   const [deck, setDeck] = useState<"main" | "upper">("main");
@@ -419,7 +423,7 @@ export default function BookingApp() {
                 {([...(["afternoon", "night"] as const), ...((liveEvents[dayModal] ?? []).map((e) => e.session).filter((x) => x === "full") as Slot[])] as Slot[]).map((s) => (
                   <button key={s} type="button" className={`bk-time${pendingSlot === s ? " selected" : ""}`} onClick={() => setPendingSlot(s)}>
                     <div className="top">{(s === "night" || s === "full") && liveEvents[dayModal]?.find((e) => e.session === s) ? (locale === "ar" ? liveEvents[dayModal].find((e) => e.session === s)!.titleAr ?? liveEvents[dayModal].find((e) => e.session === s)!.titleEn : liveEvents[dayModal].find((e) => e.session === s)!.titleEn) : t(s)}</div>
-                    <div className="bot">{(() => { const e = liveEvents[dayModal]?.find((x) => x.session === s); return e?.startsAt ? `${e.startsAt}${e.endsAt ? ` – ${e.endsAt}` : ""}` : t(`${s}Time`); })()}</div>
+                    <div className="bot">{(() => { const e = liveEvents[dayModal]?.find((x) => x.session === s); return e?.startsAt ? (e.endsAt ? span(e.startsAt, e.endsAt, locale === "ar" ? "ar" : "en") : clock(e.startsAt, locale === "ar" ? "ar" : "en")) : slotTime(s); })()}</div>
                   </button>
                 ))}
               </div>

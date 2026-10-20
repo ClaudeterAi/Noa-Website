@@ -6,6 +6,7 @@ export const revalidate = 60; // event publishes also call revalidatePath; this 
 import { routing, type Locale } from "@/i18n/routing";
 import { getPageBySlug, pick, slugPages } from "@/content/registry";
 import { SectionRenderer } from "@/components/sections";
+import { loadVenue } from "@/server/venue";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -15,6 +16,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, slug } = await params;
+  await loadVenue();
   const page = getPageBySlug(slug);
   if (!page) return {};
   const loc = locale as Locale;
@@ -23,6 +25,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function RegistryPage({ params }: { params: Params }) {
   const { locale, slug } = await params;
+  await loadVenue();
   setRequestLocale(locale);
   const page = getPageBySlug(slug);
   if (!page || page.id === "booking" || page.slug === "") notFound();
