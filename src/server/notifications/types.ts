@@ -15,6 +15,7 @@ export interface BookingContext {
   ticketUrl?: string;   // wristband page with the QR (confirmed bookings)
   qrImageUrl?: string;  // PNG of the QR, embedded in the email
   ticketToken?: string; // signed token, the dynamic suffix of the WhatsApp "Show wristband" button
+  ticket?: import("@/server/ticket-view").TicketView | null;   // full ticket for the email (event, rules, venue)
 }
 
 export interface RenderedEmail { subject: string; text: string; html: string; ics?: { filename: string; content: string } }

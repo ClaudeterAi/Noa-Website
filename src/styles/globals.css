@@ -2157,3 +2157,33 @@ html[dir="rtl"] .hub-chev{transform:scaleX(-1);}
 /* hub headings stay in ink so the pass is the only loud thing on the page */
 .hub .hub-h2,.hub .hub-h3,.hub-out-card h1{color:var(--ink,#10384A);}
 .hub-rail-err{display:block;padding:4px 12px;}
+/* ---------- ticket ---------- */
+.tk{min-height:100vh;padding:calc(var(--gutter) + 90px) var(--gutter) 60px;display:flex;justify-content:center;background:var(--bg);}
+.tk-card{width:100%;max-width:460px;background:#fff;border-radius:14px;box-shadow:0 26px 70px rgba(16,56,74,.16);overflow:hidden;color:var(--ed-ink);}
+.tk-head{display:flex;gap:16px;align-items:center;padding:22px 22px 18px;}
+.tk-img{width:84px;height:104px;object-fit:cover;border-radius:6px;flex:none;background:var(--ed-sand);}
+.tk-kicker{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ed-mute);margin-bottom:6px;}
+.tk-title{font-size:1.35rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--head);line-height:1.15;margin:0;}
+.tk-sub{font-size:.88rem;font-weight:300;margin-top:4px;}
+.tk-facts{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;padding:4px 22px 20px;margin:0;}
+.tk-facts dt{font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--ed-mute);margin-bottom:3px;}
+.tk-facts dd{margin:0;font-size:.92rem;line-height:1.35;}
+.tk-tear{height:22px;position:relative;margin:0 -1px;background:radial-gradient(circle at 0 50%,var(--bg) 11px,transparent 12px),radial-gradient(circle at 100% 50%,var(--bg) 11px,transparent 12px);}
+.tk-tear::after{content:"";position:absolute;left:22px;right:22px;top:50%;border-top:1px dashed rgba(16,56,74,.25);}
+.tk-qr{display:flex;flex-direction:column;align-items:center;padding:14px 22px 18px;gap:6px;}
+.tk-qr img{width:200px;height:200px;}
+.tk-ref{font-size:1.15rem;letter-spacing:.2em;color:var(--head);font-weight:500;}
+.tk-name{font-size:.9rem;font-weight:300;}
+.tk-state{margin-top:6px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ed-mute);}
+.tk-state.done{color:#fff;background:var(--head);padding:5px 12px;border-radius:999px;}
+.tk-venue,.tk-rules{padding:14px 22px 6px;}
+.tk-rules{padding-bottom:24px;}
+.tk-sec-h{font-size:.62rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ed-mute);margin-bottom:8px;}
+.tk-venue p{margin:0 0 6px;font-size:.9rem;font-weight:300;line-height:1.5;}
+.tk-venue-name{font-weight:500!important;color:var(--head);}
+.tk-boats{font-size:.84rem!important;}
+.tk-link{display:inline-block;margin-top:2px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--head);border-bottom:1px solid currentColor;padding-bottom:2px;}
+.tk-rules ul{margin:0;padding-inline-start:18px;}
+.tk-rules li{font-size:.84rem;line-height:1.55;font-weight:300;margin-bottom:6px;}
+/* the ticket is a document to show at the desk: no floating chat or voice buttons over it */
+body:has(.tk) .cc-fab,body:has(.tk) .vc-fab{display:none;}
