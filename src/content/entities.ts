@@ -20,6 +20,16 @@ export const media: Record<string, MediaSlot> = {
   // Placeholder film: "Aerial panorama of a tourist port at sunset" (Mixkit License, free for commercial use). Replaced by NOA's own edit via the media manager.
   "hero-video": { id: "hero-video", kind: "video", url: "/media/hero-placeholder.mp4", source: "placeholder" },
   "hero-poster": { id: "hero-poster", kind: "image", url: "/media/hero-placeholder.jpg", source: "placeholder" },
+  // Seat photos for the "Choose your seat" carousel on the package pages. Unsplash placeholders; NOA replaces them in the admin media manager.
+  "seat-general": img("seat-general", u("photo-1561501900-3701fa6a0864", 900), "Infinity pool with loungers at sunset", "مسبح لا متناهٍ مع كراسي استلقاء عند الغروب"),
+  "seat-lounger": img("seat-lounger", u("photo-1584132967334-10e028bd69f7", 900), "Sun loungers on the pool deck", "كراسي تشمّس على سطح المسبح"),
+  "seat-daybed": img("seat-daybed", u("photo-1610641818989-c2051b5e2cfd", 900), "Daybeds and parasols by the pool", "أسرّة نهارية ومظلات بجانب المسبح"),
+  "seat-high-table": img("seat-high-table", u("photo-1559339352-11d035aa65de", 900), "Tables on a deck over the sea", "طاولات على سطح يطل على البحر"),
+  "seat-pool-cabana": img("seat-pool-cabana", u("photo-1582610116397-edb318620f90", 900), "Cabana beside the pool", "كابانا بجانب المسبح"),
+  "seat-lounge-cabana": img("seat-lounge-cabana", u("photo-1596178065887-1198b6148b2b", 900), "Pool framed by palms and cabanas", "مسبح تحيط به أشجار النخيل والكابانات"),
+  "seat-alfresco": img("seat-alfresco", u("photo-1551882547-ff40c63fe5fa", 900), "Open-air terrace by the pool at dusk", "شرفة في الهواء الطلق بجانب المسبح عند الغسق"),
+  "seat-booth": img("seat-booth", u("photo-1572116469696-31de0f17cc34", 900), "Bar lit for the night", "بار مضاء للمساء"),
+  "seat-upper-cabana": img("seat-upper-cabana", u("photo-1564501049412-61c2a3083791", 900), "Upper terrace overlooking the pool", "شرفة علوية تطل على المسبح"),
   "hero-still": img("hero-still", u("photo-1540541338287-41700207dee6", 1800), "Infinity pool over the Gulf", "مسبح لا متناهٍ يطل على الخليج"),
   "split-dj": img("split-dj", u("photo-1470229722913-7c0e2dbbafd3", 900), "DJ stage", "منصة الدي جيه"),
   "split-club": img("split-club", u("photo-1566073771259-6a8506099945", 900), "Beach club deck", "سطح النادي الشاطئي"),

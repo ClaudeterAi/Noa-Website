@@ -1828,3 +1828,31 @@ html.lg-refract .bwf-inner.lg{-webkit-backdrop-filter:url(#lg-foot);backdrop-fil
 @media(max-width:1023px) and (prefers-reduced-motion:reduce){
   .mm,.mm.open,.mm-label,.mm-tile,.mm-rows li,.mm-dock{transition:none!important;transform:none!important;}
 }
+
+/* ── SEAT CAROUSEL (21st.dev Infinite Perspective Slider, NOA colours) ────────────────────────────────────────────────
+   Before JavaScript: a plain scrollable row. Once live: absolute cards on a 3D strip that tilts with drag speed.
+   Full bleed: the tariff section has var(--gutter) side padding, so the carousel steps out by the same amount. */
+.ps{--ps-frame-h:clamp(260px,50vh,540px);position:relative;margin-inline:calc(var(--gutter) * -1);margin-top:40px;outline:none;touch-action:pan-y;user-select:none;-webkit-user-select:none;}
+.ps:focus-visible{box-shadow:inset 0 0 0 2px var(--c-sea-green,#27A0A1);}
+@media(max-width:1024px){.ps{--ps-frame-h:clamp(240px,45vh,480px);}}
+@media(max-width:639px){.ps{--ps-frame-h:clamp(220px,40vh,400px);}}
+.ps-strip{display:flex;gap:var(--ps-gap);overflow-x:auto;padding-inline:var(--gutter);scroll-snap-type:x mandatory;}
+.ps-card{flex:none;width:var(--ps-w);scroll-snap-align:start;}
+.ps.is-live{overflow:hidden;cursor:grab;}
+.ps.is-live.is-dragging{cursor:grabbing;}
+.ps.is-live .ps-strip{display:block;position:relative;overflow:visible;padding:0;height:calc(var(--ps-frame-h) + 170px);perspective:2200px;}
+.ps.is-live .ps-card{position:absolute;left:0;top:0;will-change:transform;transform-origin:center center;}
+.ps-num{font-size:1.5rem;line-height:1;letter-spacing:-.01em;color:var(--c-sea-green,#27A0A1);margin-bottom:10px;font-weight:300;}
+.ps-frame{position:relative;height:var(--ps-frame-h);overflow:hidden;background:var(--c-sand-tint,#F6F2EA);}
+.ps-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;}
+.ps-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:14px;}
+.ps-name{font-size:1.05rem;letter-spacing:.06em;text-transform:uppercase;color:var(--head,#156A89);line-height:1.2;}
+.ps-price{font-size:1.35rem;font-weight:300;color:var(--c-sea-blue-ink,#10384A);white-space:nowrap;line-height:1;}
+.ps-price small{font-size:.6rem;letter-spacing:.2em;margin-inline-end:4px;vertical-align:top;color:var(--ed-mute,rgba(21,106,137,.72));}
+.ps-detail{margin-top:8px;min-height:64px;}
+.ps-desc{font-size:.9rem;line-height:1.45;color:var(--ed-mute,rgba(21,106,137,.72));}
+.ps-cap{margin-top:6px;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--c-sea-green-deep,#187A80);}
+.ps-hint{display:none;align-items:center;justify-content:center;gap:10px;margin-top:6px;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--ed-mute,rgba(21,106,137,.72));}
+.ps.is-live .ps-hint{display:flex;}
+html[dir="rtl"] .ps-name{letter-spacing:0;}
+html[dir="rtl"] .ps-cap,html[dir="rtl"] .ps-hint{letter-spacing:0;}
