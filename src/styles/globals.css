@@ -1452,9 +1452,7 @@ footer a:hover{color:#fff;}
 @media(max-width:680px){.ed-night-grid{grid-template-columns:1fr 1fr;gap:14px;}.ed-night-name{font-size:.86rem;}.ed-night-who{font-size:.84rem;}}
 /* the film sits over the still and only shows once it is actually playing; a refused autoplay leaves the photograph */
 .hero-still{background-size:cover;background-position:center;}
-.hero-video{opacity:0;transition:opacity .9s ease;}
-.hero-video.hero-video-playing{opacity:1;}
-.hero-video.hero-video-blocked{opacity:0;}
+.hero-video{opacity:1;}
 
 /* ---------- motion: masked word reveals, directional image wipes with drift, staggered fades ---------- */
 :root{--ease-out:cubic-bezier(.2,.7,.2,1);}
@@ -1524,8 +1522,10 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
 /* hero film control: shown only when the browser refused to start the film */
 .hero-play{position:absolute;inset-inline-end:var(--gutter);bottom:4%;z-index:4;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.7);background:rgba(0,0,0,.25);color:#fff;display:none;place-items:center;cursor:pointer;backdrop-filter:blur(6px);}
 .hero-play svg{width:18px;height:18px;margin-inline-start:2px;}
-.hero.film-blocked .hero-play{display:grid;}
+.hero.film-blocked .hero-play{display:none;}
 
 /* the film wrapper is the hero layer; the <video> inside fills it */
 .hero-film{overflow:hidden;}
 .hero-film .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}
+
+.hero-film video::-webkit-media-controls,.hero-film video::-webkit-media-controls-start-playback-button,.hero-film video::-webkit-media-controls-panel{display:none!important;-webkit-appearance:none!important;opacity:0!important;}
