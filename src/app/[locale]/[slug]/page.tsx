@@ -26,5 +26,5 @@ export default async function RegistryPage({ params }: { params: Params }) {
   setRequestLocale(locale);
   const page = getPageBySlug(slug);
   if (!page || page.id === "booking" || page.slug === "") notFound();
-  return <main>{page.sections.map((s) => <SectionRenderer key={s.id} section={s} locale={locale as Locale} />)}</main>;
+  return <main data-page={page.id}>{page.sections.map((s) => <SectionRenderer key={s.id} section={s} locale={locale as Locale} />)}</main>;
 }
