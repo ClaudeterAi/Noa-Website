@@ -43,6 +43,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     return { href: hrefPath({ page: id }), label: pick(label, loc) };
   };
   const booking = getPage("booking");
+  /** phone menu: these pages show as photo tiles (media slot per page), the rest as rows */
+  const MENU_TILES: Partial<Record<string, string>> = { "afternoon-package": "pkg-afternoon", "night-package": "pkg-night", cabana: "pkg-cabana", events: "party-1" };
 
   return (
     <html lang={loc} dir={DIR[loc]} className={`${barlow.variable} ${plexArabic.variable} ${naskh.variable}`}>
@@ -54,7 +56,10 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           <Motion />
           <Nav
             main={registry.nav.main.map((id) => toLink(id))}
-            mobile={registry.nav.mobile.map((id) => toLink(id, true))}
+            mobile={registry.nav.mobile.map((id) => {
+              const l = toLink(id, true), slot = MENU_TILES[id];
+              return slot === undefined ? l : { ...l, image: registry.media[slot]?.url ?? null };
+            })}
             book={{ href: hrefPath({ page: "booking" }), label: pick(booking.navLabel ?? booking.title, loc) }}
           />
           {children}
