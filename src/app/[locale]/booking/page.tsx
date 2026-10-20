@@ -4,6 +4,7 @@ import type { Locale } from "@/i18n/routing";
 import { getPage, pick } from "@/content/registry";
 import { Link } from "@/i18n/navigation";
 import BookingApp from "@/components/booking/BookingApp";
+import MovingBorder from "@/components/ui/MovingBorder";
 
 export const dynamic = "force-dynamic"; // the "open soon" / live decision is made per request, not baked at build
 
@@ -32,7 +33,7 @@ function ReservationsSoon({ locale }: { locale: Locale }) {
       <div className="cta-h">{ar ? <>تُفتح الحجوزات<br />قريباً</> : <>Reservations<br />open soon</>}</div>
       <p className="cta-body">{ar ? "خريطة المقاعد والدفع الإلكتروني في طريقهما إلى هنا. حتى ذلك الحين، يسعد فريقنا بحجز مقعدك مباشرة." : "The seat map and online payment are on their way here. Until then, our team will gladly hold your seat directly."}</p>
       <div className="cta-row">
-        <Link href="/contact"><button type="button" className="pkg-btn">{ar ? "تواصل مع الفريق" : "Contact the team"}</button></Link>
+        <Link href="/contact"><MovingBorder><button type="button" className="pkg-btn mb-btn">{ar ? "تواصل مع الفريق" : "Contact the team"}</button></MovingBorder></Link>
         <Link href="/morning-package" className="pkg-more">{ar ? "اطّلع على الباقات" : "See the packages"}</Link>
       </div>
       <p className="form-meta" style={{ marginTop: 28 }}><a href="tel:+97148400000" style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>+971 4 840 0000</a> · <a href="mailto:hello@noa-dubai.com" style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>hello@noa-dubai.com</a></p>

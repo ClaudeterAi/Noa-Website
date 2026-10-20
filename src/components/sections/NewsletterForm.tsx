@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import MovingBorder from "@/components/ui/MovingBorder";
 
 /** Email-only sign-up; stores consent on the guest record (no new tables). */
 export default function NewsletterForm({ locale }: { locale: "en" | "ar" }) {
@@ -14,7 +15,7 @@ export default function NewsletterForm({ locale }: { locale: "en" | "ar" }) {
   return (
     <form className="ed-news-form" onSubmit={submit}>
       <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={T.ph} aria-label={T.ph} />
-      <button type="submit" className="ed-btn" disabled={state === "busy"}>{T.go}</button>
+      <MovingBorder paused={state === "busy"}><button type="submit" className="ed-btn mb-btn" disabled={state === "busy"}>{T.go}</button></MovingBorder>
       {state === "error" && <p className="ed-news-err" role="alert">{T.err}</p>}
     </form>
   );
