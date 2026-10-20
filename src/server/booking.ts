@@ -1,3 +1,4 @@
+import { recordConsent } from "./consent";
 import { and, eq, gt, inArray, isNull, lt, sql } from "drizzle-orm";
 import { db, type Db, type Tx } from "@/db/client";
 import {
@@ -333,6 +334,9 @@ async function upsertGuest(g: GuestDetails, tx: Tx) {
     target: guests.email,
     set: { phone: g.phone, name: g.name, locale: g.locale ?? "en" },
   }).returning();
+  // A tick at checkout is a grant, for new and returning guests alike (returning guests' ticks used to be dropped).
+  // An unticked box is not a withdrawal: it starts unticked, so treating it as one would silently unsubscribe people.
+  if (g.marketingOptIn) await recordConsent(row.id, "email", true, "checkout", undefined, tx);
   return row;
 }
 
