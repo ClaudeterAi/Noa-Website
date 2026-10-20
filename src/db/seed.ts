@@ -5,6 +5,16 @@ import { unitTypes as types, units } from "@/components/booking/inventory";
 import { BOAT_UNITS } from "@/components/booking/boat";
 
 /** Seeds inventory from the Day 1 catalogue (same rows the admin will edit on Day 3). Idempotent. */
+/** Add any unit type the code knows and the database lacks. Existing rows (and admin price edits) are left untouched. */
+export async function ensureUnitTypes() {
+  const before = new Set((await db.select({ id: unitTypes.id }).from(unitTypes)).map((t) => t.id));
+  await db.insert(unitTypes).values(Object.values(types).map((t) => ({
+    id: t.id, cls: t.cls, nameEn: t.name.en, nameAr: t.name.ar, descEn: t.desc.en, descAr: t.desc.ar,
+    pax: t.pax, priceMorning: t.mPrice, priceAfternoon: t.price, perPerson: !!t.perPerson, tier: t.tier, imageSlot: null,
+  }))).onConflictDoNothing({ target: unitTypes.id });
+  return Object.keys(types).filter((id) => !before.has(id));
+}
+
 export async function seed(opts: { onlyIfEmpty?: boolean } = {}) {
   if (opts.onlyIfEmpty) {
     const [{ n }] = await db.execute<{ n: number }>(sql`SELECT count(*)::int AS n FROM unit_types`).then((r) => r.rows);
