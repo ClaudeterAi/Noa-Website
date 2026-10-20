@@ -1731,3 +1731,6 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
 @keyframes navDropIn{from{opacity:0}to{opacity:1}}
 html[dir="rtl"] .nav-hl{left:0;right:auto;}
 @media(prefers-reduced-motion:reduce){.nav-body,.nav-hl{transition:none;}.nav-drop.open{animation:none;}}
+/* Booking pages: the legacy body.booking-page rule (top of file) painted the logo and links #1a1a1a for the old white bar.
+   The bar is sea green everywhere now, so they take the same light text as every other page. */
+body.booking-page #nav .logo,body.booking-page #nav .nav-links a,body.booking-page #nav .nav-ham{color:var(--on-bar);}
