@@ -55,13 +55,15 @@ const Badge = ({ kind, x, y, r = 9 }: { kind: string; x: number; y: number; r?: 
   <g pointerEvents="none"><g filter="url(#bevel)"><circle cx={x} cy={y} r={r} fill="url(#disc)" /></g><circle cx={x} cy={y} r={r} fill="none" stroke="#b9a98d" strokeWidth=".4" opacity=".8" /><Icon kind={kind} x={x} y={y} scale={r / 11} /></g>
 );
 /** Caption pill: one line per " · " segment, text forced to fit its line */
-const Caption = ({ x, y, text, dark = false, max = 40 }: { x: number; y: number; text: string; dark?: boolean; max?: number }) => {
-  const parts = text.split(" · ").flatMap((t) => (t.length * 2.7 > max ? t.split(" ").reduce<string[]>((acc, wd) => { const last = acc[acc.length - 1]; if (last !== undefined && (last + " " + wd).length * 2.7 <= max) acc[acc.length - 1] = last + " " + wd; else acc.push(wd); return acc; }, []) : [t]));
-  const lh = 5.6, fs = 4.3, pw = Math.min(max, Math.max(...parts.map((t) => t.length * 2.7)) + 6), ph = parts.length * lh + 1.6;
+const Caption = ({ x, y, text, dark = false, max = 48 }: { x: number; y: number; text: string; dark?: boolean; max?: number }) => {
+  const fs = 5.2, cw = fs * 0.63, lh = fs * 1.3;   // Barlow SemiBold caps run about 0.63 em wide
+  const fit = max * 0.85;   // wrap before a line fills the pill, so a wider fallback font still fits
+  const parts = text.split(" · ").flatMap((t) => (t.length * cw > fit ? t.split(" ").reduce<string[]>((acc, wd) => { const last = acc[acc.length - 1]; if (last !== undefined && (last + " " + wd).length * cw <= fit) acc[acc.length - 1] = last + " " + wd; else acc.push(wd); return acc; }, []) : [t]));
+  const pw = Math.min(max, Math.max(...parts.map((t) => t.length * cw)) + 6), ph = parts.length * lh + 1.8;
   return (
     <g pointerEvents="none">
       <rect x={x - pw / 2} y={y - ph / 2} width={pw} height={ph} rx="3.2" fill={dark ? "#5f5040" : "#fff"} fillOpacity={dark ? 1 : 0.94} />
-      {parts.map((t, i) => <text key={i} x={x} y={y - ph / 2 + 0.8 + lh * (i + 1) - 1.3} fontSize={fs} fill={dark ? "#fff" : "#5f5040"} style={{ ...F, fontKerning: "none" }} textAnchor="middle" fontWeight="600">{t}</text>)}
+      {parts.map((t, i) => <text key={i} x={x} y={y - ph / 2 + 0.9 + lh * (i + 1) - 1.6} fontSize={fs} fill={dark ? "#fff" : "#5f5040"} style={{ ...F, fontKerning: "none" }} textAnchor="middle" fontWeight="600">{t}</text>)}
     </g>
   );
 };
@@ -123,10 +125,10 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         <radialGradient id="poolDepth" cx="50%" cy="50%" r="70%"><stop offset="0" stopColor="#d4e9ec" /><stop offset=".7" stopColor="#a9d0d7" /><stop offset="1" stopColor="#8fbfc8" /></radialGradient>
       </defs>
 
-      <text x={-PAD - BOW + 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(-90 ${-PAD - BOW + 7} ${H / 2})`}>{labels.bow}</text>
-      <text x={W + PAD - 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(90 ${W + PAD - 7} ${H / 2})`}>{labels.stern}</text>
-      <text x={(W - BOW) / 2} y={-14} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.port}</text>
-      <text x={(W - BOW) / 2} y={H + 21} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.starboard}</text>
+      <text x={-PAD - BOW + 7} y={H / 2} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(-90 ${-PAD - BOW + 7} ${H / 2})`}>{labels.bow}</text>
+      <text x={W + PAD - 7} y={H / 2} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(90 ${W + PAD - 7} ${H / 2})`}>{labels.stern}</text>
+      <text x={(W - BOW) / 2} y={-14} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle">{labels.port}</text>
+      <text x={(W - BOW) / 2} y={H + 22} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle">{labels.starboard}</text>
 
       {/* 1 · deck */}
       {deck === "main"
@@ -146,10 +148,10 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
             <rect x={x} y={y} width={w} height={h} rx="1.2" fill="none" stroke="#5f8f98" strokeWidth="2.2" strokeOpacity=".35" filter="url(#soft)" />
             <rect x={x + 0.6} y={y + 0.6} width={w - 1.2} height={h - 1.2} rx="1" fill="none" stroke="#fff" strokeOpacity=".55" strokeWidth=".6" />
             {[0.28, 0.5, 0.72].map((q) => <path key={q} d={`M${x + 5},${y + h * q} q${w / 10},-1.2 ${w / 5},0 t${w / 5},0 t${w / 5},0 t${w / 5},0`} fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth=".7" strokeLinecap="round" />)}
-            {nm && <text x={cx} y={cy + 2.4} fontSize="6.5" letterSpacing="2.4" fill="#1f4f57" style={F} textAnchor="middle" fontWeight="600">{nm}</text>}
+            {nm && <text x={cx} y={cy + 2.7} fontSize={w < 120 ? 6.8 : 8} letterSpacing={w < 120 ? 2 : 2.8} fill="#1f4f57" style={F} textAnchor="middle" fontWeight="600">{nm}</text>}
           </g>;
           case "stairs": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panel)" />{Array.from({ length: 8 }).map((_, i) => { const yy = y + 1.5 + (i * (h - 3)) / 7; return <g key={i}><line x1={x + 1.5} y1={yy} x2={x + w - 1.5} y2={yy} stroke="#fff" strokeOpacity=".8" strokeWidth=".5" /><line x1={x + 1.5} y1={yy + 0.7} x2={x + w - 1.5} y2={yy + 0.7} stroke="#8d7c64" strokeOpacity=".35" strokeWidth=".6" /></g>; })}</g>;
-          case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} max={60} />}</g>;
+          case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} max={70} />}</g>;
           case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" filter="url(#lift)" /><Badge kind="dj" x={cx} y={cy - 7} r={8} />{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
           case "bar": {
             const vertical = h > w, rr = sx(a.r ?? 500), n = vertical ? 4 : 5, stools: [number, number][] = [];
@@ -237,7 +239,7 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
       {/* 5 · interactive seats: transparent hit areas + state + corner label */}
       {units.map((u) => {
         const x = sx(u.x), y = sy(u.y), w = sx(u.w), h = sx(u.h), st = stateOf(u.id), round = !!u.r && u.r >= u.w / 2;
-        const chipW = u.label.length > 2 ? 15 : 12, chipH = 7.6, below = u.y + u.h / 2 < 7000;
+        const chipW = u.label.length > 2 ? 18 : 14.5, chipH = 9, below = u.y + u.h / 2 < 7000;
         return (
           <g key={u.id} className={`seat-g ${st}`} transform={`translate(${x} ${y})`}>
             {round
@@ -245,7 +247,7 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
               : <rect className={`seat ${u.type} ${st}`} data-seat={u.id} x="-0.6" y="-0.6" width={w + 1.2} height={h + 1.2} rx={u.r ? sx(u.r) : 1.5} fill="transparent" stroke="none" />}
             <g pointerEvents="none" transform={round ? `translate(${w / 2 - chipW / 2} ${below ? h + 3 : -chipH - 3})` : `translate(${w - chipW - 1} ${below ? h - chipH - 1 : 1})`}>
               <rect width={chipW} height={chipH} rx="1.4" fill="#fff" fillOpacity=".95" stroke={INK} strokeWidth=".35" />
-              <text x={chipW / 2} y={chipH - 2.1} fontSize="5.2" letterSpacing=".3" fill={INK} style={F} textAnchor="middle" fontWeight="600">{u.label}</text>
+              <text x={chipW / 2} y={chipH - 2.4} fontSize="6.4" letterSpacing=".3" fill={INK} style={F} textAnchor="middle" fontWeight="600">{u.label}</text>
             </g>
           </g>
         );
