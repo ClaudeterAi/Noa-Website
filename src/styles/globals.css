@@ -1563,7 +1563,8 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
   .ed-intro .ed-p{font-size:1.02rem;line-height:1.65;}
 }
 
-/* ==============================================================================================================   Inner pages in the editorial language (packages, cabanas, about, location, FAQ, contact).
+/* =====================================================================================================================
+   Inner pages in the editorial language (packages, cabanas, about, location, FAQ, contact).
    Photography framed inside the gutter, editorial type scale, hairlines on sand. Overrides the Day-1 rules above.
    ===================================================================================================================== */
 .subhero{height:auto;min-height:0;padding:calc(var(--gutter) + 72px) var(--gutter) 0;background:var(--bg);display:grid;grid-template-columns:minmax(300px,34%) 1fr;gap:clamp(32px,5vw,80px);align-items:end;}
@@ -1685,7 +1686,6 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
   .ed-elastic-panel,.ed-elastic-panel.open{flex:none;aspect-ratio:4/3;filter:none;will-change:auto;}
   .ed-elastic-spine{display:none;} .ed-elastic-shade,.ed-elastic-copy{opacity:1;transform:none;} .ed-elastic-img{transform:none;}
 }
-=======
 /* ── RESIZABLE NAV (Aceternity port, NOA colours) ─────────────────────────────
    #nav is now a transparent fixed frame; the visible bar is .nav-body, which turns into a floating pill
    past 100px. Earlier #nav rules above set background/padding on #nav itself; they are neutralised here.
@@ -1714,7 +1714,7 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
 #nav.stuck .nav-ham,#nav.menu-open .nav-ham{color:var(--on-bar);}
 .nav-drop{display:none;}
 /* Arabic labels run wider: at 800px the links touch the language switch and Book (measured: -3px). 860px gives clear air. */
-html[lang="ar"] #nav.floating .nav-body{min-width:860px;}
+@media(min-width:1024px){html[lang="ar"] #nav.floating .nav-body{min-width:860px;}}
 @media(max-width:1023px){
   .nav-body{max-width:calc(100vw - 2rem);padding:12px 0;border-radius:2rem;}
   #nav.stuck .nav-body{max-width:none;padding:10px 20px;border-radius:0;}

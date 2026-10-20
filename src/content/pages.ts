@@ -347,7 +347,7 @@ export const pages: Page[] = [
     slug: "booking",
     title: t("Book · NOA", "احجز — نوا"),
     metaDescription: t("Choose your day, pick a seat on the yacht map and reserve your place at NOA.", "اختر يومك، وحدد مقعدك على خريطة اليخت، واحجز مكانك في نوا."),
-    navLabel: t("Book Now", "احجز الآن"),
+    navLabel: t("Reserve", "احجز"),
     voiceAliases: [t("book", "احجز"), t("booking", "الحجز"), t("reserve a seat", "حجز مقعد"), t("seat map", "خريطة المقاعد")],
     sections: [],
   },

@@ -98,7 +98,7 @@ export const packages: Record<string, Package> = {
     ),
     media: "pkg-morning",
     more: { label: t("See the Morning", "اطّلع على الصباح"), href: { page: "morning-package" } },
-    book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
+    book: { label: t("Reserve", "احجز"), href: { page: "booking" } },
   },
   afternoon: {
     id: "afternoon",
@@ -112,7 +112,7 @@ export const packages: Record<string, Package> = {
     ),
     media: "pkg-afternoon",
     more: { label: t("See the Afternoon", "اطّلع على بعد الظهر"), href: { page: "afternoon-package" } },
-    book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
+    book: { label: t("Reserve", "احجز"), href: { page: "booking" } },
   },
   night: {
     id: "night",
@@ -126,7 +126,7 @@ export const packages: Record<string, Package> = {
     ),
     media: "pkg-night",
     more: { label: t("See the Night", "اطّلع على الليل"), href: { page: "night-package" } },
-    book: { label: t("Book Now", "احجز الآن"), href: { page: "booking" } },
+    book: { label: t("Reserve", "احجز"), href: { page: "booking" } },
   },
   cabana: {
     id: "cabana",
