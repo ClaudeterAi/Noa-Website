@@ -54,7 +54,7 @@ export default function Scroll() {
 
       /* headings write in, once, then release their layers */
       q("h1, h2").forEach((h) => {
-        if (h.closest(".hero") || h.closest("[data-scrub]")) return;
+        if (h.closest(".hero") || h.closest("[data-scrub]") || h.closest("[data-no-motion]")) return;   // same opt-out Motion.tsx honours
         mark([h]);
         gsap.fromTo(chars(h), { yPercent: 110, opacity: 0 }, { yPercent: 0, opacity: 1, stagger: 0.012, duration: 0.8, ease: "power3.out", clearProps: CLEAR, scrollTrigger: once(h) });
       });

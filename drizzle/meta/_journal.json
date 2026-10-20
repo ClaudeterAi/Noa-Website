@@ -43,6 +43,13 @@
       "when": 1792491288584,
       "tag": "0005_checkin",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792494647387,
+      "tag": "0006_guest_profile",
+      "breakpoints": true
     }
   ]
 }

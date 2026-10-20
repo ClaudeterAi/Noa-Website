@@ -70,14 +70,28 @@ export const guests = pgTable("guests", {
   tier: guestTierEnum("tier").notNull().default("guest"),
   tierManual: boolean("tier_manual").notNull().default(false), // NOA flagged by hand; nightly job won't override
   locale: text("locale").notNull().default("en"),
-  marketingOptIn: boolean("marketing_opt_in").notNull().default(false),
+  marketingOptIn: boolean("marketing_opt_in").notNull().default(false),   // mirrors the latest email consent in guest_consents
   consentAt: timestamp("consent_at", { withTimezone: true }),
+  preferredUnitType: text("preferred_unit_type").references(() => unitTypes.id),   // 0006: the seat type they usually book
+  birthdayMonth: smallint("birthday_month"),                                       // 0006: 1-12, no full date stored
   lastBookingAt: timestamp("last_booking_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [
   uniqueIndex("guests_email_uq").on(t.email),
   uniqueIndex("guests_cognito_sub_uq").on(t.cognitoSub),
 ]);
+
+/** 0006: consent history, one row per grant or withdrawal per channel (email | whatsapp | sms). */
+export const guestConsents = pgTable("guest_consents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  guestId: uuid("guest_id").notNull().references(() => guests.id),
+  channel: channelEnum("channel").notNull(),
+  granted: boolean("granted").notNull(),
+  source: text("source").notNull(),            // 'popup' | 'account' | 'checkout' | 'newsletter' | 'delete_request'
+  at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+  ip: text("ip"),
+  userAgent: text("user_agent"),
+}, (t) => [index("guest_consents_guest_idx").on(t.guestId, t.channel, t.at)]);
 
 /* ---------------- holds ---------------- */
 

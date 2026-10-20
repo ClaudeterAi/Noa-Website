@@ -10,6 +10,7 @@ import Effects from "@/components/layout/Effects";
 import Motion from "@/components/layout/Motion";
 import Scroll from "@/components/layout/Scroll";
 import LiquidGlass from "@/components/layout/LiquidGlass";
+import SignInDialog from "@/components/account/SignInDialog";
 import ChatConcierge from "@/components/concierge/ChatConcierge";
 import VoiceConcierge from "@/components/concierge/VoiceConcierge";
 import { barlow, naskh, plexArabic } from "@/fonts";
@@ -64,6 +65,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           />
           {children}
           <Footer locale={loc} />
+          <SignInDialog />
           <VoiceConcierge />
           <ChatConcierge />
         </NextIntlClientProvider>

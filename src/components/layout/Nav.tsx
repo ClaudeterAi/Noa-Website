@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { initials, openSignIn, useGuest } from "@/components/account/store";
 
 export interface NavLink { href: string; label: string; /** menu tile photo; links with one show as tiles in the phone menu */ image?: string | null; }
 
@@ -55,7 +56,7 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
       if (e.key === "Escape") { setOpen(false); return; }
       if (e.key !== "Tab") return;
       // keep focus inside the open menu: the menu button plus every link in the sheet, wrapping at both ends
-      const items = [hamRef.current, ...Array.from(sheetRef.current?.querySelectorAll<HTMLElement>("a[href]") ?? [])].filter(Boolean) as HTMLElement[];
+      const items = [hamRef.current, ...Array.from(sheetRef.current?.querySelectorAll<HTMLElement>("a[href], button:not([disabled])") ?? [])].filter(Boolean) as HTMLElement[];
       if (!items.length) return;
       const first = items[0], last = items[items.length - 1], at = document.activeElement as HTMLElement | null;
       if (e.shiftKey && (at === first || !items.includes(at as HTMLElement))) { e.preventDefault(); last.focus(); }
@@ -66,7 +67,7 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
     const desktop = window.matchMedia("(min-width: 1024px)");
     const onBreak = () => { if (desktop.matches) setOpen(false); };
     desktop.addEventListener("change", onBreak);
-    const t = window.setTimeout(() => sheetRef.current?.querySelector<HTMLElement>("a")?.focus({ preventScroll: true }), 60);
+    const t = window.setTimeout(() => sheetRef.current?.querySelector<HTMLElement>("a[href], button:not([disabled])")?.focus({ preventScroll: true }), 60);
     const ham = hamRef.current;
     return () => { root.style.overflow = prev; window.removeEventListener("keydown", onKey); desktop.removeEventListener("change", onBreak); clearTimeout(t); ham?.focus({ preventScroll: true }); };
   }, [open]);
@@ -81,11 +82,14 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
   const other: Locale = locale === "en" ? "ar" : "en";
   const switchLabel = other === "ar" ? "العربية" : "English";
   const cls = [stuck && "stuck", floating && "floating", open && "menu-open"].filter(Boolean).join(" ") || undefined;
+  const { me } = useGuest();
+  const signedIn = !!me?.signedIn, authOn = !!me?.authEnabled || signedIn;
+  const tierLabel = (t?: string) => (locale === "ar" ? { guest: "ضيف", preferred: "مفضّل", vip: "VIP" } : { guest: "Guest", preferred: "Preferred", vip: "VIP" })[(t ?? "guest") as "guest"];
   const tiles = mobile.filter((l) => l.image !== undefined), rows = mobile.filter((l) => l.image === undefined);
   const current = (href: string) => pathname === href || (href !== "/" && pathname.startsWith(href + "/"));
   const T = locale === "ar"
-    ? { menu: "القائمة", experience: "التجربة", info: "معلومات", language: "اللغة" }
-    : { menu: "Menu", experience: "Experience", info: "Information", language: "Language" };
+    ? { menu: "القائمة", experience: "التجربة", info: "معلومات", language: "اللغة", signIn: "تسجيل الدخول", signInSub: "أولوية المقاعد وحجوزاتك في مكان واحد", account: "حسابي" }
+    : { menu: "Menu", experience: "Experience", info: "Information", language: "Language", signIn: "Sign in", signInSub: "Seat priority and your bookings in one place", account: "My account" };
 
   return (
     <nav id="nav" className={cls} data-booking={bookingPage ? "" : undefined}>
@@ -96,6 +100,11 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
           {main.map((l) => <Link key={l.href + l.label} href={l.href} onMouseEnter={onEnter}>{l.label}</Link>)}
         </div>
         <div className="nav-actions">
+          {authOn && (signedIn
+            ? <Link href="/account" className="nav-me is-in" aria-label={T.account} title={T.account}><span>{initials(me)}</span></Link>
+            : <button type="button" className="nav-me" aria-label={T.signIn} title={T.signIn} onClick={() => openSignIn("manual")}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="3.75" /><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5" /></svg>
+              </button>)}
           <Link href={pathname} locale={other} className="nav-lang" lang={other} aria-label={switchLabel}>{switchLabel}</Link>
           <Link href={book.href} className="nav-book">{book.label}</Link>
         </div>
@@ -107,6 +116,23 @@ export default function Nav({ main, mobile, book, bookingPage }: Props) {
       </div>
       <div className={`mm${open ? " open" : ""}`} id="mobmenu" ref={sheetRef} role="dialog" aria-modal="true" aria-label={T.menu} aria-hidden={!open} inert={!open}>
         <div className="mm-scroll">
+          {authOn && (
+            <div className="mm-me" style={{ "--i": 0 } as CSSProperties}>
+              {signedIn ? (
+                <Link href="/account" onClick={() => setOpen(false)}>
+                  <span className="mm-me-av" aria-hidden="true">{initials(me)}</span>
+                  <span className="mm-me-txt"><b>{me?.guest?.name ?? me?.guest?.email}</b><small>{tierLabel(me?.guest?.tier)} · {T.account}</small></span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+                </Link>
+              ) : (
+                <button type="button" onClick={() => { setOpen(false); openSignIn("manual"); }}>
+                  <span className="mm-me-av" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8.5" r="3.75" /><path d="M4.5 20c1.2-3.6 4.1-5.5 7.5-5.5s6.3 1.9 7.5 5.5" /></svg></span>
+                  <span className="mm-me-txt"><b>{T.signIn}</b><small>{T.signInSub}</small></span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+                </button>
+              )}
+            </div>
+          )}
           <p className="mm-label" style={{ "--i": 0 } as CSSProperties}>{T.experience}</p>
           <div className="mm-tiles">
             {tiles.map((l, i) => (
