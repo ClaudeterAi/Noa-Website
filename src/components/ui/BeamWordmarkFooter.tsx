@@ -106,8 +106,10 @@ export type BeamWordmarkFooterProps = {
   background?: string;
   ink?: string;
   muted?: string;
-  /** Labels, hairlines, the beam and the wordmark's lit edge. */
+  /** Hairlines, the beam and the wordmark's lit edge. */
   accent?: string;
+  /** Column titles and the © line. Defaults to a lighter tint of the accent so 13px text clears 4.5:1 on the ground. */
+  labelColor?: string;
   /** The wordmark's resting fill, top and foot. */
   wordTop?: string;
   wordFoot?: string;
@@ -226,7 +228,7 @@ const CSS =
   // Layout.
   ".bwf-inner{position:relative;z-index:2;box-sizing:border-box;max-width:1120px;margin:0 auto;padding:clamp(48px,8.5cqw,104px) clamp(20px,6cqw,88px) 0;display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,.86fr) minmax(0,.86fr);column-gap:clamp(24px,4cqw,48px);row-gap:44px}" +
   ".bwf-inner.has-4{grid-template-columns:minmax(0,1.62fr) minmax(0,.86fr) minmax(0,.86fr) minmax(0,.86fr)}" +
-  ".bwf-label{font-size:12px;line-height:1;letter-spacing:.01em;color:rgb(var(--bwf-acc));padding-bottom:13px;position:relative;display:block}" +
+  ".bwf-label{font-size:13px;line-height:1.35;letter-spacing:.02em;color:var(--bwf-label);padding-bottom:13px;position:relative;display:block}" +
   ".bwf-label::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,rgba(var(--bwf-acc),.55),rgba(var(--bwf-acc),.28));transform-origin:0 50%;transform:scaleX(var(--bwf-line,1));transition:transform 1.1s cubic-bezier(.2,.7,.1,1) var(--bwf-d,0ms)}" +
   ".bwf[data-in='false'] .bwf-label::after{--bwf-line:0}" +
   ".bwf-col{min-width:0}" +
@@ -243,16 +245,16 @@ const CSS =
   ".bwf-tip::after{content:'';position:absolute;left:50%;bottom:100%;margin-left:-4px;border:4px solid transparent;border-bottom-color:rgba(var(--bwf-acc),.95)}" +
   ".bwf-soc:hover .bwf-tip,.bwf-soc:focus-visible .bwf-tip{opacity:1;translate:-50% 0}" +
   // Credits.
-  ".bwf-credits{margin-top:21px;font-size:14px;line-height:1.5;color:var(--bwf-muted)}" +
+  ".bwf-credits{margin-top:21px;font-size:15px;line-height:1.55;color:var(--bwf-muted)}" +
   ".bwf-credits p+p{margin-top:2px}" +
   // Legal links: a quiet row under the credits, same link treatment.
-  ".bwf-legal{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:12px;font-size:13px}" +
+  ".bwf-legal{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:12px;font-size:14px}" +
   ".bwf-credits b{font-weight:400;color:var(--bwf-ink)}" +
   ".bwf-credits a{color:var(--bwf-ink);background:linear-gradient(rgb(var(--bwf-acc)),rgb(var(--bwf-acc))) 0 100%/0 1px no-repeat;transition:background-size .35s cubic-bezier(.2,.8,.2,1),color .25s}" +
   ".bwf-credits a:hover,.bwf-credits a:focus-visible{background-size:100% 1px;color:#fff;outline:none}" +
   // Link columns.
   ".bwf-links{margin-top:13px;display:flex;flex-direction:column;gap:0}" +
-  ".bwf-link{position:relative;display:inline-flex;align-items:center;gap:8px;padding:6px 0;font-size:14.5px;line-height:21px;color:rgba(var(--bwf-ink-rgb),.78);transition:color .25s}" +
+  ".bwf-link{position:relative;display:inline-flex;align-items:center;gap:8px;padding:6px 0;font-size:15.5px;line-height:22px;color:rgba(var(--bwf-ink-rgb),.88);transition:color .25s}" +
   ".bwf-link-t{display:inline-block;transition:translate .35s cubic-bezier(.2,.8,.2,1)}" +
   ".bwf-link::before{content:'';position:absolute;left:0;top:50%;width:6px;height:1px;margin-top:0;background:rgb(var(--bwf-acc));transform:scaleX(0);transform-origin:0 50%;transition:transform .35s cubic-bezier(.2,.8,.2,1)}" +
   ".bwf-link svg{width:12px;height:12px;opacity:0;translate:-6px 0;color:rgb(var(--bwf-acc));transition:opacity .25s,translate .35s cubic-bezier(.2,.8,.2,1)}" +
@@ -310,8 +312,9 @@ export default function BeamWordmarkFooter({
   // NOA palette: sea-blue ink ground, sea-green light, sand type.
   background = "#10384A",
   ink = "#EDE6DA",
-  muted = "rgba(237, 230, 218, 0.62)",
+  muted = "rgba(237, 230, 218, 0.72)",
   accent = "#27A0A1",
+  labelColor = "#6CCACB",
   wordTop = "#156A89",
   wordFoot = "#0B2833",
   fontSans = SANS,
@@ -501,6 +504,7 @@ export default function BeamWordmarkFooter({
     "--bwf-ink-rgb": hexToRgb(ink, "237, 230, 218"),
     "--bwf-muted": muted,
     "--bwf-acc": hexToRgb(accent),
+    "--bwf-label": labelColor,
     "--bwf-lit": hexToRgb(accent),
     "--bwf-wt": wordTop,
     "--bwf-wf": wordFoot,
