@@ -21,6 +21,11 @@ interface Props {
   onSeatLeave?: () => void;
 }
 
+const PAD = 30;
+/** viewBox size and the fraction of its width outside the hull on each side; the toolbar and legend use it to line up with the hull */
+export const MAP_VIEW_W = (HULL.length + HULL.bow) / SCALE + PAD * 2;
+export const MAP_VIEW_H = HULL.beam / SCALE + PAD * 2;
+export const MAP_INSET = PAD / MAP_VIEW_W;
 const sx = (mm: number) => mm / SCALE;
 const isCircle = (bw: number, bh: number) => bw >= 4.5 && bw < 24 && Math.abs(bw - bh) < Math.max(bw, bh) * 0.12;
 const sy = (mm: number) => (mm - HULL.top) / SCALE;
@@ -50,13 +55,17 @@ const Badge = ({ kind, x, y, r = 9 }: { kind: string; x: number; y: number; r?: 
   <g pointerEvents="none"><g filter="url(#bevel)"><circle cx={x} cy={y} r={r} fill="url(#disc)" /></g><circle cx={x} cy={y} r={r} fill="none" stroke="#b9a98d" strokeWidth=".4" opacity=".8" /><Icon kind={kind} x={x} y={y} scale={r / 11} /></g>
 );
 /** Caption pill: one line per " · " segment, text forced to fit its line */
-const Caption = ({ x, y, text, dark = false, max = 40 }: { x: number; y: number; text: string; dark?: boolean; max?: number }) => {
-  const parts = text.split(" · ").flatMap((t) => (t.length * 2.7 > max ? t.split(" ").reduce<string[]>((acc, wd) => { const last = acc[acc.length - 1]; if (last !== undefined && (last + " " + wd).length * 2.7 <= max) acc[acc.length - 1] = last + " " + wd; else acc.push(wd); return acc; }, []) : [t]));
-  const lh = 5.6, fs = 4.3, pw = Math.min(max, Math.max(...parts.map((t) => t.length * 2.7)) + 6), ph = parts.length * lh + 1.6;
+/** `y` is the pill centre; pass `bottom` instead to pin the pill's lower edge (captions inside a panel use the panel's bottom minus a margin, so a 3-line caption grows upward, not out of the box) */
+const Caption = ({ x, y: yc, bottom, text, dark = false, max = 48 }: { x: number; y?: number; bottom?: number; text: string; dark?: boolean; max?: number }) => {
+  const fs = 5.2, cw = fs * 0.63, lh = fs * 1.3;   // Barlow SemiBold caps run about 0.63 em wide
+  const fit = max * 0.85;   // wrap before a line fills the pill, so a wider fallback font still fits
+  const parts = text.split(" · ").flatMap((t) => (t.length * cw > fit ? t.split(" ").reduce<string[]>((acc, wd) => { const last = acc[acc.length - 1]; if (last !== undefined && (last + " " + wd).length * cw <= fit) acc[acc.length - 1] = last + " " + wd; else acc.push(wd); return acc; }, []) : [t]));
+  const pw = Math.min(max, Math.max(...parts.map((t) => t.length * cw)) + 6), ph = parts.length * lh + 1.8;
+  const y = bottom !== undefined ? bottom - ph / 2 : (yc ?? 0);
   return (
     <g pointerEvents="none">
       <rect x={x - pw / 2} y={y - ph / 2} width={pw} height={ph} rx="3.2" fill={dark ? "#5f5040" : "#fff"} fillOpacity={dark ? 1 : 0.94} />
-      {parts.map((t, i) => <text key={i} x={x} y={y - ph / 2 + 0.8 + lh * (i + 1) - 1.3} fontSize={fs} fill={dark ? "#fff" : "#5f5040"} style={{ ...F, fontKerning: "none" }} textAnchor="middle" fontWeight="600">{t}</text>)}
+      {parts.map((t, i) => <text key={i} x={x} y={y - ph / 2 + 0.9 + lh * (i + 1) - 1.6} fontSize={fs} fill={dark ? "#fff" : "#5f5040"} style={{ ...F, fontKerning: "none" }} textAnchor="middle" fontWeight="600">{t}</text>)}
     </g>
   );
 };
@@ -72,16 +81,18 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
   const seatOf = (e: MouseEvent): string | null => (e.target as Element).closest?.("[data-seat]")?.getAttribute("data-seat") ?? null;
   const onClick = (e: MouseEvent) => { const id = seatOf(e); if (id && !taken.has(id)) onSeatClick(id); };
   const onMove = (e: MouseEvent) => { const id = seatOf(e); if (id && !taken.has(id)) onSeatMove?.(id, e); else onSeatLeave?.(); };
-  const W = HULL.length / SCALE, H = HULL.beam / SCALE, PAD = 30, L = labels.locale, R = HULL.corner / SCALE;
+  const W = HULL.length / SCALE, H = HULL.beam / SCALE, L = labels.locale, R = HULL.corner / SCALE, BOW = HULL.bow / SCALE, XF = HULL.bowFull / SCALE;
   const units = BOAT_UNITS.filter((u) => u.deck === deck && u.w > 0);
   const amen = BOAT_AMENITIES.filter((a) => a.deck === deck);
-  const hull = `M${R},0 H${W - R} a${R},${R} 0 0 1 ${R},${R} V${H - R} a${R},${R} 0 0 1 -${R},${R} H${R} a${R},${R} 0 0 1 -${R},-${R} V${R} a${R},${R} 0 0 1 ${R},-${R} Z`;
+  // planform: squared transom with rounded corners aft, a stem that flares to full beam over the first 12 m forward
+  const c = H / 2, hw = H / 2, BL = XF + BOW, p1x = -BOW + 0.18 * BL, p2x = -BOW + 0.5 * BL;
+  const hull = `M${XF},0 H${W - R} a${R},${R} 0 0 1 ${R},${R} V${H - R} a${R},${R} 0 0 1 -${R},${R} H${XF} C${p2x},${H} ${p1x},${c + 0.72 * hw} ${-BOW},${c} C${p1x},${c - 0.72 * hw} ${p2x},0 ${XF},0 Z`;
   const slabX = sx(31400);
   const Rs = sx(400);
   const slab = `M${slabX},0 H${W - Rs} a${Rs},${Rs} 0 0 1 ${Rs},${Rs} V${H - Rs} a${Rs},${Rs} 0 0 1 -${Rs},${Rs} H${slabX} Z`;
   
   return (
-    <svg className="yacht-map" onClick={onClick} onMouseMove={onMove} onMouseLeave={() => onSeatLeave?.()} viewBox={`${-PAD} ${-PAD} ${W + PAD * 2} ${H + PAD * 2}`} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={deck === "main" ? labels.main : labels.upper}>
+    <svg className="yacht-map" onClick={onClick} onMouseMove={onMove} onMouseLeave={() => onSeatLeave?.()} viewBox={`${-PAD - BOW} ${-PAD} ${W + BOW + PAD * 2} ${H + PAD * 2}`} xmlns="http://www.w3.org/2000/svg" role="img" aria-label={deck === "main" ? labels.main : labels.upper}>
       <defs>
         <linearGradient id="poolGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#a8d1d8" /><stop offset="1" stopColor="#cfe5ea" /></linearGradient>
         <linearGradient id="hullGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#f3ede1" /><stop offset="1" stopColor="#ebe2d0" /></linearGradient>
@@ -116,10 +127,10 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
         <radialGradient id="poolDepth" cx="50%" cy="50%" r="70%"><stop offset="0" stopColor="#d4e9ec" /><stop offset=".7" stopColor="#a9d0d7" /><stop offset="1" stopColor="#8fbfc8" /></radialGradient>
       </defs>
 
-      <text x={-PAD + 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(-90 ${-PAD + 7} ${H / 2})`}>{labels.bow}</text>
-      <text x={W + PAD - 7} y={H / 2} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(90 ${W + PAD - 7} ${H / 2})`}>{labels.stern}</text>
-      <text x={W / 2} y={-14} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.port}</text>
-      <text x={W / 2} y={H + 21} fontSize="7.5" letterSpacing="3" fill={INK_SOFT} style={F} textAnchor="middle">{labels.starboard}</text>
+      <text x={-PAD - BOW + 7} y={H / 2} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(-90 ${-PAD - BOW + 7} ${H / 2})`}>{labels.bow}</text>
+      <text x={W + PAD - 7} y={H / 2} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle" transform={`rotate(90 ${W + PAD - 7} ${H / 2})`}>{labels.stern}</text>
+      <text x={(W - BOW) / 2} y={-14} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle">{labels.port}</text>
+      <text x={(W - BOW) / 2} y={H + 22} fontSize="9" letterSpacing="3.4" fill={INK_SOFT} style={F} textAnchor="middle">{labels.starboard}</text>
 
       {/* 1 · deck */}
       {deck === "main"
@@ -139,11 +150,11 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
             <rect x={x} y={y} width={w} height={h} rx="1.2" fill="none" stroke="#5f8f98" strokeWidth="2.2" strokeOpacity=".35" filter="url(#soft)" />
             <rect x={x + 0.6} y={y + 0.6} width={w - 1.2} height={h - 1.2} rx="1" fill="none" stroke="#fff" strokeOpacity=".55" strokeWidth=".6" />
             {[0.28, 0.5, 0.72].map((q) => <path key={q} d={`M${x + 5},${y + h * q} q${w / 10},-1.2 ${w / 5},0 t${w / 5},0 t${w / 5},0 t${w / 5},0`} fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth=".7" strokeLinecap="round" />)}
-            {nm && <text x={cx} y={cy + 2.4} fontSize="6.5" letterSpacing="2.4" fill="#1f4f57" style={F} textAnchor="middle" fontWeight="600">{nm}</text>}
+            {nm && <text x={cx} y={cy + 2.7} fontSize={w < 120 ? 6.8 : 8} letterSpacing={w < 120 ? 2 : 2.8} fill="#1f4f57" style={F} textAnchor="middle" fontWeight="600">{nm}</text>}
           </g>;
           case "stairs": return <g key={a.id} pointerEvents="none" filter="url(#lift)"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panel)" />{Array.from({ length: 8 }).map((_, i) => { const yy = y + 1.5 + (i * (h - 3)) / 7; return <g key={i}><line x1={x + 1.5} y1={yy} x2={x + w - 1.5} y2={yy} stroke="#fff" strokeOpacity=".8" strokeWidth=".5" /><line x1={x + 1.5} y1={yy + 0.7} x2={x + w - 1.5} y2={yy + 0.7} stroke="#8d7c64" strokeOpacity=".35" strokeWidth=".6" /></g>; })}</g>;
-          case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} max={60} />}</g>;
-          case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" filter="url(#lift)" /><Badge kind="dj" x={cx} y={cy - 7} r={8} />{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
+          case "stage": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="4" fill="url(#floor)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="3.5" fill="none" stroke="#fff" strokeOpacity=".6" strokeWidth=".7" />{nm && <Caption x={x + w * 0.78} y={cy} text={nm} max={70} />}</g>;
+          case "dj": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="3" fill="url(#panelDark)" filter="url(#lift)" /><Badge kind="dj" x={cx} y={cy - 7} r={8} />{nm && <Caption x={cx} bottom={y + h - 3} text={nm} max={w - 4} />}</g>;
           case "bar": {
             const vertical = h > w, rr = sx(a.r ?? 500), n = vertical ? 4 : 5, stools: [number, number][] = [];
             for (let i = 0; i < n; i++) { const t = (i + 0.5) / n; if (vertical) { stools.push([x - 4.2, y + h * t], [x + w + 4.2, y + h * t]); } else { stools.push([x + w * t, y - 4.2], [x + w * t, y + h + 4.2]); } }
@@ -160,12 +171,12 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
               {nm && <Caption x={cx} y={cy + 8} text={nm} dark max={w - 2} />}
             </g>;
           }
-          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Badges cy2={cy - 8} />{nm && <Caption x={cx} y={y + h - 9} text={nm} max={w - 4} />}</g>;
+          case "restroom": case "salon": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".7" strokeWidth=".7" /><Badges cy2={cy - 8} />{nm && <Caption x={cx} bottom={y + h - 3.5} text={nm} max={w - 4} />}</g>;
           case "boh": return <g key={a.id} pointerEvents="none"><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panelDark)" filter="url(#lift)" /><rect x={x + 1} y={y + 1} width={w - 2} height={h - 2} rx="4.2" fill="none" stroke="#fff" strokeOpacity=".35" strokeWidth=".7" />{badges.length > 0 && <Badges cy2={cy - (nm ? 8 : 0)} />}{nm && <Caption x={cx} y={cy + 9} text={nm} max={w - 4} />}</g>;
           case "label": return <g key={a.id} pointerEvents="none">
             {a.id === "void" && <rect x={x} y={y} width={w} height={h} rx="4" fill="#e7dfcf" stroke="#c9bda6" strokeWidth=".6" />}
             {a.id === "reception" && <><rect x={x} y={y} width={w} height={h} rx="5" fill="url(#panel)" filter="url(#lift)" /><Badge kind="reception" x={cx} y={cy - 8} /></>}
-            {nm && <Caption x={cx} y={a.id === "reception" ? y + h - 9 : cy} text={nm} max={a.id === "reception" ? w - 4 : 120} />}
+            {nm && (a.id === "reception" ? <Caption x={cx} bottom={y + h - 3.5} text={nm} max={w - 4} /> : <Caption x={cx} y={cy} text={nm} max={120} />)}
           </g>;
           default: return null;
         }
@@ -230,7 +241,7 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
       {/* 5 · interactive seats: transparent hit areas + state + corner label */}
       {units.map((u) => {
         const x = sx(u.x), y = sy(u.y), w = sx(u.w), h = sx(u.h), st = stateOf(u.id), round = !!u.r && u.r >= u.w / 2;
-        const chipW = u.label.length > 2 ? 15 : 12, chipH = 7.6, below = u.y + u.h / 2 < 7000;
+        const chipW = u.label.length > 2 ? 18 : 14.5, chipH = 9, below = u.y + u.h / 2 < 7000;
         return (
           <g key={u.id} className={`seat-g ${st}`} transform={`translate(${x} ${y})`}>
             {round
@@ -238,7 +249,7 @@ export default function YachtMap({ labels, deck, taken, mine, reserved, closed, 
               : <rect className={`seat ${u.type} ${st}`} data-seat={u.id} x="-0.6" y="-0.6" width={w + 1.2} height={h + 1.2} rx={u.r ? sx(u.r) : 1.5} fill="transparent" stroke="none" />}
             <g pointerEvents="none" transform={round ? `translate(${w / 2 - chipW / 2} ${below ? h + 3 : -chipH - 3})` : `translate(${w - chipW - 1} ${below ? h - chipH - 1 : 1})`}>
               <rect width={chipW} height={chipH} rx="1.4" fill="#fff" fillOpacity=".95" stroke={INK} strokeWidth=".35" />
-              <text x={chipW / 2} y={chipH - 2.1} fontSize="5.2" letterSpacing=".3" fill={INK} style={F} textAnchor="middle" fontWeight="600">{u.label}</text>
+              <text x={chipW / 2} y={chipH - 2.4} fontSize="6.4" letterSpacing=".3" fill={INK} style={F} textAnchor="middle" fontWeight="600">{u.label}</text>
             </g>
           </g>
         );
