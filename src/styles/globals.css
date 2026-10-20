@@ -1626,3 +1626,21 @@ html.scrub .hero-video,html.scrub .hero-bg{animation:none;}
 .contact-grid{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--ed-hair);border:1px solid var(--ed-hair);}
 .contact-cell{background:var(--bg);padding:26px 24px;}
 @media(max-width:680px){.incl-row{grid-template-columns:1fr;gap:6px;}.cta-h{max-width:none;}}
+
+/* =====================================================================================================================
+   ONE RULE FOR EVERY IMAGE + TEXT SECTION: text 30 %, image 70 % of the width, on every page, whichever side the image is.
+   (3fr / 7fr of the content width; the column gap is a fixed 4 % of the viewport, taken from the text side's share.)
+   ===================================================================================================================== */
+:root{--split-gap:clamp(28px,4vw,64px);}
+@media(min-width:981px){
+  .ed-intro,.ed-pkg,.ed-portrait,.subhero,.split-prose,.prose{display:grid;column-gap:var(--split-gap);grid-template-columns:3fr 7fr;}
+  .ed-pkg,.ed-pkg.flip{padding:var(--ed-gap) var(--gutter) 0;}
+  .ed-pkg.flip,.ed-portrait.flip,.split-prose.flip{grid-template-columns:7fr 3fr;}
+  .ed-pkg.flip .ed-pkg-copy,.ed-portrait.flip .ed-portrait-copy{order:2;}
+  .split-prose > .split-prose-img{order:0;} .split-prose.flip > .split-prose-img{order:0;} .split-prose.flip > .split-prose-copy{order:2;}
+  .split-prose:not(.flip) > .split-prose-img{order:2;}   /* default: text left, image right */
+  .ed-portrait-media{max-width:none;justify-self:stretch;}
+  .ed-pkg-media,.ed-portrait-media,.subhero-bg,.split-prose-img,.ed-intro-media{width:100%;}
+  .ed-p,.split-prose-p,.subhero-sub,.ed-portrait-copy p,.ed-pkg-copy p{max-width:none;}
+  .prose p{grid-column:2;max-width:none;}
+}
