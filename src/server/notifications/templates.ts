@@ -36,8 +36,8 @@ export function renderEmail(template: Template, ctx: BookingContext): RenderedEm
     case "booking_confirmed": {
       const title = L === "ar" ? `تم تأكيد حجزك — ${ctx.ref}` : `Your reservation is confirmed — ${ctx.ref}`;
       const lines = L === "ar"
-        ? [`مرحباً ${ctx.guestName}،`, "تم تأكيد مقاعدك في نوا:", ...items, `الإجمالي المدفوع: ${aed(ctx.total)}`, CHECKIN.ar, `الرقم المرجعي: ${ctx.ref}`, "دعوة التقويم مرفقة."]
-        : [`Dear ${ctx.guestName},`, "Your seats at NOA are confirmed:", ...items, `Total paid: ${aed(ctx.total)}`, CHECKIN.en, `Reference: ${ctx.ref}`, "A calendar invite is attached."];
+        ? [`مرحباً ${ctx.guestName}،`, "تم تأكيد مقاعدك في نوا:", ...items, `الإجمالي المدفوع: ${aed(ctx.total)}`, CHECKIN.ar, `الرقم المرجعي: ${ctx.ref}`, ...(ctx.ticketUrl ? [`رمز سوار الدخول: ${ctx.ticketUrl}`] : []), "دعوة التقويم مرفقة."]
+        : [`Dear ${ctx.guestName},`, "Your seats at NOA are confirmed:", ...items, `Total paid: ${aed(ctx.total)}`, CHECKIN.en, `Reference: ${ctx.ref}`, ...(ctx.ticketUrl ? [`Your wristband code: ${ctx.ticketUrl}`] : []), "A calendar invite is attached."];
       const ics = first ? buildIcs({ uid: ctx.ref, date: first.date, slot: first.slot, summary: `NOA — ${ctx.ref}`, description: items.join("\n"), location: PIER.en, url: ctx.manageUrl }) : undefined;
       return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, lines), ics: ics ? { filename: `NOA-${ctx.ref}.ics`, content: ics } : undefined };
     }

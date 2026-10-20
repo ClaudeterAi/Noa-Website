@@ -116,6 +116,8 @@ export const bookings = pgTable("bookings", {
   source: text("source").notNull().default("web"), // 'web' | 'chat' | 'voice' | 'admin'
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
+  checkedInAt: timestamp("checked_in_at", { withTimezone: true }),   // wristband issued at the pier desk
+  checkedInBy: text("checked_in_by"),                                  // admin email who scanned
   cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
 }, (t) => [
   uniqueIndex("bookings_ref_uq").on(t.ref),

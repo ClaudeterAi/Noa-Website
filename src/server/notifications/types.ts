@@ -12,6 +12,7 @@ export interface BookingContext {
   total: number;                 // AED, whole dirhams
   items: { unitName: string; date: string; slot: "morning" | "afternoon" | "night" | "full"; guests: number; arrivalTime: string }[];
   manageUrl: string;
+  ticketUrl?: string;   // wristband page with the QR (confirmed bookings)
 }
 
 export interface RenderedEmail { subject: string; text: string; html: string; ics?: { filename: string; content: string } }
