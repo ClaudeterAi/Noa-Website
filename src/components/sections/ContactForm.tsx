@@ -1,5 +1,6 @@
 "use client";
 
+import { venueSnapshot, venueText } from "@/lib/venue";
 import { useState } from "react";
 import MovingBorder from "@/components/ui/MovingBorder";
 
@@ -31,7 +32,7 @@ export default function ContactForm({ labels, reasons, countries }: Props) {
         <div className="form-field full" style={{ flexDirection: "row", alignItems: "center", gap: 10 }}><input type="checkbox" id="c2" style={{ width: "auto", flex: "none" }} /><label htmlFor="c2" style={{ margin: 0 }}>{labels.newsletter}</label></div>
       </div>
       <div className="form-actions"><MovingBorder><button type="submit" className="pkg-btn mb-btn">{labels.send}</button></MovingBorder></div>
-      <p className="form-meta" style={{ marginTop: 24 }}>{labels.urgent} <a href="tel:+97148400000" style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>+971 4 840 0000</a>.</p>
+      <p className="form-meta" style={{ marginTop: 24 }}>{labels.urgent} <a href={venueText(venueSnapshot(), "en").phoneHref} style={{ borderBottom: "1px solid", color: "#1a1a1a" }}>{venueSnapshot().phone}</a>.</p>
     </form>
   );
 }

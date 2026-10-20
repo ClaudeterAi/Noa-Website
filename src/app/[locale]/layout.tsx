@@ -6,6 +6,8 @@ import { DIR, routing, type Locale } from "@/i18n/routing";
 import { hrefPath, getPage, pick, registry } from "@/content/registry";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
+import VenueProvider from "@/components/layout/VenueProvider";
+import { loadVenue } from "@/server/venue";
 import Effects from "@/components/layout/Effects";
 import Motion from "@/components/layout/Motion";
 import Scroll from "@/components/layout/Scroll";
@@ -24,9 +26,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const loc = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
+  await loadVenue();
   const home = getPage("home");
   return {
-    title: { default: pick(home.title, loc), template: loc === "ar" ? "%s — نوا" : "%s — NOA" },
+    title: { default: pick(home.title, loc), template: loc === "ar" ? "%s · نوا" : "%s · NOA" },
     description: pick(home.metaDescription, loc),
   };
 }
@@ -37,6 +40,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   setRequestLocale(locale);
   const loc = locale as Locale;
   const messages = await getMessages();
+  const venue = await loadVenue();
 
   const toLink = (id: (typeof registry.nav.main)[number], menu = false) => {
     const p = getPage(id);
@@ -51,6 +55,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <html lang={loc} dir={DIR[loc]} className={`${barlow.variable} ${plexArabic.variable} ${naskh.variable}`}>
       <body>
         <NextIntlClientProvider messages={messages}>
+          <VenueProvider venue={venue}>
           <Effects />
           <Scroll />
           <LiquidGlass />
@@ -68,6 +73,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
           <SignInDialog />
           <VoiceConcierge />
           <ChatConcierge />
+          </VenueProvider>
         </NextIntlClientProvider>
       </body>
     </html>

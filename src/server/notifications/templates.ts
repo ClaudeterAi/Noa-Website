@@ -1,3 +1,4 @@
+import { venueSnapshot, venueText } from "@/lib/venue";
 import type { BookingContext, Locale, RenderedEmail, RenderedWhatsApp, Template } from "./types";
 import { buildIcs } from "./ics";
 
@@ -6,9 +7,12 @@ import { buildIcs } from "./ics";
  * WhatsApp bodies are the *fallback text* that mirrors the Meta-approved template; the template
  * itself lives in Twilio Content and is referenced by SID from env (see providers/whatsapp.ts).
  */
-const PIER = { en: "Dubai Marina Pier, Berth 7", ar: "رصيف مرسى دبي، المرسى 7" };
+const PIER = { get en() { return venueText(venueSnapshot(), "en").pier; }, get ar() { return venueText(venueSnapshot(), "ar").pier; } };
 const SLOT = { morning: { en: "Morning · 9:30 AM – 2:00 PM", ar: "الصباح · 9:30 ص – 2:00 م" }, afternoon: { en: "Afternoon · 2:00 PM – 9:30 PM", ar: "بعد الظهر · 2:00 م – 9:30 م" }, night: { en: "Night session", ar: "الجلسة الليلية" }, full: { en: "Full day", ar: "يوم كامل" } } as const;
-const CHECKIN = { en: "Check in at the NOA desk on Dubai Marina Pier, Berth 7, twenty minutes before your session.", ar: "سجّل وصولك عند مكتب نوا على رصيف مرسى دبي، المرسى 7، قبل جلستك بعشرين دقيقة." };
+const CHECKIN = {
+  get en() { const v = venueText(venueSnapshot(), "en"); return `Check in at the NOA desk on ${v.pier}, ${v.arriveBefore} minutes before your session.`; },
+  get ar() { const v = venueText(venueSnapshot(), "ar"); return `سجّل وصولك عند مكتب نوا على ${v.pier}، قبل جلستك بـ ${v.arriveBefore} دقيقة.`; },
+};
 
 const fmtDate = (d: string, locale: Locale) =>
   new Intl.DateTimeFormat(locale === "ar" ? "ar-AE-u-nu-latn" : "en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Dubai" }).format(new Date(`${d}T12:00:00+04:00`));
@@ -66,7 +70,7 @@ function qrBlock(ctx: BookingContext) {
   return `<div style="margin:28px 0;padding:24px;border:1px solid #e5ded2;text-align:center">
 <div style="font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#777;margin-bottom:12px">${ar ? "سوار الدخول" : "Your wristband code"}</div>
 <img src="${ctx.qrImageUrl}" width="220" height="220" alt="${ar ? "رمز الدخول" : "Entry code"} ${ctx.ref}" style="display:block;margin:0 auto 12px;border:0" />
-<div style="font-size:13px;color:#555;margin-bottom:16px">${ar ? "اعرض هذا الرمز عند مكتب الرصيف، المرسى 7." : "Show this code at the pier desk, Berth 7."}</div>
+<div style="font-size:13px;color:#555;margin-bottom:16px">${ar ? `اعرض هذا الرمز عند مكتب الرصيف، ${venueText(venueSnapshot(), "ar").pier}.` : `Show this code at the pier desk, ${venueText(venueSnapshot(), "en").pier}.`}</div>
 <a href="${ctx.ticketUrl}" style="display:inline-block;padding:10px 22px;background:#156A89;color:#fff;text-decoration:none;border-radius:28px;font-size:13px;letter-spacing:.08em">${ar ? "افتح سوار الدخول" : "Open wristband"}</a>
 </div>`;
 }
@@ -75,7 +79,7 @@ function wrapHtml(locale: Locale, title: string, lines: string[], extra = "") {
   const body = lines.map((l) => `<p style="margin:0 0 12px;line-height:1.6">${l.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</p>`).join("");
   return `<!doctype html><html lang="${locale}" dir="${dir(locale)}"><body style="font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:32px;max-width:560px;margin:auto">
 <div style="letter-spacing:.45em;font-size:20px;margin-bottom:28px">NOA</div><h1 style="font-weight:300;font-size:26px;margin:0 0 20px">${title}</h1>${body}${extra}
-<p style="margin-top:32px;font-size:12px;color:#777">${PIER[locale]} · +971 4 840 0000 · hello@noa-dubai.com</p></body></html>`;
+<p style="margin-top:32px;font-size:12px;color:#777">${PIER[locale]} · ${venueSnapshot().phone} · ${venueSnapshot().email}</p></body></html>`;
 }
 
 export function renderEmail(template: Template, ctx: BookingContext): RenderedEmail {
@@ -94,8 +98,8 @@ export function renderEmail(template: Template, ctx: BookingContext): RenderedEm
     case "booking_reminder_24h": {
       const title = L === "ar" ? `نراك غداً في نوا · ${ctx.ref}` : `See you tomorrow at NOA · ${ctx.ref}`;
       let lines = L === "ar"
-        ? [`مرحباً ${ctx.guestName}،`, "تذكير بحجزك غداً:", ...items, CHECKIN.ar, "تنطلق القوارب كل 30 دقيقة. أحضر هوية سارية؛ جلسة بعد الظهر للبالغين فقط (+18)."]
-        : [`Dear ${ctx.guestName},`, "A reminder of your reservation tomorrow:", ...items, CHECKIN.en, "Shuttles run every 30 minutes. Bring valid ID; the afternoon session is 18+."];
+        ? [`مرحباً ${ctx.guestName}،`, "تذكير بحجزك غداً:", ...items, CHECKIN.ar, `تنطلق القوارب كل ${venueSnapshot().boatEveryMinutes} دقيقة. أحضر هوية سارية.`]
+        : [`Dear ${ctx.guestName},`, "A reminder of your reservation tomorrow:", ...items, CHECKIN.en, `Boats run every ${venueSnapshot().boatEveryMinutes} minutes. Bring valid photo ID.`];
       if (ctx.ticketUrl) lines.push(L === "ar" ? `رمز سوار الدخول: ${ctx.ticketUrl}` : `Your wristband code: ${ctx.ticketUrl}`);
       return { subject: title, text: lines.join("\n"), html: wrapHtml(L, title, ctx.ticket ? ticketIntro(ctx, "reminder") : lines, ticketHtml(ctx)) };
     }

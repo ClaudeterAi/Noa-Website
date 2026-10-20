@@ -1,4 +1,6 @@
 import { basePrice } from "@/server/events/ticketing";
+import { loadVenue } from "@/server/venue";
+import { venueText } from "@/lib/venue";
 import { registry } from "@/content/registry";
 import type { L, Locale, Section } from "@/content/types";
 import { getSetting, listUnitTypes } from "@/server/booking";
@@ -36,6 +38,7 @@ function sectionText(s: Section, locale: Locale): string[] {
 
 export async function buildKnowledge(locale: Locale): Promise<string> {
   const nightFactor = await getSetting("night_price_factor");
+  const venue = await loadVenue(); const vtE = venueText(venue, "en"), vtA = venueText(venue, "ar");
   const ar = locale === "ar";
   const types = await listUnitTypes();
   const holdMinutes = await getSetting("hold_minutes");
@@ -54,7 +57,9 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
     : `- Booking rules: a tapped seat is held for ${holdMinutes} minutes while the guest pays; at most ${maxPerCart} seats per cart; payment by card, Apple Pay or Google Pay in AED; 5% VAT is added at checkout.`);
 
   lines.push(ar ? "## الجلسات اليومية" : "## Daily sessions");
-  lines.push(ar ? "- جلستان كل يوم: بعد الظهر 2:00 إلى 9:30 مساءً (المسبح والدي جيه والغروب) والليل 9:30 مساءً إلى 2:00 فجراً (الحلبة؛ المسبح مغلق ليلاً). تُحجز المقاعد لكل جلسة. لا توجد جلسة صباحية." : "- Two sessions every day: Afternoon 2:00 to 9:30 PM (the pool, the DJ and the sunset) and Night 9:30 PM to 2:00 AM (the floor; the pool is closed at night). Seats are booked per session; night seats are priced like the afternoon unless an event sets its own price. There is no morning session.");
+  lines.push(ar
+    ? `- جلستان كل يوم: بعد الظهر ${vtA.session("afternoon")} (المسبح والدي جيه والغروب، ${vtA.age("afternoon")}) والليل ${vtA.session("night")} (الحلبة؛ المسبح مغلق ليلاً، ${vtA.age("night")}). تُحجز المقاعد لكل جلسة. لا توجد جلسة صباحية. قواعد اللباس: ${vtA.dressCode}.`
+    : `- Two sessions every day: Afternoon ${vtE.session("afternoon")} (the pool, the DJ and the sunset; ${vtE.age("afternoon")}) and Night ${vtE.session("night")} (the floor; the pool is closed at night; ${vtE.age("night")}). Seats are booked per session; night seats are priced like the afternoon unless an event sets its own price. There is no morning session. Dress code: ${vtE.dressCode}.`);
   lines.push(ar ? "## ما على المتن" : "## What is on board");
   lines.push(ar
     ? "- السطح الرئيسي: سطح شمسي عند المقدمة بعشرة أسرّة، مسبح لا متناهٍ (خليج وقناة) مع أربعة عشر سريراً نهارياً على حافته وثماني كبائن مسبح، غرفة علاج للمانيكير والباديكير والمساج، صالون شعر مع محطة وشم، دورات مياه للنساء والرجال في المنتصف وعند المؤخرة، حلبة رقص بطول 15 متراً تحت السقف مع منصة ومحطة دي جيه، أربع كبائن صالة تواجه المنصة، عشر طاولات عالية، البار الرئيسي، والاستقبال عند المؤخرة."
@@ -66,8 +71,9 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
     ? "- العلاجات والصالون تُحجز مع المقعد عند الدفع أو في الاستقبال، وتُحتسب على السوار. الصالون ومحطة الوشم مفتوحان حتى منتصف الليل الخميس والجمعة والسبت. المسبح مغلق بعد الغسق."
     : "- Treatments and the salon are booked with the seat at checkout or at reception, and charged to the wristband. The salon and tattoo station are open until midnight Thursday to Saturday. The pool is closed after dusk.");
   lines.push(ar
-    ? "- القوارب: كل 30 دقيقة من رصيف مرسى دبي، المرسى 7، من 1:30 ظهراً. آخر قارب للعودة 10:00 مساءً بعد بعد الظهر، و2:30 فجراً بعد الليل. العبور 11 دقيقة."
-    : "- Boats: every 30 minutes from Dubai Marina Pier, Berth 7, from 1:30 PM. Last boats back 10:00 PM after the afternoon, 2:30 AM after the night. The crossing is 11 minutes.");
+    ? `- القوارب: كل ${vtA.boatEvery} دقيقة من ${vtA.pier}، من ${vtA.firstBoatOf("afternoon")}. آخر قارب للعودة ${vtA.lastBoat("afternoon")} بعد بعد الظهر، و${vtA.lastBoat("night")} بعد الليل. العبور ${vtA.crossing} دقيقة. اصل قبل جلستك بـ ${vtA.arriveBefore} دقيقة. ${vtA.landmark}`
+    : `- Boats: every ${vtE.boatEvery} minutes from ${vtE.pier}, from ${vtE.firstBoatOf("afternoon")}. Last boats back ${vtE.lastBoat("afternoon")} after the afternoon, ${vtE.lastBoat("night")} after the night. The crossing is ${vtE.crossing} minutes. Arrive ${vtE.arriveBefore} minutes before the session. ${vtE.landmark}`);
+  lines.push(ar ? `- التواصل: ${vtA.phone} · ${vtA.email}. الإلغاء: ${vtA.cancellation}` : `- Contact: ${vtE.phone} · ${vtE.email}. Cancellation: ${vtE.cancellation}`);
   lines.push(ar ? "## الباقات" : "## Packages");
   for (const p of Object.values(packages)) lines.push(`### ${pick(p.name, locale)} (${pick(p.vibe, locale)}, ${pick(p.time, locale)})`, pick(p.desc, locale));
 

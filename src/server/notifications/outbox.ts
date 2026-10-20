@@ -1,5 +1,6 @@
 import { ticketToken, ticketUrl } from "@/server/ticket";
 import { loadTicketView } from "@/server/ticket-view";
+import { loadVenue } from "@/server/venue";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { db, type Db, type Tx } from "@/db/client";
 import { bookingItems, bookings, guests, inventoryUnits, notificationLog, sessions, unitTypes } from "@/db/schema";
@@ -99,6 +100,7 @@ export async function enqueueReminders(conn: DbOrTx = db): Promise<number> {
 }
 
 async function loadContext(bookingId: string, conn: DbOrTx = db): Promise<BookingContext | null> {
+  await loadVenue();   // messages render from Admin → Settings → Venue at send time
   const [b] = await conn.select({ booking: bookings, guest: guests }).from(bookings).innerJoin(guests, eq(guests.id, bookings.guestId)).where(eq(bookings.id, bookingId));
   if (!b) return null;
   const locale = (b.booking.locale === "ar" ? "ar" : "en") as Locale;

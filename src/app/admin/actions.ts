@@ -61,3 +61,17 @@ export async function assignMediaSlotAction(slotId: string, assetId: string | nu
 export async function checkInAction(ref: string) {
   try { const actor = await requireAdmin("frontdesk"); const r = await A.checkInBooking(actor, ref); revalidatePath("/admin/checkin"); revalidatePath("/admin/bookings"); return ok(r); } catch (e) { return fail(e); }
 }
+
+/** Venue facts: save, then refresh every page, the ticket, emails and the concierge. Owner only. */
+export async function saveVenueAction(venue: unknown) {
+  try {
+    const actor = await requireAdmin("owner");
+    const r = await A.saveVenue(actor, venue);
+    if (!r.ok) return { ok: false as const, error: r.errors.join(" · ") };
+    revalidatePath("/", "layout");                          // every public page re-renders with the new facts (measured: first request after save)
+    revalidatePath("/[locale]", "layout");                  // same tree addressed by its dynamic segment, in case routing changes
+    revalidatePath("/admin/settings");
+    try { const { processKbSync } = await import("@/server/events/kb-sync"); await processKbSync(); } catch { /* the cron retries */ }
+    return ok();
+  } catch (e) { return fail(e); }
+}
