@@ -3,29 +3,34 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Background film that Safari will actually autoplay. React does not emit the `muted` attribute into server HTML, and
- * Safari only grants autoplay to media that was muted at parse time — so we set the attribute via a callback ref, call
- * play() ourselves (and once more after the page becomes visible or the first touch), and hide the native play glyph
- * if Safari still refuses (Low Power Mode) by showing the poster instead.
+ * Background film written into the server HTML as a raw <video> tag, so `autoplay muted playsinline` are present when
+ * Safari first sees the file (React alone only sets `muted` from JavaScript, after hydration, which is too late for
+ * Safari's autoplay decision). The script then only confirms playback, retries on any gesture, and shows a play
+ * control if the browser still refuses. The photograph behind stays visible until the film is actually running.
  */
-export default function HeroVideo({ className, poster, sources }: { className: string; poster?: string; sources: { src: string; type: string }[] }) {
-  const ref = useRef<HTMLVideoElement | null>(null);
+const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+export default function HeroVideo({ className, sources }: { className: string; sources: { src: string; type: string }[] }) {
+  const wrap = useRef<HTMLDivElement | null>(null);
+  const html = `<video class="hero-video" autoplay muted loop playsinline webkit-playsinline x5-playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true">${sources.map((s) => `<source src="${esc(s.src)}" type="${esc(s.type)}">`).join("")}</video>`;
+
   useEffect(() => {
-    const v = ref.current;
+    const v = wrap.current?.querySelector("video");
     if (!v) return;
-    v.muted = true; v.defaultMuted = true; v.setAttribute("muted", "");
+    v.muted = true; v.defaultMuted = true;
     let stopped = false;
-    const tryPlay = () => { if (stopped) return; const p = v.play(); if (p) p.then(() => v.classList.remove("hero-video-blocked")).catch(() => v.classList.add("hero-video-blocked")); };
+    const show = () => { v.classList.add("hero-video-playing"); };
+    const tryPlay = () => { if (stopped || !v.paused) return; const p = v.play(); if (p) p.then(show).catch(() => undefined); };
+    v.addEventListener("playing", show); v.addEventListener("timeupdate", show, { once: true });
     tryPlay();
     const onVis = () => { if (document.visibilityState === "visible") tryPlay(); };
     document.addEventListener("visibilitychange", onVis);
-    window.addEventListener("touchstart", tryPlay, { once: true, passive: true });
-    window.addEventListener("pointerdown", tryPlay, { once: true, passive: true });
-    return () => { stopped = true; document.removeEventListener("visibilitychange", onVis); window.removeEventListener("touchstart", tryPlay); window.removeEventListener("pointerdown", tryPlay); };
+    const gestures: (keyof WindowEventMap)[] = ["touchstart", "pointerdown", "keydown", "wheel", "touchend", "click"];
+    gestures.forEach((g) => window.addEventListener(g, tryPlay, { passive: true }));
+    const check = window.setInterval(() => { if (!v.paused && v.currentTime > 0) { show(); window.clearInterval(check); } }, 250);
+    window.setTimeout(() => window.clearInterval(check), 15000);
+    return () => { stopped = true; window.clearInterval(check); document.removeEventListener("visibilitychange", onVis); gestures.forEach((g) => window.removeEventListener(g, tryPlay)); };
   }, []);
-  return (
-    <video ref={ref} className={className} autoPlay muted loop playsInline preload="metadata" poster={poster} aria-hidden="true" disablePictureInPicture disableRemotePlayback>
-      {sources.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
-    </video>
-  );
+
+  return <div ref={wrap} className={className} dangerouslySetInnerHTML={{ __html: html }} suppressHydrationWarning />;
 }

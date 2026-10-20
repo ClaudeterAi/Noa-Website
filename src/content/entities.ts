@@ -25,6 +25,10 @@ export const media: Record<string, MediaSlot> = {
   "split-club": img("split-club", u("photo-1566073771259-6a8506099945", 900), "Beach club deck", "سطح النادي الشاطئي"),
   "pkg-morning": img("pkg-morning", u("photo-1520250497591-112f2f40a3f4", 2000), "Morning by the lagoon pool", "الصباح عند مسبح البحيرة"),
   "pkg-afternoon": img("pkg-afternoon", u("photo-1566073771259-6a8506099945", 2000), "Golden hour on the deck", "الساعة الذهبية على السطح"),
+  "evt-demo-1": img("evt-demo-1", "/media/events/demo-1.jpg", "Techno night poster", "ملصق ليلة التكنو"),
+  "evt-demo-2": img("evt-demo-2", "/media/events/demo-2.jpg", "Thursday night poster", "ملصق ليلة الخميس"),
+  "evt-demo-3": img("evt-demo-3", "/media/events/demo-3.jpg", "Jungle night poster", "ملصق ليلة الغابة"),
+  "evt-demo-4": img("evt-demo-4", "/media/events/demo-4.jpg", "Sunset session", "جلسة الغروب"),
   "pkg-night": img("pkg-night", u("photo-1514525253161-7a46d19cd819"), "Night session", "جلسة الليل"),
   "pkg-cabana": img("pkg-cabana", u("photo-1445019980597-93fa8acb246c"), "Private cabana", "كابانا خاصة"),
   "rest-1": img("rest-1", u("photo-1565299624946-b28f40a0ae38", 900), "Restaurant plate", "طبق من المطعم"),
@@ -66,11 +70,11 @@ export const media: Record<string, MediaSlot> = {
 export const settings: Settings = {
   brand: "NOA",
   tagline: t(
-    "Dubai's first floating beach club. Days on the water, nights on the Gulf. Opening 2026.",
+    "Dubai's first floating beach club. Afternoons on the water, nights on the Gulf. Opening 2026.",
     "أول نادٍ شاطئي عائم في دبي. راسٍ في الخليج العربي. الافتتاح 2026."
   ),
   contact: { phoneDisplay: "+971 4 840 0000", phoneHref: "tel:+97148400000", email: "hello@noa-dubai.com" },
-  hours: t("Daily, 9:30 AM to 2:00 AM", "يومياً — 9:30 صباحاً إلى 9:30 مساءً"),
+  hours: t("Daily, 2:00 PM to 2:00 AM", "يومياً — 9:30 صباحاً إلى 9:30 مساءً"),
   departure: t("Dubai Marina Pier, Berth 7", "رصيف مرسى دبي، المرسى 7"),
   socials: [
     { label: "IG", href: "#" },
@@ -98,7 +102,7 @@ export const packages: Record<string, Package> = {
   },
   afternoon: {
     id: "afternoon",
-    number: "02",
+    number: "01",
     name: t("The\nAfternoon", "جلسة\nبعد الظهر"),
     vibe: t("The Sun", "الشمس"),
     time: t("2:00 PM to 9:30 PM", "2:00 ظهراً إلى 9:30 مساءً"),
@@ -112,7 +116,7 @@ export const packages: Record<string, Package> = {
   },
   night: {
     id: "night",
-    number: "03",
+    number: "02",
     name: t("The\nNight", "جلسة\nالليل"),
     vibe: t("The Floor", "الحلبة"),
     time: t("9:30 PM to 2:00 AM", "9:30 مساءً إلى 2:00 فجراً"),
@@ -126,10 +130,10 @@ export const packages: Record<string, Package> = {
   },
   cabana: {
     id: "cabana",
-    number: "04",
+    number: "03",
     name: t("The\nCabanas", "الكبائن"),
     vibe: t("Yours by the Session", "لك طوال الجلسة"),
-    time: t("Morning, afternoon or night", "صباحاً أو بعد الظهر أو ليلاً"),
+    time: t("Afternoon or night", "بعد الظهر أو ليلاً"),
     desc: t(
       "Twenty cabanas across two decks. Eight line the pool, four face the stage, eight sit on the upper deck above the floor. Each has two sofas, a low table, curtains you can draw and a host who stays with you. Six guests, booked by the session.",
       "عشرون كابينة على سطحين. ثمانٍ على حافة المسبح، وأربع تواجه المنصة، وثمانٍ على السطح العلوي فوق الحلبة. في كل منها أريكتان وطاولة منخفضة وستائر تُسدل ومضيف يبقى معك. ستة ضيوف، وتُحجز بالجلسة."
@@ -162,6 +166,10 @@ const ev = (
 });
 
 export const events: Record<string, EventItem> = {
+  "demo-techno": { ...ev("demo-techno", "2026-10-24", ["Sat 24 October 2026 · Night", "السبت 24 October 2026 · الليل"], ["Sat 24 Oct", "السبت 24"], ["Techno\nNight", "ليلة\nالتكنو"], ["Ada Stawiarz · El'Mirka (vinyl set)", "Ada Stawiarz · El'Mirka"], "evt-demo-1"), session: "night", startsAt: "21:30", endsAt: "02:00" },
+  "demo-thursday": { ...ev("demo-thursday", "2026-10-29", ["Thu 29 October 2026 · Night", "الخميس 29 October 2026 · الليل"], ["Thu 29 Oct", "الخميس 29"], ["Thursday\nResidents", "خميس\nالمقيمين"], ["NOA Residents · Hernan B", "مقيمو نوا · Hernan B"], "evt-demo-2"), session: "night", startsAt: "21:30", endsAt: "02:00" },
+  "demo-jungle": { ...ev("demo-jungle", "2026-10-30", ["Fri 30 October 2026 · Night", "الجمعة 30 October 2026 · الليل"], ["Fri 30 Oct", "الجمعة 30"], ["Jungle\nVibes", "أجواء\nالغابة"], ["Guest DJ, to be announced", "دي جيه ضيف، يُعلن لاحقاً"], "evt-demo-3"), session: "night", startsAt: "21:30", endsAt: "02:00" },
+  "demo-sunset": { ...ev("demo-sunset", "2026-11-07", ["Sat 07 November 2026 · Afternoon", "السبت 7 November 2026 · بعد الظهر"], ["Sat 07 Nov", "السبت 7"], ["Sunset\nSession", "جلسة\nالغروب"], ["Afternoon residents", "مقيمو بعد الظهر"], "evt-demo-4"), session: "afternoon", startsAt: "14:00", endsAt: "21:30" },
   "golden-hour": ev("golden-hour", "2026-03-14", ["Fri 14 March 2026 · Afternoon", "الجمعة 14 مارس 2026 · بعد الظهر"], ["Fri 14 Mar", "الجمعة 14 مارس"], ["Golden Hour\nOpening Night", "الساعة الذهبية\nليلة الافتتاح"], ["DJ Claptone · Berlin", "دي جيه كلابتون · برلين"], "evt-1"),
   "desert-moon": ev("desert-moon", "2026-03-21", ["Fri 21 March 2026 · Full Moon", "الجمعة 21 مارس 2026 · اكتمال القمر"], ["Fri 21 Mar", "الجمعة 21 مارس"], ["Desert Moon\nNight", "ليلة قمر\nالصحراء"], ["Peggy Gou · Seoul / Berlin", "بيغي غو · سيول / برلين"], "evt-2"),
   "white-edition": ev("white-edition", "2026-03-28", ["Fri 28 March 2026 · All White", "الجمعة 28 مارس 2026 · الأبيض بالكامل"], ["Fri 28 Mar", "الجمعة 28 مارس"], ["NOA\nWhite Edition", "نوا\nالإصدار الأبيض"], ["Black Coffee · Johannesburg", "بلاك كوفي · جوهانسبرغ"], "evt-3"),
@@ -180,13 +188,13 @@ export const events: Record<string, EventItem> = {
 const faq = (id: string, q: [string, string], a: [string, string]): Faq => ({ id, q: t(...q), a: t(...a) });
 
 export const faqs: Record<string, Faq> = {
-  "last-shuttle": faq("last-shuttle", ["What time is the last shuttle back?", "متى يعود آخر قارب مكوكي؟"], ["Boats leave the pier every 30 minutes. The last boat back is 2:30 PM after the morning session, 10:00 PM after the afternoon and 2:30 AM after the night. Your wristband is your ticket on board.", "تنطلق القوارب من الرصيف كل 30 دقيقة. آخر قارب للعودة في 2:30 ظهراً بعد جلسة الصباح، و10:00 مساءً بعد جلسة بعد الظهر، و2:30 فجراً بعد جلسة الليل. سوارك هو تذكرتك على المتن."]),
+  "last-shuttle": faq("last-shuttle", ["What time is the last shuttle back?", "متى يعود آخر قارب مكوكي؟"], ["Boats leave the pier every 30 minutes from 1:30 PM. The last boat back is 10:00 PM after the afternoon and 2:30 AM after the night. Your wristband is your ticket on board.", "تنطلق القوارب من الرصيف كل 30 دقيقة من 1:30 ظهراً. آخر قارب للعودة في 10:00 مساءً بعد جلسة بعد الظهر، و2:30 فجراً بعد جلسة الليل. سوارك هو تذكرتك على المتن."]),
   "stay-night": faq("stay-night", ["Can I stay on from the afternoon into the night?", "هل يمكنني البقاء من جلسة بعد الظهر إلى الليل؟"], ["Yes, if the night is not sold out. Ask your host before 8:30 PM and they will move your seat over at the desk. On event nights you need a ticket for the night, and your host can sort that too.", "نعم، إن لم تكن الليلة مكتملة. اطلب من مضيفك قبل 8:30 مساءً وسينقل مقعدك عند المكتب. في ليالي الفعاليات تحتاج إلى تذكرة لليل، ويمكن لمضيفك ترتيب ذلك أيضاً."]),
   "night-ticket": faq("night-ticket", ["Is the night session ticketed?", "هل جلسة الليل بتذكرة؟"], ["Every night has general entry sold per person, plus seats you can book on the deck plan: lounge cabanas, high tables, the alfresco lounge, the upper cabanas and the booth. A seat includes entry for everyone at it. On guest DJ nights, tickets go on sale two weeks ahead and members see them first.", "لكل ليلة دخول عام يُباع للشخص، إضافة إلى مقاعد تحجزها على مخطط السطح: كبائن الصالة، والطاولات العالية، وصالة الهواء الطلق، والكبائن العلوية، والمقصورة. المقعد يشمل الدخول لكل من فيه. في ليالي الدي جيه الضيف تُطرح التذاكر قبل أسبوعين ويراها الأعضاء أولاً."]),
   "pool-night": faq("pool-night", ["Is the pool open at night?", "هل المسبح مفتوح ليلاً؟"], ["No. The pool closes at dusk and the daybeds around it become lounge seating. The night is for the floor, the bars and the upper deck.", "لا. يُغلق المسبح عند الغسق وتتحول الأسرّة النهارية حوله إلى جلسات. الليل لحلبة الرقص والبارات والسطح العلوي."]),
   "treatments": faq("treatments", ["Can I book a massage, a manicure or the salon?", "هل يمكنني حجز مساج أو مانيكير أو الصالون؟"], ["Yes. There is a treatment room for manicures, pedicures and massage, and a hair salon with a tattoo station, both on the main deck. Book a slot with your seat at checkout or at reception when you arrive. Treatments are charged to your wristband.", "نعم. توجد غرفة علاج للمانيكير والباديكير والمساج، وصالون شعر مع محطة وشم، كلاهما على السطح الرئيسي. احجز موعداً مع مقعدك عند الدفع أو في الاستقبال عند وصولك. تُحتسب الخدمات على سوارك."]),
   "changing": faq("changing", ["Are there changing rooms and showers?", "هل توجد غرف تبديل ودُش؟"], ["Restrooms with showers and changing space are on the main deck, midships and at the stern, for women and for men. Towels are at reception and at the pool.", "توجد دورات مياه مع دُش ومساحة تبديل على السطح الرئيسي، في المنتصف وعند المؤخرة، للنساء وللرجال. المناشف في الاستقبال وعند المسبح."]),
-  "sushi-hours": faq("sushi-hours", ["When is the sushi bar open?", "متى يفتح بار السوشي؟"], ["The sushi bar on the upper deck opens at 7:00 PM and serves until 1:00 AM. The main restaurant serves breakfast from 9:30 AM, lunch from noon and dinner until 11:00 PM.", "يفتح بار السوشي على السطح العلوي في 7:00 مساءً ويقدم حتى 1:00 فجراً. المطعم الرئيسي يقدم الفطور من 9:30 صباحاً، والغداء من الظهر، والعشاء حتى 11:00 مساءً."]),
+  "sushi-hours": faq("sushi-hours", ["When is the sushi bar open?", "متى يفتح بار السوشي؟"], ["The sushi bar on the upper deck opens at 7:00 PM and serves until 1:00 AM. The main restaurant serves lunch from 2:00 PM and dinner until 11:00 PM.", "يفتح بار السوشي على السطح العلوي في 7:00 مساءً ويقدم حتى 1:00 فجراً. المطعم الرئيسي يقدم الغداء من 2:00 ظهراً والعشاء حتى 11:00 مساءً."]),
   "stairs": faq("stairs", ["How do I get to the upper deck?", "كيف أصل إلى السطح العلوي؟"], ["Stairs on both sides of the main deck, sixteen steps each. Tell us when you book if steps are a problem and we will seat you on the main deck with the same view of the stage.", "درج على جانبي السطح الرئيسي، ستة عشر درجة لكل منهما. أخبرنا عند الحجز إن كانت الدرجات مشكلة وسنجلسك على السطح الرئيسي بإطلالة مماثلة على المسرح."]),
 
   "book-advance": faq("book-advance", ["Do I need to book in advance?", "هل أحتاج إلى الحجز مسبقاً؟"], ["Walk-ins are welcome, but advance booking is strongly recommended. NOA has limited daily capacity and reserved daybeds sell out quickly, especially on weekends and event nights.", "نرحب بالزوار دون حجز، لكننا ننصح بشدة بالحجز المسبق. سعة نوا اليومية محدودة، والأسرّة النهارية المحجوزة تنفد بسرعة، خاصة في عطلات نهاية الأسبوع وليالي الفعاليات."]),

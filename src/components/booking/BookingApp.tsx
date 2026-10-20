@@ -58,7 +58,7 @@ export default function BookingApp() {
   useEffect(() => {
     const q = new URLSearchParams(window.location.search); const d = q.get("date"); const sl = q.get("slot") as Slot | null;
     const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
-    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= today && sl && ["morning", "afternoon", "night", "full"].includes(sl)) { setDate(d); setSlot(sl); setStep(2); }
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && d >= today && sl && ["afternoon", "night", "full"].includes(sl)) { setDate(d); setSlot(sl); setStep(2); }
   }, []);
 
   /* cart = the server's live holds for this browser (chat and voice fill the same cart); sessionStorage only keeps guest count / arrival choices */
@@ -410,7 +410,7 @@ export default function BookingApp() {
               <h3 className="bk-modal-event">{dayLabel(fromIso(dayModal)).toUpperCase()}</h3>
               <div className="bk-modal-tim-lbl">{t("selectTiming")}</div>
               <div className="bk-time-opts">
-                {([...(["morning", "afternoon", "night"] as const), ...((liveEvents[dayModal] ?? []).map((e) => e.session).filter((x) => x === "full") as Slot[])] as Slot[]).map((s) => (
+                {([...(["afternoon", "night"] as const), ...((liveEvents[dayModal] ?? []).map((e) => e.session).filter((x) => x === "full") as Slot[])] as Slot[]).map((s) => (
                   <button key={s} type="button" className={`bk-time${pendingSlot === s ? " selected" : ""}`} onClick={() => setPendingSlot(s)}>
                     <div className="top">{(s === "night" || s === "full") && liveEvents[dayModal]?.find((e) => e.session === s) ? (locale === "ar" ? liveEvents[dayModal].find((e) => e.session === s)!.titleAr ?? liveEvents[dayModal].find((e) => e.session === s)!.titleEn : liveEvents[dayModal].find((e) => e.session === s)!.titleEn) : t(s)}</div>
                     <div className="bot">{(() => { const e = liveEvents[dayModal]?.find((x) => x.session === s); return e?.startsAt ? `${e.startsAt}${e.endsAt ? ` – ${e.endsAt}` : ""}` : t(`${s}Time`); })()}</div>

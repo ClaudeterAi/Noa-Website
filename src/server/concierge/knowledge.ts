@@ -52,7 +52,7 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
     : `- Booking rules: a tapped seat is held for ${holdMinutes} minutes while the guest pays; at most ${maxPerCart} seats per cart; payment by card, Apple Pay or Google Pay in AED; 5% VAT is added at checkout.`);
 
   lines.push(ar ? "## الجلسات اليومية" : "## Daily sessions");
-  lines.push(ar ? "- ثلاث جلسات كل يوم: الصباح 9:30 ص–2:00 م (أجواء هادئة)، بعد الظهر 2:00–9:30 م (أجواء الحفلة)، والليل 9:30 م–2:00 فجراً (أجواء الرقص؛ المسبح مغلق ليلاً). تُحجز المقاعد لكل جلسة على حدة." : "- Three sessions every day: Morning 9:30 AM–2:00 PM (chill), Afternoon 2:00–9:30 PM (party), Night 9:30 PM–2:00 AM (dance; the pool is closed at night). Seats are booked per session; night seats are priced like the afternoon unless an event sets its own price.");
+  lines.push(ar ? "- جلستان كل يوم: بعد الظهر 2:00 إلى 9:30 مساءً (المسبح والدي جيه والغروب) والليل 9:30 مساءً إلى 2:00 فجراً (الحلبة؛ المسبح مغلق ليلاً). تُحجز المقاعد لكل جلسة. لا توجد جلسة صباحية." : "- Two sessions every day: Afternoon 2:00 to 9:30 PM (the pool, the DJ and the sunset) and Night 9:30 PM to 2:00 AM (the floor; the pool is closed at night). Seats are booked per session; night seats are priced like the afternoon unless an event sets its own price. There is no morning session.");
   lines.push(ar ? "## ما على المتن" : "## What is on board");
   lines.push(ar
     ? "- السطح الرئيسي: سطح شمسي عند المقدمة بعشرة أسرّة، مسبح لا متناهٍ (خليج وقناة) مع أربعة عشر سريراً نهارياً على حافته وثماني كبائن مسبح، غرفة علاج للمانيكير والباديكير والمساج، صالون شعر مع محطة وشم، دورات مياه للنساء والرجال في المنتصف وعند المؤخرة، حلبة رقص بطول 15 متراً تحت السقف مع منصة ومحطة دي جيه، أربع كبائن صالة تواجه المنصة، عشر طاولات عالية، البار الرئيسي، والاستقبال عند المؤخرة."
@@ -64,8 +64,8 @@ export async function buildKnowledge(locale: Locale): Promise<string> {
     ? "- العلاجات والصالون تُحجز مع المقعد عند الدفع أو في الاستقبال، وتُحتسب على السوار. الصالون ومحطة الوشم مفتوحان حتى منتصف الليل الخميس والجمعة والسبت. المسبح مغلق بعد الغسق."
     : "- Treatments and the salon are booked with the seat at checkout or at reception, and charged to the wristband. The salon and tattoo station are open until midnight Thursday to Saturday. The pool is closed after dusk.");
   lines.push(ar
-    ? "- القوارب: كل 30 دقيقة من رصيف مرسى دبي، المرسى 7، من 9:00 صباحاً. آخر قارب للعودة 2:30 ظهراً بعد الصباح، و10:00 مساءً بعد بعد الظهر، و2:30 فجراً بعد الليل. العبور 11 دقيقة."
-    : "- Boats: every 30 minutes from Dubai Marina Pier, Berth 7, from 9:00 AM. Last boats back 2:30 PM after the morning, 10:00 PM after the afternoon, 2:30 AM after the night. The crossing is 11 minutes.");
+    ? "- القوارب: كل 30 دقيقة من رصيف مرسى دبي، المرسى 7، من 1:30 ظهراً. آخر قارب للعودة 10:00 مساءً بعد بعد الظهر، و2:30 فجراً بعد الليل. العبور 11 دقيقة."
+    : "- Boats: every 30 minutes from Dubai Marina Pier, Berth 7, from 1:30 PM. Last boats back 10:00 PM after the afternoon, 2:30 AM after the night. The crossing is 11 minutes.");
   lines.push(ar ? "## الباقات" : "## Packages");
   for (const p of Object.values(packages)) lines.push(`### ${pick(p.name, locale)} (${pick(p.vibe, locale)}, ${pick(p.time, locale)})`, pick(p.desc, locale));
 

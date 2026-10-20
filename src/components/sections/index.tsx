@@ -51,12 +51,12 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
       return (
         <section className={`hero${s.quiet ? " hero-quiet" : ""}`} id={s.id}>
           {video?.url ? (
-            <HeroVideo className="hero-bg hero-video" poster={poster?.url ?? undefined} sources={[
+            <HeroVideo className="hero-bg hero-film" sources={[
               ...(isPlaceholderFilm ? [{ src: video.url.replace(/\.mp4$/, ".webm"), type: "video/webm" }] : []),
               { src: video.url, type: video.url.endsWith(".webm") ? "video/webm" : "video/mp4" },
             ]} />
           ) : (
-            <div className="hero-bg" style={still?.url ? bg("hero-still") : undefined} data-placeholder="hero-video" />
+            <div className="hero-bg hero-still" style={still?.url ? bg("hero-still") : undefined} data-placeholder="hero-video" />
           )}
           <div className="hero-fade" />
         </section>
@@ -190,7 +190,8 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
     }
     case "eventsProgramme": {
       const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
-      const items = (live?.upcoming ?? []).filter((e) => e.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+      const demo = Object.values(registry.events).filter((e) => e.id.startsWith("demo-") && e.date >= today);
+      const items = ((live?.upcoming ?? []).length ? (live?.upcoming ?? []) : demo).filter((e) => e.date >= today).sort((a, b) => a.date.localeCompare(b.date));
       const months = new Map<string, typeof items>();
       for (const e of items) { const k = e.date.slice(0, 7); months.set(k, [...(months.get(k) ?? []), e]); }
       const monthLabel = (k: string) => new Intl.DateTimeFormat(locale === "ar" ? "ar-AE-u-nu-latn" : "en-GB", { month: "long", year: "numeric", timeZone: "Asia/Dubai" }).format(new Date(`${k}-01T12:00:00+04:00`));
@@ -204,7 +205,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
           {months.size === 0 && <div className="ed-center rv ed-programme-empty">{pick(s.empty, locale)}</div>}
           {next && (
             <Link href={bookHref(next)} className="ed-next rv" prefetch={false}>
-              <div className="ed-next-img ed-frame" style={{ backgroundImage: `url('${eventImage(next.media, mUrl)}')` }} />
+              <div className="ed-next-img ed-frame" style={{ backgroundImage: `url('${eventImage(next.media, mUrl)}')` }}><span className="ed-mark" aria-hidden="true">NOA</span></div>
               <div className="ed-next-body">
                 <div className="ed-kicker">{locale === "ar" ? "الليلة القادمة" : "Next night"}</div>
                 <div className="ed-next-date">{pick(next.dateLabel, locale).toUpperCase()} · {sessionName(next).toUpperCase()}</div>
@@ -222,6 +223,8 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
                   <Link key={e.id} href={bookHref(e)} className="ed-night" prefetch={false}>
                     <div className="ed-night-img ed-frame" style={{ backgroundImage: `url('${eventImage(e.media, mUrl)}')` }}>
                       <span className="ed-night-pill">{pick(e.shortDate, locale).toUpperCase()}</span>
+                      <span className="ed-mark" aria-hidden="true">NOA</span>
+                      <span className="ed-mark" aria-hidden="true">NOA</span>
                     </div>
                     <div className="ed-night-session">{sessionName(e).toUpperCase()}</div>
                     <div className="ed-night-name">{pick(e.name, locale).replace("\n", " ")}</div>
@@ -276,7 +279,8 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
     case "posterCarousel": {
       const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Dubai" }).format(new Date());
       const pool: Array<{ id: string; date: string; name: L; artist: L; shortDate: L; media?: string; kind?: string; status?: string }> = s.source === "upcoming" ? (live?.upcoming ?? []) : (live?.highlights ?? []);
-      const picked = s.source === "upcoming" ? pool.filter((e) => e.date >= today).slice(0, 8) : pool.slice(0, 8);
+      const demoPool = Object.values(registry.events).filter((e) => e.id.startsWith("demo-") && e.date >= today);
+      const picked = s.source === "upcoming" ? (pool.filter((e) => e.date >= today).length ? pool.filter((e) => e.date >= today) : demoPool).slice(0, 8) : (pool.length ? pool : demoPool).slice(0, 8);
       const slides = picked.length
         ? picked.map((e) => ({ key: e.id, img: eventImage(e.media, mUrl), name: pick(e.name, locale).replace("\n", " "), who: pick(e.artist, locale), when: pick(e.shortDate, locale) }))
         : s.fallbackMedia.map((m, i) => ({ key: m, img: mUrl(m) ?? "", name: locale === "ar" ? "قريباً" : "Coming soon", who: "", when: locale === "ar" ? `البرنامج ${i + 1}` : `Line-up ${i + 1}` }));
@@ -287,7 +291,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
             <Carousel perView={3} arrows="inside" dots={slides.length > 3} ariaLabel={pick(s.heading, locale)}>
               {slides.map((sl) => (
                 <Link key={sl.key} href={hrefPath(s.href)} className="ed-poster">
-                  <div className={`ed-frame ${s.aspect === "1/1" ? "ed-frame-square" : "ed-frame-poster"}`} style={{ backgroundImage: `url('${sl.img}')` }} />
+                  <div className={`ed-frame ${s.aspect === "1/1" ? "ed-frame-square" : "ed-frame-poster"}`} style={{ backgroundImage: `url('${sl.img}')` }}><span className="ed-mark" aria-hidden="true">NOA</span></div>
                   <div className="ed-poster-meta"><div className="ed-poster-name">{sl.name}</div><div className="ed-poster-sub">{[sl.who, sl.when].filter(Boolean).join(" · ")}</div></div>
                 </Link>
               ))}
