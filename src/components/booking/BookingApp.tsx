@@ -42,7 +42,14 @@ export default function BookingApp() {
   const [tip, setTip] = useState<{ id: string; x: number; y: number } | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [details, setDetails] = useState({ name: "", email: "", phone: "" });
+  const [signInOpen, setSignInOpen] = useState(false);
   const [me, setMe] = useMe();
+  // signed-in guests: fill whatever is still empty from their profile (never overwrite what they typed)
+  useEffect(() => {
+    const g = me?.signedIn ? me.guest : undefined;
+    if (!g) return;
+    setDetails((d) => ({ name: d.name || g.name || "", email: d.email || g.email || "", phone: d.phone || g.phone || "" }));
+  }, [me]);
   useEffect(() => { if (me?.signedIn && me.guest) setDetails((d) => ({ name: d.name || me.guest!.name || "", email: d.email || me.guest!.email, phone: d.phone || me.guest!.phone || "" })); }, [me]);
   const welcome = (m: Me) => { setMe(m); void refresh(); };   // tier may unlock members-priority seats → re-read availability
   const [payment, setPayment] = useState<{ clientSecret: string; total: number; ref: string; until: string } | null>(null);
@@ -148,6 +155,13 @@ export default function BookingApp() {
 
   const earliest = cart.length ? Math.min(...cart.map((c) => new Date(payment?.until ?? c.expiresAt).getTime())) : null;
   const countdown = earliest ? mmss(earliest - serverNow) : null;
+  // share of the hold window left, for the draining line on the summary card. The window is the seat-hold length for a
+  // seat hold; for the payment extension (an admin setting) it is whatever was left when payment started.
+  const holdSpans = useRef(new Map<number, number>());
+  if (earliest && !holdSpans.current.has(earliest)) {
+    holdSpans.current.set(earliest, payment && new Date(payment.until).getTime() === earliest ? Math.max(earliest - serverNow, 1) : (holdMinutes || 7) * 60_000);
+  }
+  const holdFraction = earliest ? Math.max(0, Math.min(1, (earliest - serverNow) / (holdSpans.current.get(earliest) ?? 1))) : 0;
 
   /* ---------- calendar ---------- */
   const monthLabel = new Intl.DateTimeFormat(fmtLocale, { month: "long", year: "numeric" }).format(new Date(view.y, view.m, 1));
@@ -276,7 +290,7 @@ export default function BookingApp() {
         ))}
       </div>
 
-      {countdown && step !== 1 && (
+      {countdown && step === 2 && (
         <div className="bk-hold-bar" role="status" aria-live="polite">{t("holdTimer", { time: countdown })}</div>
       )}
 
@@ -335,61 +349,121 @@ export default function BookingApp() {
         </div>
       </section>
 
-      {/* STEP 3 — review & pay */}
+      {/* STEP 3 — review & pay: seats and details on the left, the dark summary card (timer, total, confirm) stays in view */}
       <section id="bkStep3" className={`bk-step-section${step === 3 ? " active" : ""}`}>
-        <div style={{ maxWidth: 1100, margin: "0 auto 30px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <button type="button" className="bk-floor-back" onClick={() => (date && slot ? goStep(2) : goStep(1))}>{t("addAnother")}</button>
-          <h2 className="bk-floor-h" style={{ flex: 1, textAlign: "center" }}>{t("reviewPay")}</h2>
-          <span />
-        </div>
-        <div className="bk-review-wrap">
-          <div>
-            {cart.length === 0 ? (
-              <div className="bk-cart-empty">{t("cartEmpty")}</div>
-            ) : cart.map((c) => {
-              return (
-                <div className="bk-cart-item" key={c.holdId}>
-                  <div className="bk-cart-img" style={{ backgroundImage: `url('${c.img}')` }} />
-                  <div>
-                    <div className="bk-cart-name">{c.name}</div>
-                    <div className="bk-cart-meta">{shortDate(c.date).toUpperCase()} · {t(c.slot).toUpperCase()} · {t("guest", { count: c.guests })} · {t("arrive")} {c.arrival}</div>
-                  </div>
-                  <div style={{ textAlign: "end" }}>
-                    <div className="bk-cart-price">{aed(c.price, locale)}</div>
-                    {!payment && <a className="bk-cart-remove" role="button" tabIndex={0} onClick={() => void removeItem(c)}>{t("remove")}</a>}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <aside className="bk-pay-panel">
-            <h3 className="bk-pay-h">{t("orderSummary")}</h3>
-            <div className="bk-pay-line"><span>{t("subtotal")}</span><span>{aed(subtotal, locale)}</span></div>
-            <div className="bk-pay-line"><span>{t("vat")}</span><span>{aed(vat, locale)}</span></div>
-            <div className="bk-pay-line"><span>{t("guests")}</span><span>{totalGuests}</span></div>
-            <div className="bk-pay-line bk-pay-total"><span>{t("total")}</span><span>{aed(payment?.total ?? total, locale)}</span></div>
-            {payment ? (
-              <div className="bk-pay-form">
-                <h4 className="bk-section-h">{t("paymentMethod")} · {payment.ref}</h4>
-                <PaymentPanel clientSecret={payment.clientSecret} amountLabel={aed(payment.total, locale)} locale={locale}
-                  returnUrl={`${window.location.origin}/${locale}/booking/confirmation`}
-                  labels={{ pay: t("payNow", { amount: "{amount}" }), paying: t("paying"), failed: t("paymentFailed") }} />
-              </div>
-            ) : (
-              <form className="bk-pay-form" onSubmit={checkout}>
-                {me?.signedIn && me.guest ? (
-                  <p className="bk-cart-meta" style={{ marginBottom: 10 }}>{t("welcomeBack", { name: me.guest.name || me.guest.email })}{me.guest.tier !== "guest" ? ` · ${t(me.guest.tier === "vip" ? "tierVip" : "tierPreferred")}` : ""}{me.lastBooking ? ` · ${t("lastTime", { seat: locale === "ar" ? me.lastBooking.unitNameAr : me.lastBooking.unitName })}` : ""}</p>
-                ) : me && !me.signedIn ? <GuestSignIn compact onSignedIn={welcome} /> : null}
-                <h4 className="bk-section-h">{t("yourDetails")}</h4>
-                <input type="text" name="name" placeholder={t("fullName")} required minLength={2} value={details.name} onChange={(e) => setDetails({ ...details, name: e.target.value })} />
-                <input type="email" name="email" placeholder={t("email")} required value={details.email} onChange={(e) => setDetails({ ...details, email: e.target.value })} />
-                <input type="tel" name="phone" placeholder={t("phone")} required minLength={6} value={details.phone} onChange={(e) => setDetails({ ...details, phone: e.target.value })} />
-                <p className="form-meta">{t("cardSub")}</p>
-                {notice && step === 3 && <p className="form-meta" role="alert" style={{ color: "#a33" }}>{notice}</p>}
-                <button type="submit" className="bk-confirm-btn" disabled={cart.length === 0 || busy}>{busy ? t("paying") : t("confirm")}</button>
-              </form>
+        <div className="bk-co">
+          <header className="bk-co-head">
+            <h1 className="bk-co-h1">{t("reviewPay")}</h1>
+            {!payment && (
+              <button type="button" className="bk-co-back" onClick={() => (date && slot ? goStep(2) : goStep(1))}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+                {t("addSeat")}
+              </button>
             )}
-          </aside>
+          </header>
+
+          <div className="bk-co-grid">
+            <div className="bk-co-main">
+              <section className="bk-co-block" aria-labelledby="co-seats">
+                <h2 id="co-seats" className="bk-co-h2">{t("seatsTitle")}</h2>
+                {cart.length === 0 ? (
+                  <div className="bk-co-empty">
+                    <p className="bk-co-empty-h">{t("emptyTitle")}</p>
+                    <p>{t("emptyBody")}</p>
+                    <button type="button" className="bk-co-btn" onClick={() => goStep(1)}>{t("emptyCta")}</button>
+                  </div>
+                ) : (
+                  <ul className="bk-co-tix">
+                    {cart.map((c) => (
+                      <li className="bk-co-tick" key={c.holdId}>
+                        <div className="bk-co-img" style={c.img ? { backgroundImage: `url('${c.img}')` } : undefined} aria-hidden="true" />
+                        <div className="bk-co-tick-body">
+                          <p className="bk-co-seat">{c.name} <span dir="ltr">{c.unitId}</span></p>
+                          <p className="bk-co-when">{shortDate(c.date)}, {t(c.slot)}</p>
+                          <p className="bk-co-meta">{t("guestsN", { count: c.guests })}, {t("arriveAt", { time: c.arrival })}</p>
+                        </div>
+                        <div className="bk-co-tick-stub">
+                          <span className="bk-co-price">{aed(c.price, locale)}</span>
+                          {!payment && (
+                            <button type="button" className="bk-co-remove" onClick={() => void removeItem(c)} aria-label={t("removeSeat", { seat: `${c.name} ${c.unitId}` })} title={t("remove")}>
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" /></svg>
+                            </button>
+                          )}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+
+              {payment ? (
+                <section className="bk-co-block" aria-labelledby="co-pay">
+                  <div className="bk-co-h2row"><h2 id="co-pay" className="bk-co-h2">{t("paymentTitle")}</h2><span className="bk-co-ref" dir="ltr">{t("bookingRef", { ref: payment.ref })}</span></div>
+                  <div className="bk-co-card">
+                    <PaymentPanel clientSecret={payment.clientSecret} amountLabel={aed(payment.total, locale)} locale={locale}
+                      returnUrl={`${window.location.origin}/${locale}/booking/confirmation`}
+                      labels={{ pay: t("payNow", { amount: "{amount}" }), paying: t("paying"), failed: t("paymentFailed") }} />
+                  </div>
+                </section>
+              ) : cart.length > 0 && (
+                <section className="bk-co-block" aria-labelledby="co-details">
+                  <h2 id="co-details" className="bk-co-h2">{t("detailsTitle")}</h2>
+                  <p className="bk-co-sub">{t("detailsSub")}</p>
+                  {me?.signedIn && me.guest ? (
+                    <p className="bk-co-welcome">
+                      <span className="bk-co-av" aria-hidden="true">{(me.guest.name || me.guest.email).split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</span>
+                      <span>{t("welcomeBack", { name: me.guest.name || me.guest.email })}{me.guest.tier !== "guest" ? <b>{t(me.guest.tier === "vip" ? "tierVip" : "tierPreferred")}</b> : null}{me.lastBooking ? <small>{t("lastTime", { seat: locale === "ar" ? me.lastBooking.unitNameAr : me.lastBooking.unitName })}</small> : null}</span>
+                    </p>
+                  ) : me && !me.signedIn ? (
+                    // outside the checkout form on purpose: GuestSignIn has its own forms, and forms cannot nest
+                    signInOpen ? <div className="bk-co-signin"><GuestSignIn onSignedIn={welcome} /></div> : (
+                      <div className="bk-co-prompt"><p>{t("signInPrompt")}</p><button type="button" className="bk-co-link" onClick={() => setSignInOpen(true)}>{t("signInCta")}</button></div>
+                    )
+                  ) : null}
+                  <form id="bk-co-form" className="bk-co-card bk-co-fields" onSubmit={checkout}>
+                    <label className="bk-co-field"><span>{t("nameLabel")}</span>
+                      <input type="text" name="name" autoComplete="name" required minLength={2} value={details.name} onChange={(e) => setDetails({ ...details, name: e.target.value })} /></label>
+                    <label className="bk-co-field"><span>{t("emailLabel")}</span>
+                      <input type="email" name="email" autoComplete="email" inputMode="email" dir="ltr" required value={details.email} onChange={(e) => setDetails({ ...details, email: e.target.value })} /></label>
+                    <label className="bk-co-field"><span>{t("phoneLabel")}</span>
+                      <input type="tel" name="phone" autoComplete="tel" inputMode="tel" dir="ltr" required minLength={6} value={details.phone} onChange={(e) => setDetails({ ...details, phone: e.target.value })} placeholder="+971 50 000 0000" /></label>
+                  </form>
+                </section>
+              )}
+            </div>
+
+            {/* the summary: the one bold element */}
+            <aside className="bk-co-sum" aria-label={t("summaryTitle")}>
+              {countdown && (
+                <div className="bk-co-hold" role="status" aria-live="polite">
+                  <span className="bk-co-hold-bar" style={{ transform: `scaleX(${holdFraction})` }} aria-hidden="true" />
+                  <span className="bk-co-hold-txt">{t("heldShort", { time: countdown })}</span>
+                </div>
+              )}
+              <h2 className="bk-co-sum-h">{t("summaryTitle")}</h2>
+              <dl className="bk-co-lines">
+                {cart.map((c) => <div key={c.holdId}><dt>{c.name} <span dir="ltr">{c.unitId}</span></dt><dd>{aed(c.price, locale)}</dd></div>)}
+                <div className="is-sub"><dt>{t("subtotal")}</dt><dd>{aed(subtotal, locale)}</dd></div>
+                <div className="is-sub"><dt>{t("vat")}</dt><dd>{aed(vat, locale)}</dd></div>
+                <div className="is-sub"><dt>{t("guests")}</dt><dd>{totalGuests}</dd></div>
+              </dl>
+              <div className="bk-co-total"><span>{t("total")}</span><strong>{aed(payment?.total ?? total, locale)}</strong></div>
+              {notice && step === 3 && <p className="bk-co-notice" role="alert">{notice}</p>}
+              {!payment && <button type="submit" form="bk-co-form" className="bk-co-confirm" disabled={cart.length === 0 || busy}>{busy ? t("paying") : t("confirmCta")}</button>}
+              <p className="bk-co-secure">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+                {t("payMethods")}
+              </p>
+            </aside>
+          </div>
+
+          {/* phones: total and confirm stay at the thumb */}
+          {!payment && cart.length > 0 && (
+            <div className="bk-co-dock">
+              <div><small>{t("total")}</small><strong>{aed(total, locale)}</strong>{countdown && <small className="bk-co-dock-hold">{t("heldShort", { time: countdown })}</small>}</div>
+              <button type="submit" form="bk-co-form" className="bk-co-confirm" disabled={busy}>{busy ? t("paying") : t("confirmCta")}</button>
+            </div>
+          )}
         </div>
       </section>
 

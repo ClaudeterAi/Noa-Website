@@ -118,6 +118,27 @@
     "welcomeBack": "أهلاً بعودتك، {name}",
     "tierVip": "عضو VIP",
     "tierPreferred": "عضو مفضّل",
-    "lastTime": "المرة السابقة: {seat}"
+    "lastTime": "المرة السابقة: {seat}",
+    "seatsTitle": "مقاعدك",
+    "guestsN": "{count, plural, one {ضيف واحد} two {ضيفان} few {# ضيوف} many {# ضيفاً} other {# ضيف}}",
+    "arriveAt": "الوصول {time}",
+    "addSeat": "إضافة مقعد آخر",
+    "detailsTitle": "بياناتك",
+    "detailsSub": "نرسل تذكرتك وسوارك إلى هنا.",
+    "paymentTitle": "الدفع",
+    "bookingRef": "الحجز {ref}",
+    "payMethods": "بطاقة أو Apple Pay أو Google Pay، بدفع آمن عبر Stripe. لا ترى نوا رقم بطاقتك أبداً.",
+    "signInPrompt": "ضيف عائد؟ سجّل الدخول لأولوية الأعضاء وتعبئة بياناتك تلقائياً.",
+    "signInCta": "تسجيل الدخول",
+    "heldShort": "محجوزة لمدة {time}",
+    "emptyTitle": "لا مقاعد بعد",
+    "emptyBody": "اختر تاريخاً ثم اختر مقاعدك من مخطط السطح.",
+    "emptyCta": "اختر تاريخاً",
+    "removeSeat": "إزالة {seat}",
+    "summaryTitle": "ملخص الطلب",
+    "confirmCta": "تأكيد الحجز",
+    "nameLabel": "الاسم الكامل",
+    "phoneLabel": "الهاتف",
+    "emailLabel": "البريد الإلكتروني"
   }
 }

@@ -2187,3 +2187,132 @@ html[dir="rtl"] .hub-chev{transform:scaleX(-1);}
 .tk-rules li{font-size:.84rem;line-height:1.55;font-weight:300;margin-bottom:6px;}
 /* the ticket is a document to show at the desk: no floating chat or voice buttons over it */
 body:has(.tk) .cc-fab,body:has(.tk) .vc-fab{display:none;}
+
+/* ---------- checkout (/booking step 3) ----------
+   Same family as the account hub: sand page, paper groups, ink type, sea accents, Barlow. The one bold element is the
+   dark summary card (timer as a draining line, total, confirm), sticky on desktop, a bottom dock on phones.
+   Everything is scoped to .bk-co so the date and seat steps are unchanged. */
+.bk-co{--ink:#10384A;--sea:#187A80;--sea2:#27A0A1;--pale:#6CCACB;--paper:#FBF8F3;--line:rgba(16,56,74,.1);--soft:rgba(16,56,74,.64);
+  max-width:1120px;margin:0 auto;padding:6px 24px 120px;color:var(--ink);}
+.bk-co-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 26px;}
+.bk-co .bk-co-h1{margin:0;font-size:clamp(1.9rem,3.6vw,2.6rem);font-weight:500;letter-spacing:-.01em;line-height:1.05;color:var(--ink);text-transform:none;}
+.bk-co-back{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 18px;border:1px solid rgba(16,56,74,.22);border-radius:9999px;background:transparent;color:var(--ink);font:inherit;font-size:.92rem;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s;}
+.bk-co-back:hover{border-color:var(--ink);background:rgba(16,56,74,.04);}
+.bk-co-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:32px;align-items:start;}
+.bk-co-main{display:grid;gap:34px;min-width:0;}
+.bk-co .bk-co-h2{margin:0 0 12px;font-size:1.2rem;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink);}
+.bk-co-h2row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+.bk-co-ref{font-size:.86rem;color:var(--soft);}
+.bk-co-sub{margin:-6px 0 14px;font-size:.92rem;color:var(--soft);}
+
+/* seat tickets */
+.bk-co-tix{list-style:none;margin:0;padding:0;display:grid;gap:12px;}
+.bk-co-tick{display:grid;grid-template-columns:104px minmax(0,1fr) 150px;align-items:stretch;background:var(--paper);border-radius:18px;overflow:hidden;box-shadow:0 1px 0 rgba(16,56,74,.05),0 14px 30px -26px rgba(16,56,74,.6);}
+.bk-co-img{background:linear-gradient(160deg,#1d6f86,#0f4a5c) center/cover no-repeat;min-height:104px;}
+.bk-co-tick-body{padding:16px 18px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;}
+.bk-co-seat{margin:0;font-size:1.08rem;font-weight:600;}
+.bk-co-seat span{font-weight:500;color:var(--soft);margin-inline-start:4px;}
+.bk-co-when{margin:0;font-size:.95rem;}
+.bk-co-meta{margin:0;font-size:.88rem;color:var(--soft);}
+.bk-co-tick-stub{position:relative;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:10px;padding:16px 18px 14px 22px;}
+.bk-co-tick-stub::before{content:'';position:absolute;top:12px;bottom:12px;inset-inline-start:0;border-inline-start:2px dashed rgba(16,56,74,.14);}
+html[dir="rtl"] .bk-co-tick-stub{align-items:flex-start;padding:16px 22px 14px 18px;}
+.bk-co-price{font-size:1.1rem;font-weight:600;white-space:nowrap;}
+.bk-co-remove{display:grid;place-items:center;width:36px;height:36px;min-height:0;padding:0;border:0;border-radius:10px;background:transparent;color:rgba(16,56,74,.5);cursor:pointer;transition:background .15s,color .15s;}
+.bk-co-remove:hover{background:rgba(163,57,46,.08);color:#A3392E;}
+.bk-co-empty{padding:28px;border-radius:18px;background:var(--paper);}
+.bk-co-empty p{margin:0 0 6px;color:var(--soft);}
+.bk-co-empty .bk-co-empty-h{font-size:1.1rem;font-weight:600;color:var(--ink);}
+.bk-co-empty .bk-co-btn{margin-top:14px;}
+
+/* details */
+.bk-co-card{background:var(--paper);border-radius:18px;padding:22px;box-shadow:0 1px 0 rgba(16,56,74,.05),0 14px 30px -26px rgba(16,56,74,.6);}
+.bk-co-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px 16px;}
+.bk-co-fields .bk-co-field:first-child{grid-column:1 / -1;}
+.bk-co-field{display:grid;gap:7px;}
+.bk-co-field > span{font-size:.86rem;font-weight:500;color:var(--soft);}
+.bk-co .bk-co-field input{width:100%;box-sizing:border-box;min-height:52px;margin:0;padding:0 16px;border-radius:14px;border:1px solid rgba(16,56,74,.18);background:#fff;color:var(--ink);font:inherit;font-size:1rem;outline:none;transition:border-color .15s,box-shadow .15s;}
+.bk-co .bk-co-field input::placeholder{color:rgba(16,56,74,.35);}
+.bk-co .bk-co-field input:focus{border-color:var(--sea2);box-shadow:0 0 0 4px rgba(39,160,161,.16);}
+.bk-co .bk-co-field input:user-invalid{border-color:#A3392E;box-shadow:0 0 0 4px rgba(163,57,46,.1);}
+html[dir="rtl"] .bk-co .bk-co-field input[dir="ltr"]{text-align:right;}
+.bk-co-welcome{display:flex;align-items:center;gap:14px;margin:0 0 14px;padding:14px 16px;border-radius:16px;background:rgba(39,160,161,.09);}
+.bk-co-welcome > span:last-child{display:flex;flex-direction:column;gap:2px;font-size:.98rem;}
+.bk-co-welcome b{font-size:.84rem;font-weight:600;color:var(--sea);}
+.bk-co-welcome small{font-size:.84rem;color:var(--soft);}
+.bk-co-av{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:9999px;background:var(--ink);color:#EDE6DA;font-weight:700;font-size:.9rem;}
+.bk-co-prompt{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 14px;padding:12px 12px 12px 18px;border-radius:16px;border:1px dashed rgba(16,56,74,.22);}
+html[dir="rtl"] .bk-co-prompt{padding:12px 18px 12px 12px;}
+.bk-co-prompt p{margin:0;font-size:.92rem;color:var(--soft);}
+.bk-co-link{flex:none;min-height:38px;padding:0 16px;border:0;border-radius:9999px;background:var(--ink);color:#EDE6DA;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer;}
+/* the inline sign-in keeps its own logic; here it just takes the checkout's look */
+.bk-co-signin{margin:0 0 14px;}
+.bk-co-signin .bk-signin{padding:18px;border-radius:16px;background:var(--paper);border:1px solid var(--line);}
+.bk-co-signin .bk-cart-name{font-family:inherit;font-style:normal;font-size:1rem;font-weight:600;color:var(--ink);}
+.bk-co-signin .bk-cart-meta{text-transform:none;letter-spacing:0;font-size:.88rem;color:var(--soft);}
+.bk-co-signin .bk-pay-form{display:flex;gap:10px;flex-wrap:wrap;margin:0;}
+.bk-co-signin input{flex:1 1 220px;min-height:46px;margin:0;padding:0 14px;border-radius:12px;border:1px solid rgba(16,56,74,.18);background:#fff;font:inherit;font-size:1rem;color:var(--ink);}
+.bk-co-signin input:focus{outline:none;border-color:var(--sea2);box-shadow:0 0 0 4px rgba(39,160,161,.16);}
+.bk-co-signin .bk-confirm-btn{width:auto;min-height:46px;margin:0;padding:0 20px;border-radius:9999px;background:var(--ink);color:#EDE6DA;font-size:.92rem;letter-spacing:0;text-transform:none;}
+
+/* summary: the bold element */
+.bk-co-sum{position:sticky;top:112px;display:flex;flex-direction:column;gap:14px;padding:26px 24px 22px;border-radius:24px;overflow:hidden;color:#EDE6DA;
+  background:radial-gradient(90% 70% at 100% 0%,rgba(39,160,161,.32),transparent 60%),linear-gradient(160deg,#14465b 0%,#10384A 55%,#0d2f3e 100%);
+  box-shadow:0 30px 60px -34px rgba(16,56,74,.75),inset 0 1px 0 rgba(255,255,255,.12);}
+.bk-co-hold{position:relative;margin:-26px -24px 4px;padding:12px 24px 10px;background:rgba(237,230,218,.06);}
+.bk-co-hold-bar{position:absolute;inset:auto 0 0 0;height:2px;background:var(--pale);transform-origin:left center;transition:transform 1s linear;}
+html[dir="rtl"] .bk-co-hold-bar{transform-origin:right center;}
+.bk-co-hold-txt{font-size:.86rem;color:rgba(237,230,218,.85);font-variant-numeric:tabular-nums;}
+.bk-co .bk-co-sum-h{margin:0;font-size:1.05rem;font-weight:600;color:#fff;text-transform:none;letter-spacing:0;}
+.bk-co-lines{margin:0;display:grid;gap:8px;}
+.bk-co-lines > div{display:flex;justify-content:space-between;gap:12px;font-size:.95rem;}
+.bk-co-lines dt{color:rgba(237,230,218,.85);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bk-co-lines dt span{opacity:.6;}
+.bk-co-lines dd{margin:0;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.bk-co-lines .is-sub:first-of-type{margin-top:6px;padding-top:12px;border-top:1px solid rgba(237,230,218,.14);}
+.bk-co-lines .is-sub{font-size:.9rem;}
+.bk-co-lines .is-sub dt{color:rgba(237,230,218,.62);}
+.bk-co-total{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid rgba(237,230,218,.14);}
+.bk-co-total span{font-size:.95rem;color:rgba(237,230,218,.8);}
+.bk-co-total strong{font-size:1.9rem;font-weight:600;color:#fff;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+.bk-co-confirm{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin:4px 0 0;padding:0 22px;border:0;border-radius:9999px;background:#EDE6DA;color:var(--ink);font:inherit;font-size:1.02rem;font-weight:700;letter-spacing:.01em;cursor:pointer;transition:transform .15s,background .2s,opacity .2s;}
+.bk-co-confirm:hover{background:#fff;}
+.bk-co-confirm:active{transform:scale(.985);}
+.bk-co-confirm:disabled{opacity:.5;cursor:default;}
+.bk-co-confirm:focus-visible,.bk-co button:focus-visible{outline:2px solid var(--pale);outline-offset:3px;}
+.bk-co-secure{display:flex;gap:8px;margin:0;font-size:.8rem;line-height:1.45;color:rgba(237,230,218,.62);}
+.bk-co-secure svg{flex:none;margin-top:2px;}
+.bk-co-notice{margin:0;padding:10px 12px;border-radius:12px;background:rgba(210,90,80,.18);color:#ffd9d4;font-size:.88rem;}
+.bk-co-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:0 22px;border:0;border-radius:9999px;background:var(--ink);color:#EDE6DA;font:inherit;font-size:.95rem;font-weight:600;cursor:pointer;}
+/* Stripe panel inside the checkout */
+.bk-co-card .bk-pay-detail{display:grid;gap:16px;}
+.bk-co-card .bk-confirm-btn{width:100%;min-height:56px;margin:0;border:0;border-radius:9999px;background:var(--ink);color:#EDE6DA;font:inherit;font-size:1.02rem;font-weight:700;letter-spacing:.01em;text-transform:none;cursor:pointer;}
+.bk-co-card .form-meta{margin:0;}
+.bk-co-dock{display:none;}
+
+@media(max-width:900px){
+  .bk-co{padding:0 16px 140px;}
+  .bk-co-head{align-items:center;margin-bottom:18px;}
+  .bk-co-grid{grid-template-columns:1fr;gap:28px;}
+  .bk-co-sum{position:static;}
+  .bk-co-sum .bk-co-confirm{display:none;}   /* the dock carries it */
+  .bk-co-tick{grid-template-columns:84px minmax(0,1fr);}
+  .bk-co-img{min-height:84px;grid-row:span 2;}
+  .bk-co-tick-body{padding:14px 14px 6px;}
+  .bk-co-tick-stub{grid-column:2;flex-direction:row;align-items:center;padding:6px 10px 10px 14px;}
+  html[dir="rtl"] .bk-co-tick-stub{flex-direction:row;padding:6px 14px 10px 10px;}
+  .bk-co-tick-stub::before{display:none;}
+  .bk-co-fields{grid-template-columns:1fr;}
+  .bk-co-prompt{flex-direction:column;align-items:stretch;padding:14px;}
+  .bk-co-dock{position:fixed;inset:auto 0 0 0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 16px calc(env(safe-area-inset-bottom,0px) + 12px);
+    background:rgba(16,56,74,.96);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);color:#EDE6DA;box-shadow:0 -12px 30px -18px rgba(0,0,0,.5);}
+  .bk-co-dock > div{display:flex;flex-direction:column;line-height:1.15;}
+  .bk-co-dock small{font-size:.76rem;color:rgba(237,230,218,.7);}
+  .bk-co-dock strong{font-size:1.25rem;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;}
+  .bk-co-dock .bk-co-confirm{width:auto;min-height:50px;margin:0;padding:0 22px;font-size:.96rem;}
+  html:has(.bk-co-dock) .cc-fab,html:has(.bk-co-dock) .vc-fab{bottom:calc(env(safe-area-inset-bottom,0px) + 88px);}
+}
+@media(prefers-reduced-motion:reduce){.bk-co *{transition:none!important;}}
+/* Arabic is a joined script: any letter-spacing pulls the letters apart, so the checkout sets it to zero throughout */
+html[lang="ar"] .bk-co,html[lang="ar"] .bk-co *{letter-spacing:0!important;}
+html[lang="ar"] .hub,html[lang="ar"] .hub *{letter-spacing:0!important;}

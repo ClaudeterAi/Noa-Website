@@ -15,7 +15,16 @@ interface Props { clientSecret: string; amountLabel: string; returnUrl: string; 
 export default function PaymentPanel(props: Props) {
   if (!stripePromise) return null;
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret: props.clientSecret, locale: props.locale, appearance: { theme: "flat", variables: { colorPrimary: "#1a1a1a", fontFamily: "inherit", borderRadius: "0" } } }}>
+    <Elements stripe={stripePromise} options={{
+      clientSecret: props.clientSecret, locale: props.locale,
+      // the card form inside Stripe's frame, in the checkout's own look: Barlow, ink, sea focus, rounded fields
+      fonts: [{ cssSrc: "https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&display=swap" }],
+      appearance: {
+        theme: "stripe",
+        variables: { colorPrimary: "#187A80", colorText: "#10384A", colorTextSecondary: "rgba(16,56,74,0.64)", colorBackground: "#ffffff", colorDanger: "#A3392E", fontFamily: "Barlow, system-ui, sans-serif", fontSizeBase: "16px", borderRadius: "14px", spacingUnit: "4px" },
+        rules: { ".Input": { border: "1px solid rgba(16,56,74,0.18)", boxShadow: "none", padding: "14px 16px" }, ".Input:focus": { borderColor: "#27A0A1", boxShadow: "0 0 0 4px rgba(39,160,161,0.16)" }, ".Label": { fontWeight: "500" }, ".Tab": { border: "1px solid rgba(16,56,74,0.18)", boxShadow: "none" }, ".Tab--selected": { borderColor: "#10384A", boxShadow: "0 0 0 1px #10384A" } },
+      },
+    }}>
       <Inner {...props} />
     </Elements>
   );
@@ -36,7 +45,7 @@ function Inner({ amountLabel, returnUrl, labels }: Props) {
   return (
     <div className="bk-pay-detail show">
       <PaymentElement options={{ layout: "tabs" }} />
-      {err && <p className="form-meta" role="alert" style={{ color: "#a33" }}>{err}</p>}
+      {err && <p className="form-meta" role="alert" style={{ color: "#A3392E" }}>{err}</p>}
       <button type="button" className="bk-confirm-btn" disabled={!stripe || busy} onClick={pay}>{busy ? labels.paying : labels.pay.replace("{amount}", amountLabel)}</button>
     </div>
   );

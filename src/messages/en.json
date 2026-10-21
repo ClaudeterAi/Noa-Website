@@ -118,6 +118,27 @@
     "welcomeBack": "Welcome back, {name}",
     "tierVip": "VIP member",
     "tierPreferred": "Preferred member",
-    "lastTime": "last time: {seat}"
+    "lastTime": "last time: {seat}",
+    "seatsTitle": "Your seats",
+    "guestsN": "{count, plural, one {# guest} other {# guests}}",
+    "arriveAt": "arrive {time}",
+    "addSeat": "Add another seat",
+    "detailsTitle": "Your details",
+    "detailsSub": "Your ticket and wristband are sent here.",
+    "paymentTitle": "Payment",
+    "bookingRef": "Booking {ref}",
+    "payMethods": "Card, Apple Pay or Google Pay, paid securely through Stripe. NOA never sees your card number.",
+    "signInPrompt": "Returning guest? Sign in for members' priority and your details filled in.",
+    "signInCta": "Sign in",
+    "heldShort": "Held for {time}",
+    "emptyTitle": "No seats yet",
+    "emptyBody": "Choose a date and pick your seats on the deck plan.",
+    "emptyCta": "Choose a date",
+    "removeSeat": "Remove {seat}",
+    "summaryTitle": "Order summary",
+    "confirmCta": "Confirm reservation",
+    "nameLabel": "Full name",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email"
   }
 }
