@@ -2225,3 +2225,6 @@ body:has(.tk) .cc-fab,body:has(.tk) .vc-fab{display:none;}
   .ed-pkg.flip .ed-pkg-copy .ed-actions,.ed-portrait.flip .ed-portrait-copy .ed-actions{align-items:flex-end;margin-inline-start:auto;margin-inline-end:0;}
   .split-prose.flip > .split-prose-copy{align-items:flex-end;}
 }
+
+/* opening sections with a photo set the image on .split-prose-img itself (no inner layer): make it fill the frame (CodeRabbit, PR #52) */
+.split-prose-img[style*="background-image"]{background-size:cover;background-position:center;background-repeat:no-repeat;}
