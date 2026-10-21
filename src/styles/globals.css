@@ -484,7 +484,7 @@ body.booking-page { padding-top: 96px; }
 .bk-cal-head { border-bottom: 1px solid #e5e0d6; }
 .bk-cal-head div {
   padding: 16px 18px; font-size: .68rem; letter-spacing: .28em; text-transform: uppercase;
-  color: #777; text-align: right;
+  color: #777; text-align: start;
 }
 .bk-cal { border-left: 1px solid #e5e0d6; }
 .bk-day {
@@ -497,7 +497,7 @@ body.booking-page { padding-top: 96px; }
 .bk-day.disabled { cursor: not-allowed; opacity: .35; }
 .bk-day-n {
   font-family: var(--font-serif); font-weight: 300; font-size: 2.4rem;
-  text-align: right; line-height: 1;
+  text-align: start; line-height: 1;
 }
 .bk-day-ev {
   margin-top: auto; aspect-ratio: 1.15/1; background-size: cover; background-position: center;
@@ -1241,7 +1241,7 @@ body{font-weight:300;}
 .ed-poster-meta{padding:14px 2px 0;text-align:center;}
 .ed-poster-name{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;}
 .ed-poster-sub{font-size:.72rem;color:var(--ed-mute);margin-top:6px;letter-spacing:.04em;}
-.ed-posters-sq .ed-center{text-align:left;}
+.ed-posters-sq .ed-center{text-align:start;}
 .ed-posters-sq .ed-h{border-bottom:1px solid var(--ed-hair);padding-bottom:16px;margin-bottom:32px;}
 
 /* newsletter band */
@@ -1298,7 +1298,7 @@ body:has(.ed-news) footer .ft-grid,body:has(.ed-news) footer .ft-bottom{border-c
   .ed-intro{gap:40px;}
   .ed-intro-copy{text-align:center;}
   .ed-intro-copy .ed-p{margin-inline:auto;}
-  .ed-facts{text-align:left;}
+  .ed-facts{text-align:start;}
   .ed-tiles{grid-template-columns:1fr;gap:16px;}
   .ed-pkg-copy{padding:0;text-align:center;}
   .ed-pkg-copy .ed-actions{align-items:center;}
@@ -2187,3 +2187,41 @@ html[dir="rtl"] .hub-chev{transform:scaleX(-1);}
 .tk-rules li{font-size:.84rem;line-height:1.55;font-weight:300;margin-bottom:6px;}
 /* the ticket is a document to show at the desk: no floating chat or voice buttons over it */
 body:has(.tk) .cc-fab,body:has(.tk) .vc-fab{display:none;}
+/* ── TEXT ALIGNMENT (owner's rule, 20 Oct 2026) ───────────────────────────────────────────────────────────────────────
+   Text follows its column: a column on the left of the screen is left-aligned, a column on the right is right-aligned.
+   Full-width headings, intros and every repeated card or row (seat cards, posters, programme, form fields, included rows,
+   numbers) sit at the reading edge: left in English, right in Arabic. Nothing is centred except text inside buttons.
+   Logical values do the mirroring: grids flip in Arabic, so "start" is the reading edge and a .flip text column is "end". */
+.cta,.cta-h,.cta-body,.cta-pre,.faq-h,.incl-h,.incl-sub,.tariff-h,.tariff-sub,.specs,.spec,.spec-n,.spec-lbl,.form-h,.form-sub,.form-meta,
+.contact-cell,.ed-center,.ed-intro-copy,.ed-intro-copy .ed-h,.ed-intro-copy .ed-eyebrow,.ed-pkg-copy,.ed-pkg-copy .ed-h,.ed-pkg-vibe,.ed-pkg-time,
+.ed-portrait-copy,.ed-portrait-copy .ed-h,.ed-portrait-copy .ed-sub,.ed-poster-meta,.ed-poster-name,.ed-poster-sub,.ed-tile-label,.ed-tile-cap,
+.ed-news-ok,.ed-news-err,.ed-map-notes,.ed-map-notes p,.ed-map-notes .ed-map-note,.hero-line,.split-text,
+.bk-h1,.bk-review-h,.bk-cart-empty,.bk-hold-bar,.bk-notice,.bk-result,.ticket-card{text-align:start;}
+.ed-center .ed-p,.ed-pkg-copy .ed-p,.ed-pkg-copy .ed-actions,.ed-intro-copy .ed-p,.ed-map-notes p,.ed-map-notes .ed-map-note,.ed-news-form{margin-inline:0;}
+.ed-pkg-copy .ed-actions,.ed-portrait-copy .ed-actions{align-items:flex-start;}
+.cta-row,.form-actions,.ed-center{justify-content:flex-start;}
+.ed-center > .mb,.cta-row{justify-content:flex-start;}
+.bk-review-h{justify-content:flex-start;}
+.bk-legend{justify-content:flex-start;}
+/* Exception (owner, 20 Oct): the closing block on each page is a standalone call-out and is centred, like the newsletter. */
+.cta,.cta .cta-pre,.cta .cta-h,.cta .cta-body,.cta .form-meta{text-align:center;}
+.cta .cta-body,.cta .cta-h,.cta .cta-pre{margin-inline:auto;}
+.cta .cta-row{justify-content:center;}
+@media(max-width:680px){ .cta .cta-row{align-items:center;} }
+/* Exception (owner, 20 Oct): the newsletter is a standalone call-out and stays centred: heading, line, field and button. */
+.ed-news .ed-center,.ed-news .ed-eyebrow,.ed-news .ed-h,.ed-news .ed-p,.ed-news .ed-news-ok,.ed-news .ed-news-err{text-align:center;}
+.ed-news .ed-p{margin-inline:auto;}
+.ed-news .ed-news-form{margin-inline:auto;justify-content:center;}
+/* Buttons line up with the text above them: the old phone rules centred them. */
+@media(max-width:680px){ .ed-news-form .mb{align-self:center;} }
+/* Phones: an old fixed height (60vw) fought the 4:3 shape and shrank image + text photos narrower than their text. They fill the column now. */
+@media(max-width:680px){ .split-prose-img{height:auto;width:100%;} }
+@media(min-width:981px){
+  /* text columns on the right of the screen in English (the left in Arabic) */
+  .ed-pkg.flip .ed-pkg-copy,.ed-pkg.flip .ed-pkg-copy .ed-h,.ed-pkg.flip .ed-pkg-vibe,.ed-pkg.flip .ed-pkg-time,
+  .ed-portrait.flip .ed-portrait-copy,.ed-portrait.flip .ed-portrait-copy .ed-h,.ed-portrait.flip .ed-portrait-copy .ed-sub,
+  .split-prose.flip > .split-prose-copy,.prose > p,.ed-next-body{text-align:end;}
+  .ed-pkg.flip .ed-pkg-copy .ed-p,.ed-portrait.flip .ed-portrait-copy .ed-p,.split-prose.flip > .split-prose-copy .split-prose-p,.prose > p{margin-inline-start:auto;margin-inline-end:0;}
+  .ed-pkg.flip .ed-pkg-copy .ed-actions,.ed-portrait.flip .ed-portrait-copy .ed-actions{align-items:flex-end;margin-inline-start:auto;margin-inline-end:0;}
+  .split-prose.flip > .split-prose-copy{align-items:flex-end;}
+}

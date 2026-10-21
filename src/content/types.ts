@@ -145,7 +145,7 @@ export type Section =
     })
   | (Base & { type: "cta"; pre: L; heading: L; body: L; primary: CtaLink; secondary: CtaLink })
   | (Base & { type: "subhero"; media: string; kicker: L; heading: L; sub: L })
-  | (Base & { type: "prose"; kicker: L; heading: L; paragraphs: L[] })
+  | (Base & { type: "prose"; kicker: L; heading: L; paragraphs: L[]; media?: string })
   | (Base & { type: "map"; kicker: L; heading: L; query: string; address: L; note: L })
   | (Base & { type: "eventsProgramme"; kicker: L; heading: L; sub: L; empty: L })
   | (Base & {

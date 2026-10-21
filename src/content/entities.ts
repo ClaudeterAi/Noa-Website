@@ -21,6 +21,13 @@ export const media: Record<string, MediaSlot> = {
   // Placeholder film: "Aerial panorama of a tourist port at sunset" (Mixkit License, free for commercial use). Replaced by NOA's own edit via the media manager.
   "hero-video": { id: "hero-video", kind: "video", url: "/media/hero-noa.mp4", source: "placeholder" },   // NOA film, 9 s seamless loop, no audio track; placeholder file kept
   "hero-poster": { id: "hero-poster", kind: "image", url: "/media/hero-placeholder.jpg", source: "placeholder" },
+  // Photos for the opening text section of each inner page (70/30 image + text). Unsplash placeholders; NOA replaces them in the admin media manager.
+  "prose-morning": img("prose-morning", u("photo-1582719508461-905c673771fd", 1400), "Pool deck and parasols in the morning", "سطح المسبح والمظلات في الصباح"),
+  "prose-afternoon": img("prose-afternoon", u("photo-1540541338287-41700207dee6", 1400), "Infinity pool above the sea in the afternoon", "مسبح لا متناهٍ فوق البحر بعد الظهر"),
+  "prose-night": img("prose-night", u("photo-1516450360452-9312f5e86fc7", 1400), "The crowd under the stage lights at night", "الحضور تحت أضواء المسرح ليلاً"),
+  "prose-cabana": img("prose-cabana", u("photo-1551882547-ff40c63fe5fa", 1400), "Pool terrace and parasols at dusk", "شرفة المسبح والمظلات عند الغسق"),
+  "prose-about": img("prose-about", u("photo-1518684079-3c830dcef090", 1400), "The Dubai coast from the air", "ساحل دبي من الجو"),
+  "prose-location": img("prose-location", u("photo-1605281317010-fe5ffe798166", 1400), "A boat crossing open water", "قارب يعبر المياه المفتوحة"),
   // Seat photos for the "Choose your seat" carousel on the package pages. Unsplash placeholders; NOA replaces them in the admin media manager.
   "seat-general": img("seat-general", u("photo-1561501900-3701fa6a0864", 900), "Infinity pool with loungers at sunset", "مسبح لا متناهٍ مع كراسي استلقاء عند الغروب"),
   "seat-lounger": img("seat-lounger", u("photo-1584132967334-10e028bd69f7", 900), "Sun loungers on the pool deck", "كراسي تشمّس على سطح المسبح"),
