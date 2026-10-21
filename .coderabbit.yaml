@@ -1,0 +1,37 @@
+# CodeRabbit — review configuration for NOA Dubai (same standards as .gemini/styleguide.md)
+language: "en-GB"
+early_access: false
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches: ["main", "feat/.*", "fix/.*", "chore/.*"]   # stacked PRs get reviewed too
+  path_filters:
+    - "!legacy-static/**"
+    - "!public/media/**"
+    - "!src/fonts/**"
+    - "!drizzle/meta/**"
+    - "!package-lock.json"
+  path_instructions:
+    - path: "src/server/booking.ts"
+      instructions: "This is the seat-hold engine. Flag anything that could let two carts own one seat, any price not read from the database, and any transaction boundary change. The partial unique indexes in src/db/schema.ts are the guarantee; code must not depend on timing."
+    - path: "src/app/api/**"
+      instructions: "Every route must validate input (zod), guard writes (admin requireAdmin, cron CRON_SECRET, webhooks signature), and never expose secrets. Side effects after the response must use after() from next/server."
+    - path: "drizzle/**"
+      instructions: "Migrations must be additive. Flag any DROP, column type change, or NOT NULL added to an existing column unless the PR description explicitly calls out approval."
+    - path: "src/components/**"
+      instructions: "User-facing strings need English and Arabic (src/messages). Check 44px touch targets, keyboard access for modals, and no horizontal overflow at 390px."
+    - path: "src/server/admin/**"
+      instructions: "Refunds and cancellations are admin-only; every mutation must write an audit_log row with before/after."
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns: [".gemini/styleguide.md"]   # one review guide for both reviewers
+chat:
+  auto_reply: true
