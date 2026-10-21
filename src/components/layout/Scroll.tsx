@@ -12,6 +12,9 @@ gsap.registerPlugin(ScrollTrigger);
  * nothing behind (transforms are cleared). Disabled for reduced motion, in the booking app, in the admin, and with
  * ?motion=off for debugging.
  */
+/** Scripts whose letters join (Arabic, Syriac, N'Ko, Arabic presentation forms). */
+const JOINED = /[\u0600-\u06FF\u0700-\u074F\u0750-\u077F\u07C0-\u07FF\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
 function chars(el: HTMLElement) {
   if (el.dataset.chars) return Array.from(el.querySelectorAll<HTMLElement>(".ch"));
   el.dataset.chars = "1";
@@ -23,7 +26,10 @@ function chars(el: HTMLElement) {
         if (!word) continue;
         if (/^\s+$/.test(word)) { frag.appendChild(document.createTextNode(word)); continue; }
         const w = document.createElement("span"); w.className = "chw";
-        for (const c of Array.from(word)) { const s = document.createElement("span"); s.className = "ch"; s.textContent = c; w.appendChild(s); out.push(s); }
+        // Arabic (and other joined scripts) must stay one run per word: a box around each letter breaks the joins
+        // between letters, so those words animate as a whole word instead of letter by letter.
+        const parts = JOINED.test(word) ? [word] : Array.from(word);
+        for (const c of parts) { const s = document.createElement("span"); s.className = "ch"; s.textContent = c; w.appendChild(s); out.push(s); }
         frag.appendChild(w);
       }
       node.parentNode?.replaceChild(frag, node);
