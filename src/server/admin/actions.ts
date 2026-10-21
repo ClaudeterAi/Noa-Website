@@ -1,8 +1,9 @@
 import { mergeVenue, setVenueSnapshot, validateVenue } from "@/lib/venue";
+import { contentFields as contentFieldList, unknownTokens } from "@/lib/content";
 import { enqueueKbSync } from "@/server/events/kb-sync";
 import { and, desc, eq, gte, inArray, isNull, lte, sql } from "drizzle-orm";
 import { db } from "@/db/client";
-import { auditLog, bookingItems, bookings, guests, inventoryUnits, notificationLog, payments, sessions, settings, unitTypes } from "@/db/schema";
+import { contentFields as contentFieldsTable, auditLog, bookingItems, bookings, guests, inventoryUnits, notificationLog, payments, sessions, settings, unitTypes } from "@/db/schema";
 import { cancelBooking } from "@/server/booking";
 import { clearManualTier, setManualTier, type Tier } from "@/server/vip";
 import { stripe } from "@/server/stripe";
@@ -137,6 +138,45 @@ export async function saveVenue(actor: Actor, input: unknown) {
   setVenueSnapshot(v);
   await enqueueKbSync("site", "knowledge", "upsert");   // the voice agent's knowledge document
   return { ok: true as const, venue: v };
+}
+
+/* ---------- page wording (Admin → Content) ---------- */
+
+/** Save an edit to one text. The address must exist, English and Arabic must be filled, venue tokens must be known. */
+export async function saveContentField(actor: Actor, input: { path: string; en: string; ar: string; arReviewed: boolean }) {
+  const field = contentFieldList().find((f) => f.path === input.path);
+  if (!field) return { ok: false as const, errors: ["Unknown text address"] };
+  const en = input.en.trim(), ar = input.ar.trim();
+  const errors: string[] = [];
+  if (!en) errors.push("English is empty");
+  if (!ar) errors.push("Arabic is empty");
+  if (en.length > 5000 || ar.length > 5000) errors.push("Text is longer than 5,000 characters");
+  const bad = [...unknownTokens(en), ...unknownTokens(ar)];
+  if (bad.length) errors.push(`Unknown placeholder: ${[...new Set(bad)].map((t) => `{{${t}}}`).join(", ")}`);
+  if (errors.length) return { ok: false as const, errors };
+  const [before] = await db.select().from(contentFieldsTable).where(eq(contentFieldsTable.path, input.path));
+  const same = en === field.original.en && ar === field.original.ar;
+  if (same) {   // identical to the code's wording: no edit needed, drop any stored one
+    if (before) await db.delete(contentFieldsTable).where(eq(contentFieldsTable.path, input.path));
+  } else {
+    await db.insert(contentFieldsTable).values({ path: input.path, valueEn: en, valueAr: ar, arReviewed: input.arReviewed, updatedBy: actor.email })
+      .onConflictDoUpdate({ target: contentFieldsTable.path, set: { valueEn: en, valueAr: ar, arReviewed: input.arReviewed, updatedBy: actor.email, updatedAt: sql`now()` } });
+  }
+  await audit(actor, "content.update", "content_fields", input.path, before ?? field.original, same ? field.original : { en, ar, arReviewed: input.arReviewed });
+  await enqueueKbSync("site", "knowledge", "upsert");
+  return { ok: true as const };
+}
+
+/** Go back to the wording shipped in the code. */
+export async function resetContentField(actor: Actor, path: string) {
+  const field = contentFieldList().find((f) => f.path === path);
+  if (!field) return { ok: false as const, errors: ["Unknown text address"] };
+  const [before] = await db.select().from(contentFieldsTable).where(eq(contentFieldsTable.path, path));
+  if (!before) return { ok: true as const };
+  await db.delete(contentFieldsTable).where(eq(contentFieldsTable.path, path));
+  await audit(actor, "content.reset", "content_fields", path, before, field.original);
+  await enqueueKbSync("site", "knowledge", "upsert");
+  return { ok: true as const };
 }
 
 /* ---------- pier check-in ---------- */

@@ -207,6 +207,19 @@ export const settings = pgTable("settings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * Page wording edited in Admin → Content. One row per edited text, addressed by a stable path into the content
+ * registry (e.g. "page:location/getting-here/heading"). No row = the wording shipped in the code. Approved 20 Oct 2026.
+ */
+export const contentFields = pgTable("content_fields", {
+  path: text("path").primaryKey(),
+  valueEn: text("value_en").notNull(),
+  valueAr: text("value_ar").notNull(),
+  arReviewed: boolean("ar_reviewed").notNull().default(false),
+  updatedBy: text("updated_by").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 /* numeric kept for future per-session price overrides */
 export const sessionPriceOverrides = pgTable("session_price_overrides", {
   sessionId: uuid("session_id").notNull().references(() => sessions.id),

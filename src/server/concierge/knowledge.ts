@@ -1,5 +1,6 @@
 import { basePrice } from "@/server/events/ticketing";
 import { loadVenue } from "@/server/venue";
+import { loadContent } from "@/server/content";
 import { venueText } from "@/lib/venue";
 import { registry } from "@/content/registry";
 import type { L, Locale, Section } from "@/content/types";
@@ -38,6 +39,7 @@ function sectionText(s: Section, locale: Locale): string[] {
 
 export async function buildKnowledge(locale: Locale): Promise<string> {
   const nightFactor = await getSetting("night_price_factor");
+  await loadContent();   // page edits from Admin → Content reach the concierge too
   const venue = await loadVenue(); const vtE = venueText(venue, "en"), vtA = venueText(venue, "ar");
   const ar = locale === "ar";
   const types = await listUnitTypes();

@@ -7,7 +7,7 @@ import { hrefPath, getPage, pick, registry } from "@/content/registry";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import VenueProvider from "@/components/layout/VenueProvider";
-import { loadVenue } from "@/server/venue";
+import { loadSite } from "@/server/site";
 import Effects from "@/components/layout/Effects";
 import Motion from "@/components/layout/Motion";
 import Scroll from "@/components/layout/Scroll";
@@ -26,7 +26,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const loc = (hasLocale(routing.locales, locale) ? locale : routing.defaultLocale) as Locale;
-  await loadVenue();
+  await loadSite();
   const home = getPage("home");
   return {
     title: { default: pick(home.title, loc), template: loc === "ar" ? "%s · نوا" : "%s · NOA" },
@@ -40,7 +40,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   setRequestLocale(locale);
   const loc = locale as Locale;
   const messages = await getMessages();
-  const venue = await loadVenue();
+  const { venue, content } = await loadSite();
 
   const toLink = (id: (typeof registry.nav.main)[number], menu = false) => {
     const p = getPage(id);
@@ -55,7 +55,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <html lang={loc} dir={DIR[loc]} className={`${barlow.variable} ${plexArabic.variable} ${naskh.variable}`}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <VenueProvider venue={venue}>
+          <VenueProvider venue={venue} content={content}>
           <Effects />
           <Scroll />
           <LiquidGlass />

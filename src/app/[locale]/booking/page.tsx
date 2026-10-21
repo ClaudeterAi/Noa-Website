@@ -5,14 +5,14 @@ import { getPage, pick } from "@/content/registry";
 import { Link } from "@/i18n/navigation";
 import BookingApp from "@/components/booking/BookingApp";
 import MovingBorder from "@/components/ui/MovingBorder";
-import { loadVenue } from "@/server/venue";
+import { loadSite } from "@/server/site";
 import { venueSnapshot, venueText } from "@/lib/venue";
 
 export const dynamic = "force-dynamic"; // the "open soon" / live decision is made per request, not baked at build
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  await loadVenue();
+  await loadSite();
   const page = getPage("booking");
   return { title: { absolute: pick(page.title, locale as Locale) }, description: pick(page.metaDescription, locale as Locale) };
 }
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function BookingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await loadVenue();
+  await loadSite();
   if (!process.env.DATABASE_URL) return <ReservationsSoon locale={locale as Locale} />;
   return <BookingApp />;
 }

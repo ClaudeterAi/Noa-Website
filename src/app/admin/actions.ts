@@ -75,3 +75,25 @@ export async function saveVenueAction(venue: unknown) {
     return ok();
   } catch (e) { return fail(e); }
 }
+
+/** Page wording: save or reset one text, then refresh every page and the concierge. Editor and above. */
+export async function saveContentAction(input: { path: string; en: string; ar: string; arReviewed: boolean }) {
+  try {
+    const actor = await requireAdmin("editor");
+    const r = await A.saveContentField(actor, input);
+    if (!r.ok) return { ok: false as const, error: r.errors.join(" · ") };
+    revalidatePath("/", "layout"); revalidatePath("/[locale]", "layout"); revalidatePath("/admin/content");
+    try { const { processKbSync } = await import("@/server/events/kb-sync"); await processKbSync(); } catch { /* the cron retries */ }
+    return ok();
+  } catch (e) { return fail(e); }
+}
+export async function resetContentAction(path: string) {
+  try {
+    const actor = await requireAdmin("editor");
+    const r = await A.resetContentField(actor, path);
+    if (!r.ok) return { ok: false as const, error: r.errors.join(" · ") };
+    revalidatePath("/", "layout"); revalidatePath("/[locale]", "layout"); revalidatePath("/admin/content");
+    try { const { processKbSync } = await import("@/server/events/kb-sync"); await processKbSync(); } catch { /* the cron retries */ }
+    return ok();
+  } catch (e) { return fail(e); }
+}
