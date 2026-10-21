@@ -329,8 +329,8 @@ export default function BookingApp() {
         <div className="bk-legend" style={mapInset}>
           {legend.map(([k, , style, outline]) => <span key={k}><span className={`bk-legend-swatch${outline ? " is-outline" : ""}`} style={style} />{t(`legend.${k}`)}</span>)}
         </div>
-        <p className="form-meta" style={{ textAlign: "center", marginTop: 18 }}>{t("holdNote", { minutes: holdMinutes })}</p>
-        <div style={{ textAlign: "center", marginTop: 24 }}>
+        <p className="form-meta" style={{ marginTop: 18 }}>{t("holdNote", { minutes: holdMinutes })}</p>
+        <div style={{ marginTop: 24 }}>
           <button type="button" className="bk-floor-next" onClick={() => (cart.length ? goStep(3) : setNotice(t("pickSeatFirst")))}>{t("proceed")}</button>
         </div>
       </section>
@@ -339,7 +339,7 @@ export default function BookingApp() {
       <section id="bkStep3" className={`bk-step-section${step === 3 ? " active" : ""}`}>
         <div style={{ maxWidth: 1100, margin: "0 auto 30px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <button type="button" className="bk-floor-back" onClick={() => (date && slot ? goStep(2) : goStep(1))}>{t("addAnother")}</button>
-          <h2 className="bk-floor-h" style={{ flex: 1, textAlign: "center" }}>{t("reviewPay")}</h2>
+          <h2 className="bk-floor-h bk-review-h" style={{ flex: 1 }}>{t("reviewPay")}</h2>
           <span />
         </div>
         <div className="bk-review-wrap">

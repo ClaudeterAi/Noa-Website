@@ -411,7 +411,7 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
               openFirst={s.openFirst}
               items={s.faqIds.map((id) => ({ id, q: pick(registry.faqs[id].q, locale), a: pick(registry.faqs[id].a, locale) }))}
             />
-            {s.more && <div style={{ textAlign: "center", marginTop: 36 }}><CtaA link={s.more} locale={locale} className="pkg-more" /></div>}
+            {s.more && <div style={{ marginTop: 36 }}><CtaA link={s.more} locale={locale} className="pkg-more" /></div>}
           </div>
         </section>
       );
@@ -443,6 +443,17 @@ export async function SectionRenderer({ section: s, locale }: { section: Section
       );
 
     case "prose":
+      // With a photo it is a 70/30 image + text section like splitProse (image on the left, so pages alternate with the hero above it).
+      if (s.media) return (
+        <section className="split-prose flip prose-media" id={s.id}>
+          <div className="split-prose-img rv" style={bg(s.media)} role="img" aria-label={media[s.media]?.alt?.[locale] ?? ""} />
+          <div className="split-prose-copy rv d1">
+            <div className="split-prose-num">{pick(s.kicker, locale)}</div>
+            <h2 className="split-prose-h"><Rich l={s.heading} locale={locale} /></h2>
+            {s.paragraphs.map((p, i) => <p key={i} className="split-prose-p"><Rich l={p} locale={locale} /></p>)}
+          </div>
+        </section>
+      );
       return (
         <section className="prose rv" id={s.id}>
           <div className="prose-kicker">{pick(s.kicker, locale)}</div>
